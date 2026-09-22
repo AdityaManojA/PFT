@@ -21,6 +21,7 @@ import { renderBudgets } from './views/budgets.js';
 import { renderLogin } from './views/login.js';
 import { renderLanding } from './views/landing.js';
 import { initNotificationCenter, openNotificationDrawer, updateNotificationBadge } from './services/notification-center.js';
+import { CloudVaultSyncService } from './services/cloud-vault-sync.js';
 
 class AppCoordinator {
   constructor() {
@@ -63,13 +64,68 @@ class AppCoordinator {
     await updateNotificationBadge();
     await initNotificationCenter();
 
-    const currentHash = window.location.hash;
+    // Cross-Platform Cloud Vault Sync: pull remote changes & start real-time listener
+    if (user) {
+      dismissIOSInstallBanner(true);
+      CloudVaultSyncService.pullCloudVault(user).then((res) => {
+        if (res && res.success && (res.addedAccounts > 0 || res.addedTxns > 0)) {
+          this.refreshCurrentView();
+        }
+      }).catch(err => console.log('[CloudVaultSync] Init pull deferred:', err));
+
+      CloudVaultSyncService.initRealtimeSync(user, () => {
+        this.refreshCurrentView();
+      });
+    }
+
+    // iOS / Safari: re-sync whenever app comes back to foreground
+    // (iOS kills Firestore WebSocket connections in background)
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible') {
+        const activeUser = await getCurrentUser();
+        if (!activeUser) return;
+        // Re-pull latest data and reinit the realtime listener (iOS may have killed it)
+        CloudVaultSyncService.pullCloudVault(activeUser).then((res) => {
+          if (res && res.success && (res.addedAccounts > 0 || res.addedTxns > 0)) {
+            this.showToast(`Cloud synced: +${res.addedAccounts} accounts, +${res.addedTxns} txns`, 'success');
+            this.refreshCurrentView();
+          }
+        }).catch(() => {});
+        // Re-init realtime listener in case iOS killed it
+        CloudVaultSyncService.initRealtimeSync(activeUser, () => {
+          this.refreshCurrentView();
+        });
+      }
+    });
+
+    // Safari BFCache: page restored from cache (e.g. swipe back on iOS)
+    window.addEventListener('pageshow', async (e) => {
+      if (e.persisted) {
+        const activeUser = await getCurrentUser();
+        if (!activeUser) return;
+        CloudVaultSyncService.pullCloudVault(activeUser).then((res) => {
+          if (res && res.success && (res.addedAccounts > 0 || res.addedTxns > 0)) {
+            this.refreshCurrentView();
+          }
+        }).catch(() => {});
+      }
+    });
+
+    const initialHash = window.location.hash;
+    const initialPath = window.location.pathname.replace(/^\/+|\/+$/g, '');
+    let initialRoute = (initialHash.replace(/^#\/?/, '').split('?')[0]) || initialPath;
+
+    // Immediately remove # from address bar if user entered with https://sbafa-ft.web.app/#/landing
+    if (initialHash) {
+      const cleanPath = initialRoute ? `/${initialRoute}` : '/';
+      window.history.replaceState(null, '', cleanPath);
+    }
 
     if (!user) {
-      if (currentHash === '#/login') {
-        this.navigate('#/login');
+      if (initialRoute === 'login') {
+        this.navigate('login', false);
       } else {
-        this.navigate(currentHash || '#/landing');
+        this.navigate(initialRoute || 'landing', false);
       }
       return;
     }
@@ -79,7 +135,7 @@ class AppCoordinator {
     if (isLocked) {
       this.showBiometricLockScreen();
     } else {
-      this.navigate(window.location.hash || '#/dashboard');
+      this.navigate(initialRoute || 'dashboard', false);
     }
   }
 
@@ -169,24 +225,75 @@ class AppCoordinator {
   }
 
   setupRouting() {
+    window.__sbafaNavigate = (target) => this.navigate(target, true);
+
+    // Browser back/forward navigation
+    window.addEventListener('popstate', () => {
+      const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+      this.navigate(path, false);
+    });
+
+    // Hash fallback: immediately cleanse # from address bar
     window.addEventListener('hashchange', () => {
-      this.navigate(window.location.hash);
+      const hash = window.location.hash;
+      if (hash) {
+        const clean = hash.replace(/^#\/?/, '');
+        this.navigate(clean, true);
+      }
+    });
+
+    // Intercept clicks on links with #/ or internal /
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (!href || href.startsWith('mailto:') || href.startsWith('tel:') || link.target === '_blank') return;
+
+      if (href.startsWith('#/')) {
+        e.preventDefault();
+        const route = href.replace(/^#\/?/, '');
+        this.navigate(route, true);
+      } else if (href.startsWith('/') && !href.startsWith('//')) {
+        e.preventDefault();
+        const route = href.replace(/^\/+/, '');
+        this.navigate(route, true);
+      }
     });
 
     // Tab bar clicks
     document.querySelectorAll('.nav-item').forEach(btn => {
       btn.onclick = () => {
         const route = btn.dataset.route;
-        window.location.hash = `#/${route}`;
+        this.navigate(route, true);
       };
     });
   }
 
-  async navigate(hash = '#/dashboard') {
-    const rawRoute = hash.replace(/^#\/?/, '').split('?')[0];
+  async navigate(pathOrHash = '/dashboard', updateHistory = true) {
+    const rawRoute = String(pathOrHash || '')
+      .replace(/^#\/?/, '')
+      .replace(/^\/+/, '')
+      .split('?')[0];
     const user = await getCurrentUser();
-    const route = rawRoute || (user ? 'dashboard' : 'landing');
+    let route = rawRoute || (user ? 'dashboard' : 'landing');
+    if (!user && route !== 'login' && route !== 'landing') {
+      route = 'landing';
+    }
     this.currentRoute = route;
+
+    // Maintain clean URL without # in address bar
+    const cleanPath = `/${route}`;
+    if (updateHistory) {
+      if (window.location.hash) {
+        window.history.replaceState(null, '', cleanPath);
+      } else if (window.location.pathname !== cleanPath && window.location.pathname !== '/') {
+        window.history.pushState(null, '', cleanPath);
+      } else if (window.location.pathname === '/' && route === 'landing') {
+        // Keep root clean
+      } else if (window.location.pathname !== cleanPath) {
+        window.history.replaceState(null, '', cleanPath);
+      }
+    }
 
     // Toggle bottom nav visibility on login or landing screens
     if (this.bottomNav) {
@@ -242,8 +349,27 @@ class AppCoordinator {
   async handleLoginSuccess(user) {
     this.updateHeaderUserProfile(user);
     await updateNotificationBadge();
+    dismissIOSInstallBanner(true);
+
+    // Cross-Platform Cloud Vault Sync upon sign-in
+    try {
+      // Push first to ensure userId is written to cloud (needed for cross-device restore)
+      await CloudVaultSyncService.pushLocalVault(user);
+
+      // Then pull any remote changes that might have arrived from another device
+      const res = await CloudVaultSyncService.pullCloudVault(user);
+      if (res && res.success && (res.addedAccounts > 0 || res.addedTxns > 0)) {
+        this.showToast(`Cloud Vault synced across devices (+${res.addedAccounts} accounts, +${res.addedTxns} txns)`, 'success');
+      }
+      CloudVaultSyncService.initRealtimeSync(user, () => {
+        this.refreshCurrentView();
+      });
+    } catch (err) {
+      console.warn('[CloudVaultSync] Login sync error:', err);
+    }
+
     this.showToast(`Logged in as ${user.name}!`, 'success');
-    window.location.hash = '#/dashboard';
+    this.navigate('dashboard', true);
   }
 
   setupGlobalControls() {
@@ -252,13 +378,13 @@ class AppCoordinator {
     if (brandLink) {
       brandLink.onclick = async () => {
         const user = await getCurrentUser();
-        window.location.hash = user ? '#/dashboard' : '#/landing';
+        this.navigate(user ? 'dashboard' : 'landing', true);
       };
       brandLink.onkeydown = async (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           const user = await getCurrentUser();
-          window.location.hash = user ? '#/dashboard' : '#/landing';
+          this.navigate(user ? 'dashboard' : 'landing', true);
         }
       };
     }
@@ -267,7 +393,7 @@ class AppCoordinator {
     const landingBtn = document.getElementById('header-landing-btn');
     if (landingBtn) {
       landingBtn.onclick = () => {
-        window.location.hash = '#/landing';
+        this.navigate('landing', true);
       };
     }
 
@@ -324,7 +450,7 @@ class AppCoordinator {
       // Cmd+K or Ctrl+K -> Search Ledger
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        window.location.hash = '#/transactions';
+        this.navigate('transactions', true);
         setTimeout(() => {
           const searchInput = document.getElementById('txns-search-input');
           if (searchInput) searchInput.focus();
@@ -334,7 +460,7 @@ class AppCoordinator {
       // Cmd+N or Ctrl+N -> Add Expense
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'n') {
         e.preventDefault();
-        window.location.hash = '#/add';
+        this.navigate('add', true);
       }
 
       // Cmd+L or Ctrl+L -> Lock app
@@ -354,7 +480,7 @@ class AppCoordinator {
 
     const currentUser = await getCurrentUser();
     if (!currentUser) {
-      window.location.hash = '#/login';
+      this.navigate('login', true);
       return;
     }
 
@@ -413,6 +539,10 @@ class AppCoordinator {
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button id="sheet-sync-cloud-btn" class="btn btn-secondary btn-block" style="padding: 11px; display: flex; align-items: center; justify-content: center; gap: 8px; border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.08);">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+              <span>Sync Cloud Vault Now (Cross-Platform)</span>
+            </button>
             <button id="sheet-add-bank-btn" class="btn btn-secondary btn-block" style="padding: 11px;">
               💳 Manage / Add Bank Accounts
             </button>
@@ -432,6 +562,26 @@ class AppCoordinator {
       if (e.target.id === 'profile-sheet-backdrop') modalContainer.innerHTML = '';
     };
 
+    const syncCloudBtn = document.getElementById('sheet-sync-cloud-btn');
+    if (syncCloudBtn) {
+      syncCloudBtn.onclick = async () => {
+        syncCloudBtn.disabled = true;
+        syncCloudBtn.innerHTML = '<span>🔄 Syncing with Cloud...</span>';
+        try {
+          await CloudVaultSyncService.pushLocalVault(currentUser);
+          const pullRes = await CloudVaultSyncService.pullCloudVault(currentUser);
+          const added = (pullRes.addedAccounts || 0) + (pullRes.addedTxns || 0);
+          this.showToast(added > 0 ? `Cloud synced: +${added} remote records merged!` : 'Cloud Vault is fully up to date!', 'success');
+          this.refreshCurrentView();
+        } catch (err) {
+          this.showToast(`Sync error: ${err.message}`, 'info');
+        } finally {
+          syncCloudBtn.disabled = false;
+          syncCloudBtn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg> <span>Sync Cloud Vault Now (Cross-Platform)</span>';
+        }
+      };
+    }
+
     const autofillChk = document.getElementById('profile-autofill-chk');
     if (autofillChk) {
       autofillChk.onchange = async () => {
@@ -448,7 +598,7 @@ class AppCoordinator {
 
     document.getElementById('sheet-add-bank-btn').onclick = () => {
       modalContainer.innerHTML = '';
-      window.location.hash = '#/accounts';
+      this.navigate('accounts', true);
     };
 
     const resetAccountBtn = document.getElementById('sheet-reset-account-btn');
@@ -456,21 +606,22 @@ class AppCoordinator {
       resetAccountBtn.onclick = () => {
         promptPinAuthModal(currentUser, 'permanently reset your full account and purge all data for a fresh start', async () => {
           await resetUserData(currentUser.id);
-          localStorage.removeItem('sbafa_last_gmail_sync');
+          localStorage.removeItem('sbafa-last_gmail_sync');
           this.showToast('Full account reset complete. All data cleared — ready for a fresh statement!', 'success');
           modalContainer.innerHTML = '';
-          window.location.hash = '#/accounts';
+          this.navigate('accounts', true);
           this.refreshCurrentView();
         });
       };
     }
 
     document.getElementById('logout-btn').onclick = () => {
+      CloudVaultSyncService.stopRealtimeSync();
       setCurrentUser(null);
       this.updateHeaderUserProfile(null);
       modalContainer.innerHTML = '';
       this.showToast('Logged out successfully.', 'info');
-      window.location.hash = '#/login';
+      this.navigate('login', true);
       this.refreshCurrentView();
     };
   }
@@ -478,6 +629,17 @@ class AppCoordinator {
   handleNetworkChange(isOnline) {
     if (this.offlineBanner) {
       this.offlineBanner.style.display = isOnline ? 'none' : 'flex';
+    }
+    if (isOnline) {
+      getCurrentUser().then(user => {
+        if (user) {
+          CloudVaultSyncService.pullCloudVault(user).then(res => {
+            if (res && res.success && (res.addedAccounts > 0 || res.addedTxns > 0)) {
+              this.refreshCurrentView();
+            }
+          }).catch(e => console.warn('[CloudVaultSync] Online pull deferred:', e));
+        }
+      });
     }
   }
 

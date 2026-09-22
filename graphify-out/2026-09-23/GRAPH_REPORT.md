@@ -1,24 +1,24 @@
 # Graph Report - PFT  (2026-09-23)
 
 ## Corpus Check
-- 41 files · ~43,960 words
+- 42 files · ~45,929 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 7 file(s) not represented in the graph (top: (none) 3, .css 3, .example 1)
+- Unclassified: 8 file(s) not represented in the graph (top: (none) 3, .css 3, .example 1)
 
 ## Summary
-- 327 nodes · 747 edges · 25 communities (14 shown, 11 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.85)
+- 340 nodes · 804 edges · 24 communities (14 shown, 10 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d45db4dc`
+- Built from commit: `5dc7b38f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- createParticleMesh
-- accounts.js
 - app.js
+- accounts.js
+- getCurrentUser
 - dashboard.js
 - categorizer.js
 - manifest.json
@@ -28,16 +28,15 @@
 - rules/graphify.md
 - workflows/graphify.md
 - sw.js
-- login.js
+- BiometricAuthService
 - Design Scout
 - pwa_maker_skill_finance_tracker.md
 - db.js
 - Graphify + Antigravity Project Workflow & Setup Guide
 - index.js
-- test_verification.mjs
 
 ## God Nodes (most connected - your core abstractions)
-1. `getCurrentUser()` - 32 edges
+1. `getCurrentUser()` - 39 edges
 2. `renderAccounts()` - 27 edges
 3. `formatINR()` - 20 edges
 4. `BankPDFParser` - 20 edges
@@ -63,23 +62,27 @@
 ## Import Cycles
 - None detected.
 
-## Communities (25 total, 11 thin omitted)
+## Communities (24 total, 10 thin omitted)
+
+### Community 0 - "app.js"
+Cohesion: 0.16
+Nodes (9): escapeHtml(), drainOfflineQueue(), getAllUsers(), checkAndRenderIOSInstallPrompt(), dismissIOSInstallBanner(), initPWAEngine(), promptPWAInstall(), createParticleMesh() (+1 more)
 
 ### Community 1 - "accounts.js"
-Cohesion: 0.12
-Nodes (24): addNotification(), addStatementUploadHistory(), getStatementUploadHistory(), resetUserData(), BankPDFParser, GmailStatementSyncService, confirmDeleteAccountModal(), confirmRemovePasskeyModal() (+16 more)
+Cohesion: 0.13
+Nodes (21): resetUserData(), BankPDFParser, GmailStatementSyncService, confirmDeleteAccountModal(), confirmRemovePasskeyModal(), escapeHtml(), findAccountByBankAndLast4(), handleUploadedFile() (+13 more)
 
-### Community 2 - "app.js"
-Cohesion: 0.14
-Nodes (11): AppCoordinator, escapeHtml(), BiometricAuthService, drainOfflineQueue(), getAllUsers(), purgeAllTestData(), seedInitialDataIfNeeded(), checkAndRenderIOSInstallPrompt() (+3 more)
+### Community 2 - "getCurrentUser"
+Cohesion: 0.19
+Nodes (8): AppCoordinator, addStatementUploadHistory(), getCurrentUser(), getStatementUploadHistory(), notifyCloudSync(), triggerCloudSync(), CloudVaultSyncService, isSyncing
 
 ### Community 3 - "dashboard.js"
-Cohesion: 0.20
-Nodes (21): openEditTransactionModal(), addTransaction(), formatINR(), getActiveAccountFilter(), getUserAccounts(), setActiveAccountFilter(), getCategoryMeta(), escapeHtml() (+13 more)
+Cohesion: 0.19
+Nodes (22): escapeHtml(), openEditTransactionModal(), addTransaction(), formatINR(), getActiveAccountFilter(), getUserAccounts(), setActiveAccountFilter(), getCategoryMeta() (+14 more)
 
 ### Community 4 - "categorizer.js"
-Cohesion: 0.13
-Nodes (14): escapeHtml(), db, BankStatementParser, ALL_CATEGORIES, categorizeTransaction(), CATEGORY_DEFINITIONS, detectMCC(), extractCleanMerchant() (+6 more)
+Cohesion: 0.14
+Nodes (12): BankStatementParser, ALL_CATEGORIES, categorizeTransaction(), CATEGORY_DEFINITIONS, detectMCC(), extractCleanMerchant(), formatTitleCase(), NPCI_MCC_MAP (+4 more)
 
 ### Community 5 - "manifest.json"
 Cohesion: 0.12
@@ -94,12 +97,12 @@ Cohesion: 0.22
 Nodes (9): csv, os, pypdf, re, batch_decrypt_directory(), decrypt_pdf(), Bank Email Statement Streamliner & Auto-Decryptor…, Decrypt a password-protected bank PDF statement. (+1 more)
 
 ### Community 8 - "auth.js"
-Cohesion: 0.20
-Nodes (5): FirebaseAuthService, GoogleAuthService, firebaseConfig, loadFirebaseConfig(), ref_https
+Cohesion: 0.13
+Nodes (10): FirebaseAuthService, db, firebaseConfig, loadFirebaseConfig(), ref_fs, ref_https, ref_path, checkFiles() (+2 more)
 
-### Community 12 - "login.js"
-Cohesion: 0.61
-Nodes (7): findUserByEmail(), loginUser(), registerUser(), setCurrentUser(), escapeHtml(), promptRegistrationGoogleStep(), renderLogin()
+### Community 12 - "BiometricAuthService"
+Cohesion: 0.24
+Nodes (9): BiometricAuthService, GoogleAuthService, findUserByEmail(), loginUser(), registerUser(), setCurrentUser(), escapeHtml(), promptRegistrationGoogleStep() (+1 more)
 
 ### Community 15 - "Design Scout"
 Cohesion: 0.10
@@ -110,36 +113,32 @@ Cohesion: 0.14
 Nodes (13): 1. Project Overview & Architecture, 2. Web App Manifest (`public/manifest.json`), 3. iOS Native Fit & HTML Meta Tags, 4. Service Worker & Caching Strategy Matrix, 5. Offline Architecture & IndexedDB Sync Queue, 6. PWA Mobile UX Guidelines, 7. iOS Custom Install Prompt Component, 8. Feature Core & Execution Checklist (+5 more)
 
 ### Community 17 - "db.js"
-Cohesion: 0.14
-Nodes (31): AppDatabase, deleteNotification(), getCurrentUser(), getUnreadNotificationCount(), getUserBudgets(), getUserNotifications(), getUserSpendingCap(), getUserTransactions() (+23 more)
+Cohesion: 0.12
+Nodes (33): addNotification(), AppDatabase, deleteNotification(), getUnreadNotificationCount(), getUserBudgets(), getUserNotifications(), getUserSpendingCap(), getUserTransactions() (+25 more)
 
 ### Community 22 - "index.js"
 Cohesion: 0.10
 Nodes (21): admin, getTransporter(), monthEndExpenseReminder(), nodemailer, { onRequest }, { onSchedule }, sendAlertEmail(), dependencies (+13 more)
 
-### Community 23 - "test_verification.mjs"
-Cohesion: 0.33
-Nodes (5): ref_fs, ref_path, checkFiles(), parsed, testHeaders
-
 ## Knowledge Gaps
-- **79 isolated node(s):** `{ onSchedule }`, `{ onRequest }`, `admin`, `nodemailer`, `name` (+74 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 119 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **11 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **80 isolated node(s):** `{ onSchedule }`, `{ onRequest }`, `admin`, `nodemailer`, `name` (+75 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 120 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getCurrentUser()` connect `db.js` to `createParticleMesh`, `accounts.js`, `app.js`, `dashboard.js`, `categorizer.js`, `login.js`?**
-  _High betweenness centrality (0.047) - this node is a cross-community bridge._
-- **Why does `BankPDFParser` connect `accounts.js` to `app.js`, `categorizer.js`, `test_verification.mjs`?**
-  _High betweenness centrality (0.044) - this node is a cross-community bridge._
-- **Why does `FirebaseAuthService` connect `auth.js` to `categorizer.js`?**
-  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+- **Why does `getCurrentUser()` connect `getCurrentUser` to `app.js`, `accounts.js`, `dashboard.js`, `auth.js`, `BiometricAuthService`, `db.js`?**
+  _High betweenness centrality (0.066) - this node is a cross-community bridge._
+- **Why does `BankPDFParser` connect `accounts.js` to `app.js`, `auth.js`, `categorizer.js`?**
+  _High betweenness centrality (0.043) - this node is a cross-community bridge._
+- **Why does `FirebaseAuthService` connect `auth.js` to `getCurrentUser`?**
+  _High betweenness centrality (0.032) - this node is a cross-community bridge._
 - **What connects `{ onSchedule }`, `{ onRequest }`, `admin` to the rest of the system?**
-  _79 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _80 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `accounts.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.12070874861572536 - nodes in this community are weakly interconnected._
-- **Should `app.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.14112903225806453 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.1282051282051282 - nodes in this community are weakly interconnected._
 - **Should `categorizer.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.12561576354679804 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.14130434782608695 - nodes in this community are weakly interconnected._
+- **Should `manifest.json` be split into smaller, more focused modules?**
+  _Cohesion score 0.125 - nodes in this community are weakly interconnected._

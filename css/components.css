@@ -131,7 +131,9 @@
   letter-spacing: -0.01em;
   user-select: none;
   text-decoration: none;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .btn:focus-visible {
@@ -267,6 +269,9 @@
 .btn-block {
   width: 100%;
   display: flex;
+  box-sizing: border-box;
+  white-space: normal;
+  text-align: center;
 }
 
 .btn-sm {
@@ -277,10 +282,18 @@
 }
 
 .btn-lg {
-  padding: 13px 22px;
+  padding: 13px 20px;
   font-size: var(--text-base);
   border-radius: var(--radius-lg);
   font-weight: 700;
+  line-height: 1.35;
+}
+
+@media (max-width: 480px) {
+  .btn-lg {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
 }
 
 .btn-icon {
@@ -532,17 +545,22 @@
 
 /* iOS Banner */
 .ios-install-banner {
+  display: flex;
+  flex-direction: column;
+  position: relative;
   margin: 12px 18px;
-  padding: 14px 16px;
+  padding: 14px 44px 14px 16px;
   background: var(--bg-surface-elevated);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
 }
 
 .ios-install-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px;
   margin-bottom: 6px;
 }
 
@@ -552,12 +570,39 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  color: var(--text-primary);
+}
+
+.ios-install-dismiss {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg-deep, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.ios-install-dismiss:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
 }
 
 .ios-install-text {
   font-size: 11px;
   color: var(--text-muted);
-  line-height: 1.4;
+  line-height: 1.45;
+  margin: 0;
 }
 
 /* ==========================================================================
@@ -886,7 +931,7 @@
 }
 
 .account-toggle-pill {
-  padding: 5px 12px;
+  padding: 6px 14px;
   font-size: 11.5px;
   font-weight: 600;
   border-radius: var(--radius-full);
@@ -898,18 +943,56 @@
   white-space: nowrap;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
+  user-select: none;
+}
+
+.account-toggle-pill .pill-full-label {
+  display: inline;
+}
+
+.account-toggle-pill .pill-short-label {
+  display: none;
+}
+
+.bank-pill-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.bank-pill-icon {
+  font-size: 11.5px;
+  flex-shrink: 0;
+}
+
+.bank-pill-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.bank-pill-digits {
+  font-family: var(--font-family-mono, monospace);
+  font-size: 10px;
+  opacity: 0.85;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
 }
 
 .account-toggle-pill:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .account-toggle-pill.active {
   background: var(--accent-primary);
   color: #FFFFFF;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   font-weight: 700;
 }
 
@@ -941,7 +1024,7 @@
   border-color: var(--accent-primary);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .account-switcher-wrapper {
     flex-direction: column;
     align-items: stretch;
@@ -950,23 +1033,58 @@
     margin-bottom: 14px;
   }
 
+  .account-switcher-label {
+    font-size: 10px;
+    gap: 5px;
+  }
+
   .account-toggle-pills {
     width: 100%;
-    display: flex;
-    justify-content: space-between;
-    gap: 4px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3px;
     padding: 3px;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .account-toggle-pill {
-    flex: 1;
+    width: 100%;
+    min-width: 0;
+    padding: 7px 4px;
+    font-size: 11px;
+    font-weight: 600;
     text-align: center;
     justify-content: center;
-    padding: 6px 6px;
+    border-radius: var(--radius-full);
+    box-sizing: border-box;
+  }
+
+  .account-toggle-pill .pill-full-label {
+    display: none;
+  }
+
+  .account-toggle-pill .pill-short-label {
+    display: inline;
+    font-weight: 700;
+  }
+
+  .bank-pill-content {
+    gap: 2px;
+    justify-content: center;
+  }
+
+  .bank-pill-icon {
+    display: none; /* Hide emoji on mobile to allow clear readability of bank name and last 4 */
+  }
+
+  .bank-pill-name {
     font-size: 11px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  }
+
+  .bank-pill-digits {
+    font-size: 9.5px;
+    opacity: 0.8;
   }
 
   .account-switcher-dropdown-container {

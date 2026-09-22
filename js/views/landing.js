@@ -236,7 +236,7 @@ export async function renderLanding(container) {
   if (_meshCleanup) { _meshCleanup(); _meshCleanup = null; }
 
   const currentUser = await getCurrentUser();
-  const ctaRoute = currentUser ? '#/dashboard' : '#/login';
+  const ctaRoute = currentUser ? '/dashboard' : '/login';
   const ctaText  = currentUser ? 'Enter Dashboard →' : 'Launch Vault →';
 
   container.innerHTML = `
@@ -281,7 +281,7 @@ export async function renderLanding(container) {
             </button>
             ${!currentUser ? `
               <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                Have an account? <a href="#/login" style="color: var(--accent-primary); font-weight: 700; text-decoration: none;">Login</a>
+                Have an account? <a href="/login" style="color: var(--accent-primary); font-weight: 700; text-decoration: none;">Login</a>
               </div>
             ` : ''}
           </div>
@@ -428,10 +428,22 @@ export async function renderLanding(container) {
 
   // ── Button listeners ──────────────────────────────────────
   const launchBtn = document.getElementById('landing-launch-btn');
-  if (launchBtn) launchBtn.onclick = () => { window.location.hash = ctaRoute; };
+  if (launchBtn) launchBtn.onclick = () => {
+    if (window.__sbafaNavigate) {
+      window.__sbafaNavigate(ctaRoute);
+    } else {
+      window.location.href = ctaRoute;
+    }
+  };
 
   const bottomCtaBtn = document.getElementById('landing-bottom-cta-btn');
-  if (bottomCtaBtn) bottomCtaBtn.onclick = () => { window.location.hash = ctaRoute; };
+  if (bottomCtaBtn) bottomCtaBtn.onclick = () => {
+    if (window.__sbafaNavigate) {
+      window.__sbafaNavigate(ctaRoute);
+    } else {
+      window.location.href = ctaRoute;
+    }
+  };
 
   const exploreArchBtn = document.getElementById('landing-explore-arch-btn');
   if (exploreArchBtn) {

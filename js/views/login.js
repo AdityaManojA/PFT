@@ -4,8 +4,9 @@
  * Combines 6-digit Knowledge PIN with Google Authentication / Biometric device passkey.
  */
 
-import { loginUser, registerUser, getCurrentUser, setCurrentUser, findUserByEmail } from '../db.js';
+import { loginUser, registerUser, getCurrentUser, setCurrentUser, findUserByEmail, db } from '../db.js';
 import { GoogleAuthService, BiometricAuthService } from '../auth.js';
+import { CloudVaultSyncService } from '../services/cloud-vault-sync.js';
 
 let activeAuthTab = 'login'; // 'login' or 'signup'
 
@@ -186,8 +187,8 @@ export async function renderLogin(container, onLoginSuccess) {
             </label>
           </div>
 
-          <button type="submit" id="signup-submit-btn" class="btn btn-primary btn-lg btn-block">
-            Proceed to Step 2: Register Google 2FA →
+          <button type="submit" id="signup-submit-btn" class="btn btn-primary btn-lg btn-block" style="white-space: normal; padding: 12px 14px; line-height: 1.35; font-size: 14px; text-align: center; justify-content: center; box-sizing: border-box;">
+            <span>Proceed to Step 2: Register Google 2FA →</span>
           </button>
         </form>
 
@@ -279,13 +280,23 @@ export async function renderLogin(container, onLoginSuccess) {
   const googleBtn = container.querySelector('#google-signin-btn');
   if (googleBtn) {
     googleBtn.onclick = async () => {
+      googleBtn.disabled = true;
+      const originalHTML = googleBtn.innerHTML;
+      googleBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24">${googleBtn.querySelector('svg').innerHTML}</svg><span>Signing in...</span>`;
+
       try {
         const googleProfile = await GoogleAuthService.signInWithGoogle();
-        if (!googleProfile || !googleProfile.email) return;
+        if (!googleProfile || !googleProfile.email) {
+          googleBtn.disabled = false;
+          googleBtn.innerHTML = originalHTML;
+          return;
+        }
 
-        const existing = await findUserByEmail(googleProfile.email);
+        // 1. Check if user exists locally
+        let existing = await findUserByEmail(googleProfile.email);
+
         if (existing) {
-          // If Google provides an image, save it immediately so it's always up to date
+          // Update profile picture if newer
           if (googleProfile.picture && (existing.picture !== googleProfile.picture || existing.photoURL !== googleProfile.picture)) {
             await db.users.update(existing.id, {
               picture: googleProfile.picture,
@@ -294,20 +305,35 @@ export async function renderLogin(container, onLoginSuccess) {
             existing.picture = googleProfile.picture;
             existing.photoURL = googleProfile.picture;
           }
-          // Direct login for existing users via Google
           setCurrentUser(existing);
           if (onLoginSuccess) onLoginSuccess(existing);
-        } else {
-          // If no account exists yet, direct to registration tab and pre-fill Google PFP
-          tabSignup.click();
-          const signupName = container.querySelector('#signup-name');
-          const signupEmail = container.querySelector('#signup-email');
-          if (signupName && !signupName.value) signupName.value = googleProfile.name || '';
-          if (signupEmail && !signupEmail.value) signupEmail.value = googleProfile.email || '';
-          window.__pendingGooglePicture = googleProfile.picture || '';
-          showSignupErr(`No vault found for ${googleProfile.email}. Please set your 6-digit PIN below to finalize your vault.`);
+          return;
         }
+
+        // 2. No local user found — try restoring from cloud vault (cross-device login)
+        googleBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24">${originalHTML.match(/<svg[^>]*>([\s\S]*?)<\/svg>/)?.[1] || ''}</svg><span>Restoring vault from cloud...</span>`;
+        const restored = await CloudVaultSyncService.restoreFromCloudVault(googleProfile.email, googleProfile);
+
+        if (restored) {
+          // Cloud vault found and restored — log them in directly!
+          setCurrentUser(restored);
+          if (onLoginSuccess) onLoginSuccess(restored);
+          return;
+        }
+
+        // 3. Truly no vault anywhere — prompt registration
+        googleBtn.disabled = false;
+        googleBtn.innerHTML = originalHTML;
+        tabSignup.click();
+        const signupName = container.querySelector('#signup-name');
+        const signupEmail = container.querySelector('#signup-email');
+        if (signupName && !signupName.value) signupName.value = googleProfile.name || '';
+        if (signupEmail && !signupEmail.value) signupEmail.value = googleProfile.email || '';
+        window.__pendingGooglePicture = googleProfile.picture || '';
+        showSignupErr(`No vault found for ${googleProfile.email}. Please set your 6-digit PIN below to finalize your vault.`);
       } catch (err) {
+        googleBtn.disabled = false;
+        googleBtn.innerHTML = originalHTML;
         if (err && err.message && !err.message.includes('cancelled') && !err.message.includes('closed')) {
           showLoginErr(err.message);
         }
@@ -427,10 +453,10 @@ function promptRegistrationGoogleStep(pendingData, onLoginSuccess) {
 
   modalContainer.innerHTML = `
     <div class="modal-backdrop active" id="register-google-backdrop">
-      <div class="modal-sheet" style="max-width: 440px; text-align: center;">
+      <div class="modal-sheet" style="max-width: 440px; width: 100%; box-sizing: border-box; text-align: center; padding: 22px 16px max(24px, env(safe-area-inset-bottom, 24px)) 16px;">
         <div class="sheet-handle"></div>
 
-        <div style="width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #4285F4, #1D4ED8); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 12px auto; box-shadow: 0 4px 16px rgba(66, 133, 244, 0.35);">
+        <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #4285F4, #1D4ED8); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px auto; box-shadow: 0 4px 16px rgba(66, 133, 244, 0.35);">
           🛡️
         </div>
 
@@ -438,12 +464,12 @@ function promptRegistrationGoogleStep(pendingData, onLoginSuccess) {
         <h3 style="font-size: var(--text-lg); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
           Register Google Authentication
         </h3>
-        <p style="font-size: var(--text-xs); color: var(--text-muted); line-height: 1.5; margin-bottom: 18px;">
-          Vault prepared for <strong>${escapeHtml(pendingData.name)}</strong> (<code>${escapeHtml(pendingData.email)}</code>).<br/>
+        <p style="font-size: var(--text-xs); color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; word-break: break-word;">
+          Vault prepared for <strong>${escapeHtml(pendingData.name)}</strong> (<code style="word-break: break-all;">${escapeHtml(pendingData.email)}</code>).<br/>
           Link your Google Account as your compulsory two-factor authentication key to finalize and lock your vault.
         </p>
 
-        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 20px; text-align: left; font-size: 11.5px; line-height: 1.4; color: var(--text-secondary);">
+        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 18px; text-align: left; font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); word-break: break-word;">
           <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
             <span>🔐</span> Zero-Knowledge 2FA Guarantee
           </div>
@@ -451,10 +477,10 @@ function promptRegistrationGoogleStep(pendingData, onLoginSuccess) {
         </div>
 
         <!-- Custom In-App Error Banner -->
-        <div id="register-google-error" style="display: none; color: var(--signal-expense); font-size: 11.5px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 14px; text-align: center;"></div>
+        <div id="register-google-error" style="display: none; color: var(--signal-expense); font-size: 11.5px; line-height: 1.4; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 14px; text-align: center; word-break: break-word;"></div>
 
-        <button id="register-google-btn" class="btn btn-google btn-lg btn-block" style="margin-bottom: 10px;">
-          <svg width="20" height="20" viewBox="0 0 24 24">
+        <button id="register-google-btn" class="btn btn-google btn-lg btn-block" style="white-space: normal; padding: 12px 14px; line-height: 1.35; font-size: 14px; margin-bottom: 12px; gap: 8px; text-align: center; justify-content: center; box-sizing: border-box;">
+          <svg width="20" height="20" viewBox="0 0 24 24" style="flex-shrink: 0;">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
@@ -463,7 +489,7 @@ function promptRegistrationGoogleStep(pendingData, onLoginSuccess) {
           <span>Link Google Account &amp; Finalize Vault →</span>
         </button>
 
-        <button id="register-google-cancel-btn" class="btn btn-ghost btn-sm" style="color: var(--text-muted);">
+        <button id="register-google-cancel-btn" class="btn btn-ghost btn-sm" style="color: var(--text-muted); padding: 8px 14px;">
           ← Back to Edit Details
         </button>
       </div>
@@ -502,7 +528,7 @@ function promptRegistrationGoogleStep(pendingData, onLoginSuccess) {
     } catch (err) {
       regGoogleBtn.disabled = false;
       regGoogleBtn.innerHTML = `
-        <svg width="20" height="20" viewBox="0 0 24 24">
+        <svg width="20" height="20" viewBox="0 0 24 24" style="flex-shrink: 0;">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>

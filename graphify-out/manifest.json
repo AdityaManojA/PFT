@@ -1,14 +1,14 @@
 {
   "firebase.json": {
-    "mtime": 1790105034.142232,
-    "seen": 1790105090.4014478,
-    "ast_hash": "5498be04c661c4e8544658dd719c94b5",
+    "mtime": 1790105885.433831,
+    "seen": 1790105980.3060193,
+    "ast_hash": "51d9a277511eeeb0e3c80252f1ed7168",
     "semantic_hash": ""
   },
   "js/app.js": {
-    "mtime": 1790103876.98789,
-    "seen": 1790104974.4108846,
-    "ast_hash": "ec3ccebb3c46a44419d13beb5bcd6caa",
+    "mtime": 1790107636.597246,
+    "seen": 1790107688.0509987,
+    "ast_hash": "a741e05e63ab57384b66d855a688dfc7",
     "semantic_hash": ""
   },
   "js/auth.js": {
@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   "js/db.js": {
-    "mtime": 1790105050.7748947,
-    "seen": 1790105090.4014478,
-    "ast_hash": "284ca7cc7d4bdb0a1d4e80a148f0b4d9",
+    "mtime": 1790105834.455615,
+    "seen": 1790105980.3060193,
+    "ast_hash": "06dea1a7b102b543bef62ebeebbad55f",
     "semantic_hash": ""
   },
   "js/parsers/bank-parser.js": {
@@ -42,9 +42,9 @@
     "semantic_hash": ""
   },
   "js/pwa.js": {
-    "mtime": 1790104797.3923259,
-    "seen": 1790104974.4108846,
-    "ast_hash": "f3830258ec6056f2431601fd152e63d9",
+    "mtime": 1790107614.8696804,
+    "seen": 1790107688.0509987,
+    "ast_hash": "224daae0fb7663368030e9f7a74fbc89",
     "semantic_hash": ""
   },
   "js/views/accounts.js": {
@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "js/views/add-expense.js": {
-    "mtime": 1790102763.3114173,
-    "seen": 1790103219.4866912,
-    "ast_hash": "dd4be185f650348ec45c00c8b22bfb92",
+    "mtime": 1790105426.9554849,
+    "seen": 1790105537.3099978,
+    "ast_hash": "37b8c6d9560cbfd4a17305fb34c52b8b",
     "semantic_hash": ""
   },
   "js/views/budgets.js": {
@@ -72,15 +72,15 @@
     "semantic_hash": ""
   },
   "js/views/landing.js": {
-    "mtime": 1790099688.597301,
-    "seen": 1790100857.8151426,
-    "ast_hash": "28ece8ffb2df174ba2fee70649d3c755",
+    "mtime": 1790105415.9399219,
+    "seen": 1790105537.3099978,
+    "ast_hash": "7de4888cc848300480b6beee2461dead",
     "semantic_hash": ""
   },
   "js/views/login.js": {
-    "mtime": 1790102262.2777412,
-    "seen": 1790102388.9265308,
-    "ast_hash": "08228c17035fa767bff81b9dca4c7d01",
+    "mtime": 1790108312.7880495,
+    "seen": 1790108360.9867816,
+    "ast_hash": "184852d83145feff097f24cd414c339f",
     "semantic_hash": ""
   },
   "js/views/transactions.js": {
@@ -90,9 +90,9 @@
     "semantic_hash": ""
   },
   "manifest.json": {
-    "mtime": 1790101911.0692205,
-    "seen": 1790102388.9265308,
-    "ast_hash": "56af639b320c899d65be16f0529d66a4",
+    "mtime": 1790107562.9430385,
+    "seen": 1790107688.0509987,
+    "ast_hash": "55b15f176d707c764245d9f3ae2c99b8",
     "semantic_hash": ""
   },
   "package.json": {
@@ -120,15 +120,15 @@
     "semantic_hash": "ee4b85b73cbba1067f5fb73593b10b82"
   },
   "sw.js": {
-    "mtime": 1790105235.3987584,
-    "seen": 1790105268.5118594,
-    "ast_hash": "8be43618e481ce75cf1737e543465251",
+    "mtime": 1790108324.3582194,
+    "seen": 1790108360.9867816,
+    "ast_hash": "9a3cbf1cbeb8bc98fdfc0222aa7603e9",
     "semantic_hash": ""
   },
   "js/firebase-config.js": {
-    "mtime": 1790105040.9145637,
-    "seen": 1790105090.4014478,
-    "ast_hash": "e4309abe9aeb861bd5e919c15b372db9",
+    "mtime": 1790107508.2925928,
+    "seen": 1790107688.0509987,
+    "ast_hash": "e005f53afec3555869700304becd8890",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1790105246.507843,
-    "seen": 1790105268.5118594,
-    "ast_hash": "0ee3ce5804bbbad669386ec24225e83e",
+    "mtime": 1790108334.7312365,
+    "seen": 1790108360.9867816,
+    "ast_hash": "4ad925607f63d36cf32e2fc25d984b17",
     "semantic_hash": ""
   },
   "public/index.html": {
@@ -279,6 +279,12 @@
     "mtime": 1790103865.7820368,
     "seen": 1790104974.412022,
     "ast_hash": "436e16123143725fa0652222729a922a",
+    "semantic_hash": ""
+  },
+  "js/services/cloud-vault-sync.js": {
+    "mtime": 1790107545.8485749,
+    "seen": 1790107688.0509987,
+    "ast_hash": "c24b3855cc743babb66d809dd7265764",
     "semantic_hash": ""
   }
 }

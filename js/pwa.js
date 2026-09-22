@@ -100,24 +100,36 @@ export async function promptPWAInstall() {
  * Section 7: iOS Custom Install Prompt Component
  */
 function checkAndRenderIOSInstallPrompt() {
+  const banner = document.getElementById('ios-install-banner');
+  if (!banner) return;
+
+  // Never show if permanently dismissed or once user has logged in
+  const permanentlyDismissed = localStorage.getItem('sbafa_ios_install_dismissed');
+  const sessionDismissed = sessionStorage.getItem('ios_install_dismissed');
+  const activeUserId = localStorage.getItem('pft_active_user_id');
+
+  if (permanentlyDismissed === 'true' || sessionDismissed === 'true' || activeUserId) {
+    banner.style.display = 'none';
+    return;
+  }
+
   const userAgent = window.navigator.userAgent.toLowerCase();
   const isIOS = /iphone|ipad|ipod/.test(userAgent);
   const isStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
 
-  const banner = document.getElementById('ios-install-banner');
-  if (!banner) return;
-
-  // Show if on iOS and not yet in standalone mode, and user hasn't dismissed it
-  const dismissed = sessionStorage.getItem('ios_install_dismissed');
-  if (isIOS && !isStandalone && !dismissed) {
+  // Show only on iOS Safari when not installed and not logged in
+  if (isIOS && !isStandalone) {
     banner.style.display = 'flex';
   } else {
     banner.style.display = 'none';
   }
 }
 
-export function dismissIOSInstallBanner() {
+export function dismissIOSInstallBanner(permanent = true) {
   sessionStorage.setItem('ios_install_dismissed', 'true');
+  if (permanent) {
+    localStorage.setItem('sbafa_ios_install_dismissed', 'true');
+  }
   const banner = document.getElementById('ios-install-banner');
   if (banner) banner.style.display = 'none';
 }

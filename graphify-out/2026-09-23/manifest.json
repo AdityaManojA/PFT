@@ -1,26 +1,26 @@
 {
   "firebase.json": {
-    "mtime": 1790105034.142232,
-    "seen": 1790105090.4014478,
-    "ast_hash": "5498be04c661c4e8544658dd719c94b5",
+    "mtime": 1790105885.433831,
+    "seen": 1790105980.3060193,
+    "ast_hash": "51d9a277511eeeb0e3c80252f1ed7168",
     "semantic_hash": ""
   },
   "js/app.js": {
-    "mtime": 1790103876.98789,
-    "seen": 1790104974.4108846,
-    "ast_hash": "ec3ccebb3c46a44419d13beb5bcd6caa",
+    "mtime": 1790105877.4160545,
+    "seen": 1790105980.3060193,
+    "ast_hash": "8ef19a9697e094d04d03d913bc129d55",
     "semantic_hash": ""
   },
   "js/auth.js": {
-    "mtime": 1790092680.6690485,
-    "seen": 1790092802.8011634,
-    "ast_hash": "e90ee012541263ec36f80c6d162b0ea3",
+    "mtime": 1790105189.9920466,
+    "seen": 1790105268.5108166,
+    "ast_hash": "4f3cd9fc90aed8be5c52d3974fe6965b",
     "semantic_hash": ""
   },
   "js/db.js": {
-    "mtime": 1790105050.7748947,
-    "seen": 1790105090.4014478,
-    "ast_hash": "284ca7cc7d4bdb0a1d4e80a148f0b4d9",
+    "mtime": 1790105834.455615,
+    "seen": 1790105980.3060193,
+    "ast_hash": "06dea1a7b102b543bef62ebeebbad55f",
     "semantic_hash": ""
   },
   "js/parsers/bank-parser.js": {
@@ -48,15 +48,15 @@
     "semantic_hash": ""
   },
   "js/views/accounts.js": {
-    "mtime": 1790103090.6157703,
-    "seen": 1790103219.4866912,
-    "ast_hash": "a3df6ab92ea4e21282098f076a701520",
+    "mtime": 1790105224.923185,
+    "seen": 1790105268.5118594,
+    "ast_hash": "9b94dd4d4c68aee52039362627c2729c",
     "semantic_hash": ""
   },
   "js/views/add-expense.js": {
-    "mtime": 1790102763.3114173,
-    "seen": 1790103219.4866912,
-    "ast_hash": "dd4be185f650348ec45c00c8b22bfb92",
+    "mtime": 1790105426.9554849,
+    "seen": 1790105537.3099978,
+    "ast_hash": "37b8c6d9560cbfd4a17305fb34c52b8b",
     "semantic_hash": ""
   },
   "js/views/budgets.js": {
@@ -72,9 +72,9 @@
     "semantic_hash": ""
   },
   "js/views/landing.js": {
-    "mtime": 1790099688.597301,
-    "seen": 1790100857.8151426,
-    "ast_hash": "28ece8ffb2df174ba2fee70649d3c755",
+    "mtime": 1790105415.9399219,
+    "seen": 1790105537.3099978,
+    "ast_hash": "7de4888cc848300480b6beee2461dead",
     "semantic_hash": ""
   },
   "js/views/login.js": {
@@ -120,9 +120,9 @@
     "semantic_hash": "ee4b85b73cbba1067f5fb73593b10b82"
   },
   "sw.js": {
-    "mtime": 1790105060.4647446,
-    "seen": 1790105090.4014478,
-    "ast_hash": "7093e2b737366de970f9bd7325c571fe",
+    "mtime": 1790105896.0080009,
+    "seen": 1790105980.3060193,
+    "ast_hash": "7a8fc3c2e733d9b5e4a01c30faa99de0",
     "semantic_hash": ""
   },
   "js/firebase-config.js": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1790105067.4997067,
-    "seen": 1790105090.4014478,
-    "ast_hash": "e5beb0445184cec11852f72148d0ee82",
+    "mtime": 1790105902.9918442,
+    "seen": 1790105980.3060193,
+    "ast_hash": "2c16c4a2f8e09bdeae349f69f89a7852",
     "semantic_hash": ""
   },
   "public/index.html": {
@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "js/services/gmail-sync.js": {
-    "mtime": 1790103025.7603881,
-    "seen": 1790103219.4866912,
-    "ast_hash": "f663e9301c74bf3d290de6b8402c562f",
+    "mtime": 1790105207.2152202,
+    "seen": 1790105268.5118594,
+    "ast_hash": "8c001b23b11f4b3e8df66bec3a64a343",
     "semantic_hash": ""
   },
   "scratch/security_check.ps1": {
@@ -279,6 +279,12 @@
     "mtime": 1790103865.7820368,
     "seen": 1790104974.412022,
     "ast_hash": "436e16123143725fa0652222729a922a",
+    "semantic_hash": ""
+  },
+  "js/services/cloud-vault-sync.js": {
+    "mtime": 1790105800.5466106,
+    "seen": 1790105980.3060193,
+    "ast_hash": "f5631e779eaadd558f83e6333a99d354",
     "semantic_hash": ""
   }
 }

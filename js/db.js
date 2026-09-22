@@ -30,6 +30,37 @@ class AppDatabase extends DexieClass {
 
 export const db = new AppDatabase();
 
+// Cross-Platform Cloud Sync Notification
+export function notifyCloudSync() {
+  if (typeof window !== 'undefined' && window.CloudVaultSyncService) {
+    window.CloudVaultSyncService.scheduleCloudPush();
+  }
+}
+
+// Automatically sync Dexie mutations to Firestore
+if (typeof window !== 'undefined') {
+  try {
+    ['accounts', 'transactions', 'budgets'].forEach(tableName => {
+      const table = db[tableName];
+      if (table && table.hook) {
+        table.hook('creating', () => { notifyCloudSync(); });
+        table.hook('updating', () => { notifyCloudSync(); });
+        table.hook('deleting', () => { notifyCloudSync(); });
+      }
+    });
+  } catch (e) {
+    console.warn('[DB] Sync hooks deferred:', e);
+  }
+}
+
+export async function triggerCloudSync() {
+  const user = await getCurrentUser();
+  if (user && typeof window !== 'undefined' && window.CloudVaultSyncService) {
+    return await window.CloudVaultSyncService.pushLocalVault(user);
+  }
+  return { success: false, reason: 'Sync not available' };
+}
+
 // Format INR currency (e.g. ₹1,24,500.00)
 export function formatINR(amount, hideDecimals = false) {
   const num = Number(amount) || 0;
@@ -389,6 +420,7 @@ export async function addTransaction(transaction) {
     }
   }
 
+  notifyCloudSync();
   return id;
 }
 
@@ -545,6 +577,7 @@ export async function addStatementUploadHistory(userId, newEntries) {
     userId,
     value: updated
   });
+  notifyCloudSync();
   return updated;
 }
 

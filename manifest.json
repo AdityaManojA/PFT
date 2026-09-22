@@ -3,44 +3,44 @@
   "name": "SBAFA - Personal Finance Tracker",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "/icons/icon-192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-192.png",
+      "src": "/icons/icon-192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/icons/icon-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/icons/icon-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
     },
     {
-      "src": "icons/SBAFA_Logo.svg",
+      "src": "/icons/SBAFA_Logo.svg",
       "type": "image/svg+xml",
       "sizes": "512x512",
       "purpose": "any maskable"
     },
     {
-      "src": "icons/icon.svg",
+      "src": "/icons/icon.svg",
       "type": "image/svg+xml",
       "sizes": "512x512",
       "purpose": "any"
     }
   ],
-  "id": "./?source=pwa",
-  "start_url": "./?source=pwa",
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
   "background_color": "#272A32",
   "theme_color": "#E86034",
   "display": "standalone",
@@ -51,7 +51,7 @@
     "browser"
   ],
   "orientation": "any",
-  "scope": "./",
+  "scope": "/",
   "lang": "en-IN",
   "categories": [
     "finance",
@@ -64,15 +64,15 @@
       "name": "Add Expense",
       "short_name": "Add",
       "description": "Log a manual expense",
-      "url": "./?source=shortcut#/add",
-      "icons": [{ "src": "icons/add-icon.png", "sizes": "192x192" }]
+      "url": "/add?source=shortcut",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "View Ledger",
       "short_name": "Ledger",
       "description": "Search transactions",
-      "url": "./?source=shortcut#/transactions",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+      "url": "/transactions?source=shortcut",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

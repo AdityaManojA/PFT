@@ -4,7 +4,7 @@
  * and Background Sync queue for offline expense logging.
  */
 
-const CACHE_NAME = 'sbafa-v3.4.7';
+const CACHE_NAME = 'sbafa-v3.5.2';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -22,6 +22,7 @@ const STATIC_ASSETS = [
   './js/parsers/categorizer.js',
   './js/parsers/pdf-parser.js',
   './js/components/edit-category-modal.js',
+  './js/services/cloud-vault-sync.js',
   './js/services/gmail-sync.js',
   './js/services/email-service.js',
   './js/services/notification-center.js',
@@ -38,13 +39,16 @@ const STATIC_ASSETS = [
   './icons/icon-512.png'
 ];
 
-// External vendor libraries (Dexie.js, PapaParse, Chart.js, PDF.js, Google GSI) cached with CacheFirst
+// External vendor libraries (Dexie.js, PapaParse, Chart.js, PDF.js, Google GSI, Firebase) cached with CacheFirst
 const VENDOR_URLS = [
   'https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js',
   'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'
 ];
 
 // Install Event: Pre-cache app shell and core assets
@@ -161,7 +165,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. HTML Shell / App Navigation & Core Local Assets -> StaleWhileRevalidate
+  // 4. HTML Shell / App Navigation (SPA PushState Navigation)
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put('./index.html', copy));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // 5. Other static assets -> StaleWhileRevalidate
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       const fetchPromise = fetch(request)

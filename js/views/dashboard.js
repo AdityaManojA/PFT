@@ -195,19 +195,28 @@ export async function renderDashboard(container) {
     accountSwitcherHtml = `
       <div class="account-switcher-wrapper">
         <div class="account-switcher-label">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           <span>Account</span>
         </div>
-        <div class="account-toggle-pills" id="dashboard-account-toggle-group">
-          <button type="button" class="account-toggle-pill ${activeAccount === 'all' ? 'active' : ''}" data-account-id="all">
-            All Accounts
+        <div class="account-toggle-pills" id="dashboard-account-toggle-group" role="tablist" aria-label="Account Switcher">
+          <button type="button" class="account-toggle-pill ${activeAccount === 'all' ? 'active' : ''}" data-account-id="all" role="tab" aria-selected="${activeAccount === 'all'}">
+            <span class="pill-full-label">All Accounts</span>
+            <span class="pill-short-label">All</span>
           </button>
           ${accounts.map(acc => {
-            const digits = String(acc.accountNumberMask || '').replace(/[^0-9]/g, '');
+            const digits = String(acc.accountNumberMask || acc.accountNumberLast4 || '').replace(/[^0-9]/g, '');
             const last4 = digits ? digits.slice(-4) : '••••';
+            const shortBank = (acc.bankName || 'Bank')
+              .replace(/\s+Bank\b/i, '')
+              .replace(/State Bank of India/i, 'SBI')
+              .trim();
             return `
-              <button type="button" class="account-toggle-pill ${activeAccount === String(acc.id) ? 'active' : ''}" data-account-id="${escapeHtml(acc.id)}" title="${escapeHtml(acc.bankName)} (${escapeHtml(acc.accountNumberMask)})">
-                🏛️ ${escapeHtml(acc.bankName)} (${last4})
+              <button type="button" class="account-toggle-pill ${activeAccount === String(acc.id) ? 'active' : ''}" data-account-id="${escapeHtml(acc.id)}" role="tab" aria-selected="${activeAccount === String(acc.id)}" title="${escapeHtml(acc.bankName)} (${escapeHtml(acc.accountNumberMask || last4)})">
+                <span class="bank-pill-content">
+                  <span class="bank-pill-icon">🏛️</span>
+                  <span class="bank-pill-name">${escapeHtml(shortBank)}</span>
+                  <span class="bank-pill-digits">(${last4})</span>
+                </span>
               </button>
             `;
           }).join('')}

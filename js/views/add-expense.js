@@ -77,7 +77,7 @@ export async function renderAddExpense(container, showToastCallback) {
         </select>
         ${accounts.length === 0 ? `
           <div style="font-size: 11px; color: var(--accent-amber); margin-top: 5px;">
-            ⚠️ You need to add a bank account before logging transactions. <a href="#/accounts" style="color: var(--accent-blue); text-decoration: underline;">+ Add Bank Account</a>
+            ⚠️ You need to add a bank account before logging transactions. <a href="/accounts" style="color: var(--accent-blue); text-decoration: underline;">+ Add Bank Account</a>
           </div>
         ` : ''}
       </div>

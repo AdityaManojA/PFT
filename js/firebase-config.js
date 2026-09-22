@@ -5,9 +5,7 @@
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAxSptDWa8INfst6MkwYneBQz6FtJn27IU",
-  authDomain: (typeof window !== 'undefined' && (window.location.hostname.endsWith('web.app') || window.location.hostname.endsWith('firebaseapp.com')))
-    ? window.location.hostname
-    : "sbafa-ft.firebaseapp.com",
+  authDomain: "sbafa-ft.firebaseapp.com",
   projectId: "sbafa-ft",
   storageBucket: "sbafa-ft.firebasestorage.app",
   messagingSenderId: "396883332575",

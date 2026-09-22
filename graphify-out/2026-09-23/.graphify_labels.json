@@ -1,7 +1,7 @@
 {
-  "0": "createParticleMesh",
+  "0": "app.js",
   "1": "accounts.js",
-  "2": "app.js",
+  "2": "getCurrentUser",
   "3": "dashboard.js",
   "4": "categorizer.js",
   "5": "manifest.json",
@@ -11,7 +11,7 @@
   "9": "rules/graphify.md",
   "10": "workflows/graphify.md",
   "11": "sw.js",
-  "12": "login.js",
+  "12": "BiometricAuthService",
   "13": "unprotect_pdf.ps1",
   "14": "server.ps1",
   "15": "Design Scout",
@@ -22,6 +22,5 @@
   "20": "security_check.ps1",
   "21": "verify.ps1",
   "22": "index.js",
-  "23": "test_verification.mjs",
   "24": "generate_icons.ps1"
 }
