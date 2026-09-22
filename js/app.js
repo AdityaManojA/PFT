@@ -8,6 +8,10 @@ import { seedInitialDataIfNeeded, drainOfflineQueue, getCurrentUser, getAllUsers
 import { BiometricAuthService } from './auth.js';
 import { initPWAEngine, promptPWAInstall, dismissIOSInstallBanner } from './pwa.js';
 import { BankPDFParser } from './parsers/pdf-parser.js';
+import { categorizeTransaction } from './parsers/categorizer.js';
+if (typeof window !== 'undefined') {
+  window.__categorizeTransaction = categorizeTransaction;
+}
 
 import { renderDashboard } from './views/dashboard.js';
 import { renderTransactions } from './views/transactions.js';
@@ -101,7 +105,7 @@ class AppCoordinator {
 
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute('content', theme === 'light' ? '#FFFFFF' : '#08090C');
+      metaTheme.setAttribute('content', theme === 'light' ? '#F5F1E8' : '#181915');
     }
 
     const sunIcon = document.querySelector('.theme-icon-sun');
@@ -119,8 +123,16 @@ class AppCoordinator {
 
   updateHeaderUserProfile(user) {
     const nameEl = document.getElementById('header-user-name');
+    const userBtn = document.getElementById('header-user-btn');
     if (nameEl) {
-      nameEl.innerText = user ? user.name : 'Sign In';
+      if (user && user.name) {
+        const firstName = user.name.trim().split(/\s+/)[0] || user.name;
+        nameEl.innerText = firstName;
+        if (userBtn) userBtn.title = `${user.name} • Tap to view profile or switch account`;
+      } else {
+        nameEl.innerText = 'Sign In';
+        if (userBtn) userBtn.title = 'Sign In to Vault';
+      }
     }
   }
 

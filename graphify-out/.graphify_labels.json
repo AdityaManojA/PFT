@@ -1,13 +1,13 @@
 {
-  "0": "app.js",
+  "0": "db.js",
   "1": "accounts.js",
-  "2": "AppCoordinator",
-  "3": "dashboard.js",
+  "2": ".init",
+  "3": "formatINR",
   "4": "categorizer.js",
   "5": "manifest.json",
   "6": "package.json",
   "7": "email_pdf_streamline.py",
-  "8": "FirebaseAuthService",
+  "8": "auth.js",
   "9": "rules/graphify.md",
   "10": "workflows/graphify.md",
   "11": "sw.js",
@@ -16,9 +16,11 @@
   "14": "server.ps1",
   "15": "Design Scout",
   "16": "pwa_maker_skill_finance_tracker.md",
-  "17": "auth.js",
-  "18": "getCurrentUser",
+  "17": "getCurrentUser",
+  "18": "createParticleMesh",
   "19": "Graphify + Antigravity Project Workflow & Setup Guide",
   "20": "security_check.ps1",
-  "21": "verify.ps1"
+  "21": "verify.ps1",
+  "22": "index.js",
+  "23": "test_verification.mjs"
 }

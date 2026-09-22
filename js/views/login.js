@@ -20,10 +20,10 @@ export async function renderLogin(container, onLoginSuccess) {
       </div>
 
       <!-- Brand Logo Badge -->
-      <div style="width: 52px; height: 52px; margin: 0 auto 14px auto; border-radius: var(--radius-md); background: var(--text-primary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; color: var(--text-inverse); box-shadow: var(--shadow-sm);">
-        S
+      <div style="width: 58px; height: 58px; margin: 0 auto 16px auto; border-radius: 14px; overflow: hidden; box-shadow: 0 8px 24px rgba(224, 76, 0, 0.35);">
+        <img src="icons/SBAFA_Logo.svg" alt="SBAFA Logo" style="width: 100%; height: 100%; object-fit: cover;" />
       </div>
-      <h2 style="font-size: var(--text-2xl); font-weight: 800; letter-spacing: -0.025em; margin-bottom: 6px;">SBAFA Enclave</h2>
+      <h2 style="font-size: var(--text-2xl); font-family: var(--font-family-display); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 6px;">SBAFA Enclave</h2>
       <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 22px;">
         Zero-telemetry, 256-bit encrypted personal finance vault.
       </p>

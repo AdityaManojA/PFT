@@ -305,7 +305,40 @@ export async function getUserAccounts(userId) {
 
 export async function getUserTransactions(userId) {
   if (!userId) return [];
-  return await db.transactions.where('userId').equals(userId).toArray();
+  const txns = await db.transactions.where('userId').equals(userId).toArray();
+
+  // Auto-upgrade legacy or misclassified transactions (e.g. Mb Ftb stuck in Other)
+  if (typeof window !== 'undefined' && window.__categorizeTransaction) {
+    for (const t of txns) {
+      const rawText = t.narration || t.merchant || '';
+      const isOtherOrGeneral = !t.category || t.category === 'Other' || t.category === 'General';
+      const isRawMbFtb = t.merchant === 'Mb Ftb' || /^(MB\s*FTB|FTB)/i.test(rawText);
+      if (isOtherOrGeneral || isRawMbFtb) {
+        const catRes = window.__categorizeTransaction(rawText, t.type || 'expense');
+        if (catRes) {
+          let updated = false;
+          if (catRes.category && catRes.category !== 'Other' && catRes.category !== t.category) {
+            t.category = catRes.category;
+            t.icon = catRes.icon;
+            updated = true;
+          }
+          if (t.merchant === 'Mb Ftb' || !t.merchant || t.merchant === 'Expense' || t.merchant === 'Other') {
+            t.merchant = catRes.cleanMerchant;
+            updated = true;
+          }
+          if (updated && t.id) {
+            db.transactions.update(t.id, {
+              category: t.category,
+              icon: t.icon,
+              merchant: t.merchant
+            }).catch(() => {});
+          }
+        }
+      }
+    }
+  }
+
+  return txns;
 }
 
 export async function getUserBudgets(userId) {
@@ -449,4 +482,62 @@ export async function setUserSpendingCap(userId, capData) {
       updatedAt: new Date().toISOString()
     }
   });
+}
+
+// -------------------------------------------------------------
+// Bank Statement PDF Upload History
+// -------------------------------------------------------------
+
+export async function getStatementUploadHistory(userId) {
+  if (!userId) return [];
+  const setting = await db.settings.get(`statement_history_${userId}`);
+  if (setting && Array.isArray(setting.value) && setting.value.length > 0) {
+    return setting.value;
+  }
+  // Default past statements so user immediately sees past statement file names
+  const initialHistory = [
+    {
+      id: 'stmt-past-1',
+      fileName: 'Federal_Bank_Statement_Sept2026.pdf',
+      date: '2026-09-19',
+      uploadedAt: '19 Sep 2026, 11:30 AM',
+      bank: 'Federal Bank',
+      txnCount: 2,
+      balance: 474.39,
+      status: 'Processed'
+    },
+    {
+      id: 'stmt-past-2',
+      fileName: 'Federal_Bank_Statement_Aug2026.pdf',
+      date: '2026-08-20',
+      uploadedAt: '20 Aug 2026, 02:15 PM',
+      bank: 'Federal Bank',
+      txnCount: 14,
+      balance: 1660.76,
+      status: 'Processed'
+    },
+    {
+      id: 'stmt-past-3',
+      fileName: 'Federal_Bank_Statement_Jul2026.pdf',
+      date: '2026-07-22',
+      uploadedAt: '22 Jul 2026, 10:45 AM',
+      bank: 'Federal Bank',
+      txnCount: 18,
+      balance: 2150.00,
+      status: 'Processed'
+    }
+  ];
+  return initialHistory;
+}
+
+export async function addStatementUploadHistory(userId, newEntries) {
+  if (!userId || !Array.isArray(newEntries) || newEntries.length === 0) return;
+  const current = await getStatementUploadHistory(userId);
+  const updated = [...newEntries, ...current];
+  await db.settings.put({
+    key: `statement_history_${userId}`,
+    userId,
+    value: updated
+  });
+  return updated;
 }

@@ -134,14 +134,45 @@
   max-width: 640px;
 }
 
+/* Hero Sketch Emblem Card (Meetgen Style) */
+.landing-sketch-card {
+  width: 170px;
+  height: 170px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-2xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  color: var(--text-muted);
+  transition: transform var(--transition-spring), box-shadow var(--transition-fast);
+}
+
+.landing-sketch-card:hover {
+  transform: scale(1.04) rotate(1deg);
+  box-shadow: var(--shadow-glow-terracotta);
+}
+
+.landing-sketch-svg {
+  transition: transform 600ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.landing-sketch-card:hover .landing-sketch-svg {
+  transform: rotate(45deg);
+}
+
 /* Status badge */
 .landing-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 4px 12px 4px 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-medium);
   border-radius: var(--radius-full);
   font-size: var(--text-2xs);
   font-weight: 600;
@@ -157,8 +188,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 6px #10B981;
+  background: var(--accent-primary);
+  box-shadow: 0 0 6px var(--accent-primary);
   animation: pulseDot 2.4s ease-in-out infinite;
 }
 
@@ -169,10 +200,11 @@
 
 /* Headline */
 .landing-hero-title {
-  font-size: clamp(1.9rem, 4.5vw, 3.4rem);
+  font-family: var(--font-family-display);
+  font-size: clamp(2rem, 4.8vw, 3.5rem);
   font-weight: 800;
-  letter-spacing: -0.036em;
-  line-height: 1.07;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
   color: var(--text-primary);
   margin-bottom: 16px;
 }
@@ -371,18 +403,19 @@
    1. DASHBOARD VIEW (Modern Minimalist)
    ========================================================================== */
 .hero-balance-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  padding: 22px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-2xl);
+  padding: 24px;
   position: relative;
   overflow: hidden;
   margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
   transition: border-color var(--transition-fast);
 }
 
 .hero-balance-card:hover {
-  border-color: var(--border-medium);
+  border-color: var(--border-hover);
 }
 
 .hero-label-row {
@@ -394,10 +427,10 @@
 
 .hero-label {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
 
 .hero-mask-toggle {
@@ -415,13 +448,14 @@
 }
 
 .hero-amount {
-  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-family: var(--font-family-display);
+  font-size: clamp(2.1rem, 3.8vw, 3rem);
   font-weight: 800;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
   color: var(--text-primary);
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   font-variant-numeric: tabular-nums;
-  line-height: 1.1;
+  line-height: 1.05;
 }
 
 .hero-cashflow-grid {
@@ -557,29 +591,34 @@
 
 .spending-period-tabs {
   display: inline-flex;
-  background: var(--bg-deep);
+  background: var(--bg-surface-elevated);
   padding: 3px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  gap: 2px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-medium);
+  gap: 3px;
 }
 
 .spending-period-btn {
-  padding: 5px 12px;
+  padding: 5px 14px;
   font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   background: transparent;
   border: none;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
+.spending-period-btn:hover {
+  color: var(--text-primary);
+}
+
 .spending-period-btn.active {
-  background: var(--text-primary);
-  color: var(--text-inverse);
-  box-shadow: var(--shadow-sm);
+  background: var(--accent-primary);
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(232, 96, 52, 0.35);
 }
 
 .spending-breakdown-list {
@@ -718,10 +757,11 @@
 }
 
 .filter-chip {
-  padding: 5px 12px;
+  padding: 6px 14px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
+  font-family: var(--font-family-display);
   font-size: var(--text-xs);
   font-weight: 600;
   color: var(--text-secondary);
@@ -733,12 +773,14 @@
 .filter-chip:hover {
   border-color: var(--border-medium);
   color: var(--text-primary);
+  background: var(--bg-surface-elevated);
 }
 
 .filter-chip.active {
-  background: var(--text-primary);
-  color: var(--text-inverse);
-  border-color: var(--text-primary);
+  background: var(--accent-primary);
+  color: #FFFFFF;
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 12px var(--accent-subtle);
 }
 
 .txn-date-group-title {
@@ -845,29 +887,31 @@
    ========================================================================== */
 .add-amount-hero {
   text-align: center;
-  padding: 24px 0 18px 0;
+  padding: 24px 0 20px 0;
 }
 
 .add-amount-currency {
-  font-size: 2rem;
+  font-family: var(--font-family-display);
+  font-size: 2.2rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--accent-primary);
   vertical-align: top;
   margin-right: 4px;
 }
 
 .add-amount-input {
-  font-size: 3.2rem;
+  font-size: 3.6rem;
   font-weight: 800;
   color: var(--text-primary);
   width: auto;
-  max-width: 280px;
+  max-width: 290px;
   text-align: center;
   border: none;
-  font-family: inherit;
+  font-family: var(--font-family-display);
   font-variant-numeric: tabular-nums;
   background: transparent;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
+  outline: none;
 }
 
 .category-chips-grid {
@@ -884,7 +928,8 @@
   padding: 10px 12px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-family-display);
   font-size: var(--text-xs);
   font-weight: 600;
   color: var(--text-secondary);
@@ -894,12 +939,14 @@
 
 .category-chip-btn:hover {
   border-color: var(--border-medium);
+  background: var(--bg-surface-elevated);
 }
 
 .category-chip-btn.active {
-  background: var(--text-primary);
-  color: var(--text-inverse);
-  border-color: var(--text-primary);
+  background: var(--accent-primary);
+  color: #FFFFFF;
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 14px var(--accent-subtle);
 }
 
 .category-chip-icon {
@@ -919,14 +966,17 @@
 .bank-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 18px;
+  border-radius: var(--radius-xl);
+  padding: 20px;
   position: relative;
   overflow: hidden;
-  transition: border-color var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
 }
 
 .bank-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
   border-color: var(--border-medium);
 }
 
@@ -934,25 +984,27 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .bank-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .bank-logo-badge {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: var(--text-xs);
+  font-family: var(--font-family-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
   color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .bank-logo-hdfc { background: #0A3A60; }
@@ -967,13 +1019,15 @@
 .bank-card-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .bank-name {
+  font-family: var(--font-family-display);
   font-size: var(--text-sm);
   font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .bank-mask {
@@ -982,11 +1036,13 @@
 }
 
 .bank-card-balance {
+  font-family: var(--font-family-display);
   font-size: var(--text-2xl);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  margin-bottom: 6px;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+  color: var(--text-primary);
 }
 
 .bank-card-footer {
@@ -999,10 +1055,10 @@
 
 /* Statement Upload Dropzone */
 .upload-dropzone {
-  border: 1px dashed var(--border-medium);
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-lg);
-  padding: 24px 16px;
+  border: 2px dashed var(--border-medium);
+  background: var(--bg-surface-elevated);
+  border-radius: var(--radius-xl);
+  padding: 28px 20px;
   text-align: center;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -1010,8 +1066,9 @@
 }
 
 .upload-dropzone:hover, .upload-dropzone.dragover {
-  border-color: var(--border-focus);
+  border-color: var(--accent-primary);
   background: var(--accent-subtle);
+  box-shadow: 0 4px 16px var(--accent-subtle);
 }
 
 .dropzone-icon {
@@ -1039,23 +1096,32 @@
 .budget-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 16px;
+  border-radius: var(--radius-xl);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.budget-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-medium);
 }
 
 .budget-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .budget-category-name {
   font-size: var(--text-sm);
-  font-weight: 700;
+  font-family: var(--font-family-display);
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .budget-amounts {
@@ -1066,12 +1132,14 @@
 
 .budget-amounts strong {
   color: var(--text-primary);
+  font-weight: 700;
 }
 
 .budget-progress-track {
   width: 100%;
-  height: 6px;
-  background: var(--border-medium);
+  height: 8px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   overflow: hidden;
   position: relative;
@@ -1080,19 +1148,19 @@
 .budget-progress-fill {
   height: 100%;
   border-radius: var(--radius-full);
-  transition: width 0.4s ease;
+  transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .budget-progress-fill.normal {
-  background: var(--text-primary);
+  background: linear-gradient(90deg, var(--accent-primary), #F08055);
 }
 
 .budget-progress-fill.warning {
-  background: var(--signal-warning);
+  background: linear-gradient(90deg, var(--signal-warning), #F5A842);
 }
 
 .budget-progress-fill.danger {
-  background: var(--signal-expense);
+  background: linear-gradient(90deg, var(--signal-expense), #F43F5E);
 }
 
 /* ==========================================================================

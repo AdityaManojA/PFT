@@ -5,17 +5,17 @@
  */
 
 export const CATEGORY_DEFINITIONS = {
-  Dining: { name: 'Dining', icon: '🍔', color: '#F97316', bg: 'rgba(249, 115, 22, 0.12)' },
-  Groceries: { name: 'Groceries', icon: '🛒', color: '#10B981', bg: 'rgba(16, 185, 129, 0.12)' },
-  Shopping: { name: 'Shopping', icon: '🛍️', color: '#EC4899', bg: 'rgba(236, 72, 153, 0.12)' },
-  Entertainment: { name: 'Entertainment', icon: '🍿', color: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.12)' },
-  Transport: { name: 'Transport', icon: '🚗', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)' },
-  Utilities: { name: 'Utilities', icon: '⚡', color: '#EAB308', bg: 'rgba(234, 179, 8, 0.12)' },
-  Health: { name: 'Health', icon: '💊', color: '#EF4444', bg: 'rgba(239, 68, 68, 0.12)' },
-  Investments: { name: 'Investments', icon: '📈', color: '#06B6D4', bg: 'rgba(6, 182, 212, 0.12)' },
-  Transfers: { name: 'Transfers', icon: '🔄', color: '#64748B', bg: 'rgba(100, 116, 139, 0.12)' },
-  Salary: { name: 'Salary', icon: '💼', color: '#22C55E', bg: 'rgba(34, 197, 94, 0.12)' },
-  Other: { name: 'Other', icon: '🏷️', color: '#94A3B8', bg: 'rgba(148, 163, 184, 0.12)' }
+  Dining: { name: 'Dining', icon: '🍔', color: '#E86034', bg: 'rgba(232, 96, 52, 0.12)' },
+  Groceries: { name: 'Groceries', icon: '🛒', color: '#2E7D5B', bg: 'rgba(46, 125, 91, 0.12)' },
+  Shopping: { name: 'Shopping', icon: '🛍️', color: '#C85A80', bg: 'rgba(200, 90, 128, 0.12)' },
+  Entertainment: { name: 'Entertainment', icon: '🍿', color: '#8860D0', bg: 'rgba(136, 96, 208, 0.12)' },
+  Transport: { name: 'Transport', icon: '🚗', color: '#3A7BD5', bg: 'rgba(58, 123, 213, 0.12)' },
+  Utilities: { name: 'Utilities', icon: '⚡', color: '#D9822B', bg: 'rgba(217, 130, 43, 0.12)' },
+  Health: { name: 'Health', icon: '💊', color: '#D94532', bg: 'rgba(217, 69, 50, 0.12)' },
+  Investments: { name: 'Investments', icon: '📈', color: '#3D6B52', bg: 'rgba(61, 107, 82, 0.12)' },
+  Transfers: { name: 'Transfers', icon: '🔄', color: '#7E7C74', bg: 'rgba(126, 124, 116, 0.12)' },
+  Salary: { name: 'Salary', icon: '💼', color: '#2E7D5B', bg: 'rgba(46, 125, 91, 0.12)' },
+  Other: { name: 'Other', icon: '🏷️', color: '#A09D94', bg: 'rgba(160, 157, 148, 0.12)' }
 };
 
 export const ALL_CATEGORIES = Object.values(CATEGORY_DEFINITIONS);
@@ -33,7 +33,8 @@ const SPECIFIC_VENDOR_RULES = [
     patterns: [
       /bbps/i, /billdesk/i, /bescom/i, /adani.*power/i, /tata.*power/i, /electricity/i,
       /airtel/i, /jio/i, /broadband/i, /act.*fibernet/i, /water\s*board/i, /gas\s*bill/i,
-      /recharge/i, /dth/i, /postpaid/i, /prepaid/i
+      /recharge/i, /dth/i, /postpaid/i, /prepaid/i,
+      /sms\s*chg/i, /folio\s*chg/i, /service\s*chg/i, /bank\s*chg/i, /annual\s*fee/i, /card\s*fee/i
     ]
   },
   // Entertainment & Streaming
@@ -53,7 +54,8 @@ const SPECIFIC_VENDOR_RULES = [
     patterns: [
       /swiggy/i, /zomato/i, /starbucks/i, /mcdonald/i, /domino/i, /kfc/i, /burger\s*king/i,
       /palmtree/i, /seaportcafe/i, /cafe/i, /restaurant/i, /pizza/i, /biryani/i, /dhaba/i,
-      /baker/i, /kitchen/i, /canteen/i, /food/i, /eatery/i,
+      /baker/i, /kitchen/i, /canteen/i, /food/i, /eatery/i, /tea/i, /coffee/i, /snack/i,
+      /hotel/i, /shawarma/i, /juice/i, /mess/i, /dining/i, /tiffin/i, /curry/i, /roast/i,
       /\/(581[1-4]|5812)\b/ // MCC: Eating Places, Restaurants
     ]
   },
@@ -64,6 +66,7 @@ const SPECIFIC_VENDOR_RULES = [
     patterns: [
       /blinkit/i, /zepto/i, /bigbasket/i, /instamart/i, /dmart/i, /d-mart/i, /more\s*retail/i,
       /nature.*basket/i, /grocery/i, /supermarket/i, /spencer/i, /vegetables/i, /fruits/i,
+      /provisions/i, /dairy/i, /milk/i, /hypermarket/i, /bazaar/i,
       /\/(5411|5499|5422|5441|5451|5462)\b/ // MCC: Grocery, Supermarkets, Food Stores
     ]
   },
@@ -75,6 +78,7 @@ const SPECIFIC_VENDOR_RULES = [
       /amazon/i, /flipkart/i, /myntra/i, /ajio/i, /tatacliq/i, /nykaa/i, /meesho/i, /zara/i,
       /h&m/i, /uniqlo/i, /adnix/i, /vyapar/i, /lifestyle/i, /shoppers\s*stop/i, /croma/i,
       /reliance\s*digital/i, /store/i, /mart/i, /electronics/i, /clothing/i, /fashion/i,
+      /apparel/i, /footwear/i, /mall/i, /retail/i,
       /\/(5732|5733|5311|5331|5611|5621|5651|5691|5941|5942|5943|5944)\b/ // MCC: Retail, Department stores
     ]
   },
@@ -85,7 +89,7 @@ const SPECIFIC_VENDOR_RULES = [
     patterns: [
       /uber/i, /ola/i, /rapido/i, /irctc/i, /metro/i, /fuel/i, /petrol/i, /diesel/i,
       /shell/i, /indianoil/i, /hpcl/i, /bpcl/i, /indigo/i, /air\s*india/i, /makemytrip/i,
-      /fastag/i, /toll/i, /parking/i, /pkt/i,
+      /fastag/i, /toll/i, /parking/i, /pkt/i, /railway/i, /flight/i, /bus/i, /redbus/i,
       /\/(7523|7524|5541|5542|4111|4112|4121|4131|4789)\b/ // MCC: Parking, Service Stations, Rails, Cabs
     ]
   },
@@ -95,7 +99,7 @@ const SPECIFIC_VENDOR_RULES = [
     icon: '💊',
     patterns: [
       /apollo/i, /pharmeasy/i, /1mg/i, /medplus/i, /hospital/i, /clinic/i, /pharmacy/i,
-      /diagnostic/i, /dr\./i, /netmeds/i, /practo/i, /dent/i, /optical/i,
+      /diagnostic/i, /dr\./i, /netmeds/i, /practo/i, /dent/i, /optical/i, /medical/i, /chemist/i,
       /\/(5912|8011|8021|8031|8041|8042|8049|8062|8071|8099)\b/ // MCC: Drug Stores, Doctors, Hospitals
     ]
   },
@@ -114,17 +118,19 @@ const SPECIFIC_VENDOR_RULES = [
     category: 'Utilities',
     icon: '⚡',
     patterns: [
-      /\/(4900|4814|4812|4813|4816|4821)\b/
+      /\/(4900|4814|4812|4813|4816|4821)\b/,
+      /rent/i, /society/i, /maintenance/i, /housing/i
     ]
   },
-  // P2P Transfers & UPI Personal
+  // P2P Transfers, Bank Funds Transfers & Mobile Banking
   {
     category: 'Transfers',
     icon: '🔄',
     patterns: [
       /\/0000\b/, // MCC 0000 = P2P UPI Transfer
       /\/6540\b/, // POI Stored Value / P2P
-      /transfer\s*to/i, /sent\s*to/i, /p2p/i
+      /transfer\s*to/i, /sent\s*to/i, /p2p/i,
+      /\b(MB\s*FTB|MB:FTB|MB-FTB|IB\s*FTB|IB:FTB|FTB|FUNDS?\s*TRANSFER|INTERNAL\s*TRF|TPT|NEFT|IMPS|RTGS|CHQ|CHEQUE|CLG|TRF)\b/i
     ]
   }
 ];
@@ -187,12 +193,12 @@ export function categorizeTransaction(narration = '', type = 'expense') {
     }
   }
 
-  // 3. Fallback: If it's a personal UPI transfer (e.g. handle has personal name)
-  if (/^UPI(OUT|\s*IN)?/i.test(text)) {
+  // 3. Fallback: If it's a personal UPI or Bank Fund Transfer (e.g. MB FTB, IMPS, NEFT)
+  if (/^(UPI|MB\s*FTB|MB:FTB|MB-FTB|IB\s*FTB|FTB|IMPS|NEFT|RTGS|TRF|TRANSFER)/i.test(text) || /\b(MB\s*FTB|MB:FTB|FTB)\b/i.test(text)) {
     return {
       category: 'Transfers',
       icon: '🔄',
-      cleanMerchant: extractCleanMerchant(text, 'UPI Transfer')
+      cleanMerchant: extractCleanMerchant(text, 'Bank Fund Transfer')
     };
   }
 
@@ -287,10 +293,22 @@ export function extractCleanMerchant(narration = '', fallback = 'Merchant') {
     }
   }
 
+  // Clean MB FTB / Mobile Banking Fund Transfers
+  if (/^(MB\s*FTB|MB:FTB|MB-FTB|IB\s*FTB|IB:FTB|FTB)\b/i.test(s)) {
+    const after = s.replace(/^(MB\s*FTB|MB:FTB|MB-FTB|IB\s*FTB|IB:FTB|FTB)[\s/:\-_]*/i, '').trim();
+    if (after.length > 2 && !/^\d+$/.test(after)) {
+      const cleanChunk = after.split(/[-–—/:]/)[0].trim();
+      if (cleanChunk.length > 2 && !/^(TFR|DR|CR|NEFT|IMPS)$/i.test(cleanChunk)) {
+        return formatTitleCase(cleanChunk);
+      }
+    }
+    return 'Bank Fund Transfer';
+  }
+
   // Clean prefix noise
-  s = s.replace(/^(ACH\s+[CD]-|POS\s+\d+\s+|NEFT\s+[A-Z0-9]+-|RTGS\s+|IMPS\s+\d+\s+)/i, '');
-  const firstChunk = s.split(/[-–—/]/)[0].trim();
-  if (firstChunk && firstChunk.length > 2) {
+  s = s.replace(/^(ACH\s+[CD]-|POS\s+\d+\s+|NEFT\s+[A-Z0-9]+-|RTGS\s+|IMPS\s+\d+\s+|MB\s*FTB[\s/:\-_]*|FTB[\s/:\-_]*)/i, '');
+  const firstChunk = s.split(/[-–—/:]/)[0].trim();
+  if (firstChunk && firstChunk.length > 2 && !/^(TFR|DR|CR|TRANSFER)$/i.test(firstChunk)) {
     return formatTitleCase(firstChunk);
   }
 
@@ -303,4 +321,10 @@ function formatTitleCase(str) {
     .split(/\s+/)
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+}
+
+if (typeof window !== 'undefined') {
+  window.__categorizeTransaction = categorizeTransaction;
+  window.__extractCleanMerchant = extractCleanMerchant;
+  window.__getCategoryMeta = getCategoryMeta;
 }

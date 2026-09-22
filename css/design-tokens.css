@@ -1,55 +1,59 @@
 /**
- * Design Tokens - SBAFA Personal Finance Enclave
- * Theme: Modern Minimalist (Obsidian Grayscale, Architectural Precision, Tabular Figures)
- * Guidelines: SKILL.md (design-scout)
+ * Design Tokens - SBAFA Personal Finance
+ * Inspired by Warm Editorial & Tactile Modernist Aesthetics (referencing SKILL.md)
+ * Palette: Warm Wheat Linen / Espresso Charcoal with Burnt Tangerine Terracotta Accents
  */
 
 :root {
-  /* Surface & Canvas Hierarchy */
-  --bg-deep: #08090C;
-  --bg-main: #0C0E14;
-  --bg-surface: #12151E;
-  --bg-surface-elevated: #181B26;
-  --bg-surface-subtle: rgba(18, 21, 30, 0.75);
-  --bg-glass: rgba(12, 14, 20, 0.82);
-  --bg-glass-card: rgba(18, 21, 30, 0.65);
-  --bg-glass-card-hover: rgba(26, 31, 45, 0.75);
+  /* Core Brand Identity (Terracotta Tangerine) */
+  --accent-primary: #E86034;
+  --accent-primary-hover: #D45025;
+  --accent-primary-subtle: rgba(232, 96, 52, 0.12);
+  --accent-primary-glow: rgba(232, 96, 52, 0.25);
+  --accent-primary-text: #FFFFFF;
 
-  /* Hairline Borders & Dividers */
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.14);
+  /* Secondary Accents */
+  --accent-sage: #3D6B52;
+  --accent-sage-subtle: rgba(61, 107, 82, 0.12);
+  --accent-ochre: #D9822B;
+  --accent-ochre-subtle: rgba(217, 130, 43, 0.12);
+
+  /* Functional Financial Signals */
+  --signal-income: #2E7D5B;
+  --signal-income-subtle: rgba(46, 125, 91, 0.12);
+  --signal-expense: #E86034;
+  --signal-expense-subtle: rgba(232, 96, 52, 0.12);
+  --signal-warning: #D9822B;
+  --signal-warning-subtle: rgba(217, 130, 43, 0.12);
+
+  /* Dark Mode Hierarchy (Warm Espresso Obsidian & Wheat Tones) */
+  --bg-deep: #121310;
+  --bg-main: #181915;
+  --bg-surface: #20221C;
+  --bg-surface-elevated: #282A24;
+  --bg-surface-subtle: rgba(32, 34, 28, 0.85);
+  --bg-glass: rgba(24, 25, 21, 0.88);
+  --bg-glass-card: rgba(32, 34, 28, 0.75);
+  --bg-glass-card-hover: rgba(40, 42, 36, 0.9);
+
+  /* Warm Borders & Dividers */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.13);
   --border-hover: rgba(255, 255, 255, 0.22);
-  --border-focus: rgba(255, 255, 255, 0.45);
-  --border-accent: rgba(16, 185, 129, 0.35);
+  --border-focus: rgba(232, 96, 52, 0.55);
+  --border-accent: rgba(232, 96, 52, 0.35);
 
-  /* Restrained Monochrome & Functional Signals */
-  --accent-white: #FFFFFF;
-  --accent-neutral: #E2E8F0;
-  --accent-subtle: rgba(255, 255, 255, 0.06);
+  /* High Legibility Warm Editorial Typography */
+  --text-primary: #F7F5EE;
+  --text-secondary: #B0AEA5;
+  --text-muted: #7E7C74;
+  --text-dim: #55544E;
+  --text-inverse: #181915;
 
-  --accent-emerald: #10B981;
-  --accent-emerald-subtle: rgba(16, 185, 129, 0.12);
-  --accent-emerald-glow: rgba(16, 185, 129, 0.25);
-
-  --accent-blue: #3B82F6;
-  --accent-blue-subtle: rgba(59, 130, 246, 0.12);
-  --accent-blue-glow: rgba(59, 130, 246, 0.25);
-
-  --signal-income: #10B981;
-  --signal-expense: #F43F5E;
-  --signal-expense-subtle: rgba(244, 63, 94, 0.12);
-  --signal-warning: #F59E0B;
-  --signal-warning-subtle: rgba(245, 158, 11, 0.12);
-
-  /* High Legibility Editorial Typography */
-  --text-primary: #FFFFFF;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
-  --text-dim: #475569;
-  --text-inverse: #08090C;
-
+  /* Typography Families */
   --font-family-base: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-family-mono: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace;
+  --font-family-display: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Typography Scale */
   --text-2xs: 0.6875rem; /* 11px */
@@ -63,87 +67,77 @@
   --text-4xl: 2.75rem;    /* 44px */
   --text-5xl: 3.5rem;     /* 56px */
 
-  /* Precision Radii */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  /* Tactile Modernist Radii (Pills & Squircles) */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
   --radius-xl: 24px;
-  --radius-2xl: 32px;
+  --radius-2xl: 30px;
   --radius-full: 9999px;
 
-  /* Shadows (Restrained, Crisp Depth) */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.7);
-  --shadow-glow-emerald: 0 0 20px -2px rgba(16, 185, 129, 0.3);
-  --shadow-glow-white: 0 0 24px -4px rgba(255, 255, 255, 0.15);
+  /* Warm Depth Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 18px -2px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 36px -4px rgba(0, 0, 0, 0.6);
+  --shadow-glow-terracotta: 0 0 24px -2px rgba(232, 96, 52, 0.35);
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.25);
 
   /* Transitions */
   --transition-fast: 140ms cubic-bezier(0.16, 1, 0.3, 1);
   --transition-normal: 240ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-spring: 380ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  --transition-spring: 360ms cubic-bezier(0.34, 1.35, 0.64, 1);
 
   /* Layout Safe Areas */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
-  --nav-height: 66px;
+  --nav-height: 68px;
 }
 
 /**
- * Modern Minimalist Light Theme (Gallery White, Ink Monochrome)
+ * Warm Linen Oatmeal / Wheat Light Theme
+ * As shown in the Meetgen editorial mobile app reference!
  */
 :root[data-theme="light"],
 [data-theme="light"] {
-  /* Surface & Canvas Hierarchy */
-  --bg-deep: #F1F4F9;
-  --bg-main: #FFFFFF;
-  --bg-surface: #F8FAFC;
+  /* Warm Linen / Oatmeal Surface Canvas */
+  --bg-deep: #EDE7DD;
+  --bg-main: #F5F1E8;
+  --bg-surface: #FAF7F0;
   --bg-surface-elevated: #FFFFFF;
-  --bg-surface-subtle: rgba(241, 245, 249, 0.9);
-  --bg-glass: rgba(255, 255, 255, 0.88);
-  --bg-glass-card: rgba(255, 255, 255, 0.8);
-  --bg-glass-card-hover: rgba(241, 245, 249, 0.95);
+  --bg-surface-subtle: rgba(245, 241, 232, 0.9);
+  --bg-glass: rgba(245, 241, 232, 0.88);
+  --bg-glass-card: rgba(255, 255, 255, 0.9);
+  --bg-glass-card-hover: #FFFFFF;
 
-  /* Hairline Borders & Dividers */
-  --border-subtle: rgba(15, 23, 42, 0.08);
-  --border-medium: rgba(15, 23, 42, 0.14);
-  --border-hover: rgba(15, 23, 42, 0.24);
-  --border-focus: rgba(15, 23, 42, 0.5);
-  --border-accent: rgba(5, 150, 105, 0.35);
+  /* Subtle Warm Slate Borders */
+  --border-subtle: rgba(26, 27, 23, 0.08);
+  --border-medium: rgba(26, 27, 23, 0.14);
+  --border-hover: rgba(26, 27, 23, 0.25);
+  --border-focus: rgba(232, 96, 52, 0.6);
+  --border-accent: rgba(232, 96, 52, 0.4);
 
-  /* High Legibility Editorial Typography - Razor Sharp Contrast */
-  --text-primary: #0F172A;
-  --text-secondary: #334155;
-  --text-muted: #64748B;
-  --text-dim: #475569;
+  /* Deep Charcoal Typography */
+  --text-primary: #191A16;
+  --text-secondary: #585750;
+  --text-muted: #828078;
+  --text-dim: #A6A49C;
   --text-inverse: #FFFFFF;
 
-  /* Restrained Monochrome & Functional Signals */
-  --accent-white: #0F172A;
-  --accent-neutral: #1E293B;
-  --accent-subtle: rgba(15, 23, 42, 0.05);
+  /* Signals tailored for light linen */
+  --signal-income: #1E6B4A;
+  --signal-income-subtle: rgba(30, 107, 74, 0.1);
+  --signal-expense: #D94D20;
+  --signal-expense-subtle: rgba(217, 77, 32, 0.1);
+  --signal-warning: #B86B1C;
+  --signal-warning-subtle: rgba(184, 107, 28, 0.1);
 
-  --accent-emerald: #059669;
-  --accent-emerald-subtle: rgba(5, 150, 105, 0.12);
-  --accent-emerald-glow: rgba(5, 150, 105, 0.22);
-
-  --accent-blue: #1D4ED8;
-  --accent-blue-subtle: rgba(29, 78, 216, 0.1);
-  --accent-blue-glow: rgba(29, 78, 216, 0.2);
-
-  --signal-income: #047857;
-  --signal-expense: #BE123C;
-  --signal-expense-subtle: rgba(190, 18, 60, 0.08);
-  --signal-warning: #B45309;
-  --signal-warning-subtle: rgba(180, 83, 9, 0.08);
-
-  /* Shadows (Soft Crisp Depth) */
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
-  --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.1);
-  --shadow-lg: 0 12px 32px -4px rgba(15, 23, 42, 0.14);
-  --shadow-glow-emerald: 0 0 20px -2px rgba(5, 150, 105, 0.2);
-  --shadow-glow-white: 0 0 20px -4px rgba(15, 23, 42, 0.08);
+  /* Soft Organic Depth Shadows */
+  --shadow-sm: 0 1px 3px rgba(30, 31, 26, 0.05);
+  --shadow-md: 0 4px 16px -2px rgba(30, 31, 26, 0.08);
+  --shadow-lg: 0 12px 32px -4px rgba(30, 31, 26, 0.12);
+  --shadow-glow-terracotta: 0 0 20px -2px rgba(232, 96, 52, 0.25);
+  --shadow-card: 0 1px 4px rgba(30, 31, 26, 0.06);
 }

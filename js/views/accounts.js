@@ -4,7 +4,7 @@
  * and automated weekly Gmail statement sync with zero third-party telemetry.
  */
 
-import { db, formatINR, getCurrentUser, getUserAccounts, purgeAllTestData, resetUserData, addNotification } from '../db.js';
+import { db, formatINR, getCurrentUser, getUserAccounts, purgeAllTestData, resetUserData, addNotification, getStatementUploadHistory, addStatementUploadHistory } from '../db.js';
 import { BiometricAuthService } from '../auth.js';
 import { BankStatementParser } from '../parsers/bank-parser.js';
 import { BankPDFParser } from '../parsers/pdf-parser.js';
@@ -20,6 +20,7 @@ export async function renderAccounts(container, showToastCallback) {
   const userBank = userId ? await BankPDFParser.getPrimaryBank(userId) : 'Federal';
   const savedPasskey = userId ? await BankPDFParser.getSavedPasswordRaw(userBank, userId) : '';
   const isWeeklyDue = GmailStatementSyncService.isWeeklySyncDue();
+  const statementHistory = userId ? await getStatementUploadHistory(userId) : [];
 
   let bankCardsHtml = '';
   if (accounts.length === 0) {
@@ -184,7 +185,41 @@ export async function renderAccounts(container, showToastCallback) {
         <div style="font-size: var(--text-xs); color: var(--text-muted);">
           Auto-decrypted using your saved statement passkey. 100% private on your device.
         </div>
-        <input type="file" id="statement-file-input" accept="application/pdf,.pdf,.csv,text/csv" style="display: none;" />
+        <input type="file" id="statement-file-input" accept="application/pdf,.pdf,.csv,text/csv" multiple style="display: none;" />
+      </div>
+
+      <!-- Past Uploaded Statements Text Block (3 Recent + Popup Modal for Full History) -->
+      <div class="past-statements-container" style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border-medium);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <span>Past Uploaded Statements (3 Recent)</span>
+          </div>
+          <button type="button" id="view-statement-history-btn" class="btn btn-ghost btn-sm" style="font-size: 11px; padding: 3px 8px; color: var(--accent-primary); font-weight: 700;">
+            View Full History (${statementHistory.length}) →
+          </button>
+        </div>
+
+        <div class="past-statements-list" style="display: flex; flex-direction: column; gap: 6px;">
+          ${statementHistory.length === 0 ? `
+            <div style="font-size: 11px; color: var(--text-muted); font-style: italic; padding: 4px 0;">No statements uploaded yet.</div>
+          ` : statementHistory.slice(0, 3).map((stmt, idx) => `
+            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 11.5px;">
+              <div style="display: flex; align-items: center; gap: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 12px;">
+                <span style="font-size: 14px;">📄</span>
+                <span style="font-weight: 600; color: var(--text-primary); font-family: monospace; font-size: 11.5px;" title="${escapeHtml(stmt.fileName)}">
+                  ${escapeHtml(stmt.fileName)}
+                </span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0; font-size: 11px; color: var(--text-muted);">
+                <span>${escapeHtml(stmt.uploadedAt || stmt.date || '')}</span>
+                <span style="background: rgba(46, 125, 91, 0.12); color: var(--signal-income); padding: 2px 7px; border-radius: var(--radius-full); font-weight: 600; font-size: 10px; border: 1px solid rgba(46, 125, 91, 0.25);">
+                  ✓ ${escapeHtml(stmt.status || 'Processed')}
+                </span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
       </div>
     </div>
 
@@ -371,17 +406,25 @@ export async function renderAccounts(container, showToastCallback) {
     e.preventDefault();
     dropzone.classList.remove('dragover');
     if (e.dataTransfer.files.length > 0) {
-      handleUploadedFile(e.dataTransfer.files[0], showToastCallback, () => renderAccounts(container, showToastCallback));
+      handleUploadedFiles(Array.from(e.dataTransfer.files), showToastCallback, () => renderAccounts(container, showToastCallback));
     }
   };
 
   fileInput.onchange = (e) => {
     if (e.target.files.length > 0) {
-      const selected = e.target.files[0];
+      const selectedFiles = Array.from(e.target.files);
       e.target.value = '';
-      handleUploadedFile(selected, showToastCallback, () => renderAccounts(container, showToastCallback));
+      handleUploadedFiles(selectedFiles, showToastCallback, () => renderAccounts(container, showToastCallback));
     }
   };
+
+  // --- View Full Statement History Modal ---
+  const viewHistoryBtn = container.querySelector('#view-statement-history-btn');
+  if (viewHistoryBtn) {
+    viewHistoryBtn.onclick = () => {
+      openStatementHistoryModal(statementHistory);
+    };
+  }
 
   // --- Reset All Vault Data Button Handler (PIN-Gated) ---
   const resetBtn = container.querySelector('#reset-vault-data-btn');
@@ -431,77 +474,105 @@ function renderBankCardHtml(acc, isPrivacy) {
 }
 
 /**
- * Handle either PDF or CSV upload
+ * Handle multiple uploaded files (PDFs and/or CSVs)
  */
-async function handleUploadedFile(file, showToast, refreshCallback) {
-  const fileName = file.name.toLowerCase();
+async function handleUploadedFiles(files, showToast, refreshCallback) {
+  if (!files || files.length === 0) return;
 
-  if (fileName.endsWith('.pdf') || file.type === 'application/pdf') {
-    handlePdfFile(file, showToast, refreshCallback);
-  } else {
-    // CSV file
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target.result;
-      processCsvText(text, null, showToast, refreshCallback);
-    };
-    reader.readAsText(file);
+  const curUser = await getCurrentUser();
+  if (!curUser || !curUser.id) {
+    showToast('Please sign in to import statements into your vault.', 'warning');
+    window.location.hash = '#/login';
+    return;
   }
-}
+  const userId = curUser.id;
+  const isAutofill = await BankPDFParser.isAutofillEnabled(userId);
 
-/**
- * Handle Bank Statement PDF with automatic password decryption
- */
-async function handlePdfFile(file, showToast, refreshCallback) {
-  try {
-    const reader = new FileReader();
-    reader.onerror = (e) => {
-      showToast('Could not read statement PDF file: ' + (e.target?.error?.message || 'File read error'), 'warning');
-    };
-    reader.onload = async (e) => {
+  // Collect candidate autofill passwords
+  let candidatePwds = [''];
+  if (isAutofill) {
+    const primaryBank = await BankPDFParser.getPrimaryBank(userId);
+    const savedPrimary = await BankPDFParser.getSavedPassword(primaryBank, userId);
+    const savedHdfcPwd = await BankPDFParser.getSavedPassword('HDFC', userId);
+    const savedFedPwd = await BankPDFParser.getSavedPassword('FEDERAL', userId);
+    candidatePwds = [savedPrimary, savedHdfcPwd, savedFedPwd, ''].filter(Boolean);
+    if (!candidatePwds.includes('')) candidatePwds.push('');
+  }
+
+  const parsedStatements = [];
+  const filesNeedingPassword = [];
+
+  for (const file of files) {
+    const fileName = file.name.toLowerCase();
+    if (fileName.endsWith('.pdf') || file.type === 'application/pdf') {
       try {
-        const arrayBuffer = e.target.result;
-        const curUser = await getCurrentUser();
-        const userId = curUser ? curUser.id : null;
-        const isAutofill = await BankPDFParser.isAutofillEnabled(userId);
-
+        const arrayBuffer = await file.arrayBuffer();
         let decryptedText = null;
 
-        // Check if autofill is enabled and try candidate passwords
-        if (isAutofill) {
-          const primaryBank = await BankPDFParser.getPrimaryBank(userId);
-          const savedPrimary = await BankPDFParser.getSavedPassword(primaryBank, userId);
-          const savedHdfcPwd = await BankPDFParser.getSavedPassword('HDFC', userId);
-          const savedFedPwd = await BankPDFParser.getSavedPassword('FEDERAL', userId);
-          const candidates = [savedPrimary, savedHdfcPwd, savedFedPwd, ''].filter(Boolean);
-
-          for (const pwd of candidates) {
-            try {
-              decryptedText = await BankPDFParser.extractPdfText(arrayBuffer, pwd);
-              if (decryptedText) break;
-            } catch (err) {
-              // Continue to next password
-            }
+        for (const pwd of candidatePwds) {
+          try {
+            decryptedText = await BankPDFParser.extractPdfText(arrayBuffer, pwd);
+            if (decryptedText) break;
+          } catch (e) {
+            // Try next password
           }
         }
 
         if (decryptedText) {
-          // Successfully decrypted with saved password
-          await parseAndIngestPdfText(decryptedText, showToast, refreshCallback);
+          const parsed = BankPDFParser.parseTextToTransactions(decryptedText);
+          parsedStatements.push({ file, result: parsed });
         } else {
-          // Prompt user for password
-          promptPdfPasswordModal(arrayBuffer, file.name, showToast, refreshCallback);
+          filesNeedingPassword.push({ file, arrayBuffer });
         }
       } catch (err) {
-        console.error('PDF file handling error:', err);
-        showToast('Error processing statement PDF: ' + (err.message || 'Unknown error'), 'warning');
+        console.error('File read error for:', file.name, err);
+        showToast(`Could not read ${file.name}: ${err.message || 'Unknown error'}`, 'warning');
       }
-    };
-    reader.readAsArrayBuffer(file);
-  } catch (err) {
-    console.error('File read error:', err);
-    showToast('Failed to open PDF statement: ' + (err.message || 'Unknown error'), 'warning');
+    } else {
+      // CSV File
+      try {
+        const text = await file.text();
+        processCsvText(text, null, showToast, refreshCallback);
+      } catch (err) {
+        showToast(`Could not read ${file.name}: ${err.message}`, 'warning');
+      }
+    }
   }
+
+  // If some PDFs need a password, prompt for the first one and queue the rest
+  if (filesNeedingPassword.length > 0) {
+    const firstProtected = filesNeedingPassword[0];
+    promptPdfPasswordModal(
+      firstProtected.arrayBuffer,
+      firstProtected.file.name,
+      showToast,
+      async (manualDecryptedText) => {
+        if (manualDecryptedText) {
+          const parsed = BankPDFParser.parseTextToTransactions(manualDecryptedText);
+          parsedStatements.push({ file: firstProtected.file, result: parsed });
+        }
+        if (parsedStatements.length > 0) {
+          await ingestMultipleStatements(parsedStatements, userId, showToast, refreshCallback);
+        }
+      }
+    );
+    // If we also had some already-decrypted statements, ingest them right away
+    if (parsedStatements.length > 0) {
+      await ingestMultipleStatements(parsedStatements, userId, showToast, refreshCallback);
+    }
+    return;
+  }
+
+  if (parsedStatements.length > 0) {
+    await ingestMultipleStatements(parsedStatements, userId, showToast, refreshCallback);
+  }
+}
+
+/**
+ * Handle a single uploaded file (backwards compatibility wrapper)
+ */
+async function handleUploadedFile(file, showToast, refreshCallback) {
+  return handleUploadedFiles([file], showToast, refreshCallback);
 }
 
 function promptPdfPasswordModal(arrayBuffer, fileName, showToast, refreshCallback) {
@@ -588,7 +659,11 @@ function promptPdfPasswordModal(arrayBuffer, fileName, showToast, refreshCallbac
       }
 
       modalContainer.innerHTML = '';
-      await parseAndIngestPdfText(text, showToast, refreshCallback);
+      if (typeof refreshCallback === 'function' && refreshCallback.length === 1) {
+        refreshCallback(text);
+      } else {
+        await parseAndIngestPdfText(text, showToast, refreshCallback);
+      }
     } catch (err) {
       submitBtn.disabled = false;
       submitBtn.innerText = 'Decrypt & Import →';
@@ -602,69 +677,151 @@ function promptPdfPasswordModal(arrayBuffer, fileName, showToast, refreshCallbac
   };
 }
 
-async function parseAndIngestPdfText(pdfText, showToast, refreshCallback) {
+/**
+ * Ingest multiple parsed statements and for each bank account,
+ * always take the available balance from the statement with the LATEST date.
+ */
+async function ingestMultipleStatements(statementList, userId, showToast, refreshCallback) {
   try {
-    const user = await getCurrentUser();
-    if (!user || !user.id) {
-      showToast('Please sign in to import statements into your vault.', 'warning');
-      window.location.hash = '#/login';
-      return;
-    }
-    const userId = user.id;
-    const result = BankPDFParser.parseTextToTransactions(pdfText);
-    if (result.transactions.length === 0) {
-      showToast('Decrypted PDF, but found no transaction rows to extract.', 'info');
-      return;
-    }
+    if (!statementList || statementList.length === 0) return;
 
-    // Retrieve user accounts and find or auto-create matched account
     const userAccounts = await db.accounts.where('userId').equals(userId).toArray();
-    let matchedAccount = userAccounts.find(a => 
-      (a.bankCode && result.bankCode && a.bankCode.toLowerCase() === result.bankCode.toLowerCase()) ||
-      (a.bankName && result.detectedBank && a.bankName.toLowerCase().includes(result.detectedBank.toLowerCase()))
-    );
 
-    let netChange = 0;
-    for (const t of result.transactions) {
-      netChange += (t.type === 'income' ? t.amount : -t.amount);
+    // Group statements by bank
+    const bankGroups = {};
+    for (const item of statementList) {
+      const res = item.result;
+      if (!res.transactions || res.transactions.length === 0) continue;
+      const key = (res.bankCode || res.detectedBank || 'OTHER').toUpperCase();
+      if (!bankGroups[key]) bankGroups[key] = [];
+      bankGroups[key].push(item);
     }
 
-    if (!matchedAccount) {
-      const newAccId = `acc-${userId}-${Date.now().toString(36)}`;
-      matchedAccount = {
-        id: newAccId,
-        userId,
-        bankName: result.detectedBank || 'Bank Account',
-        accountNumberMask: '•••• ' + Math.floor(1000 + Math.random() * 9000),
-        accountType: 'Savings Account',
-        balance: result.availableBalance != null ? result.availableBalance : Math.max(0, netChange),
-        bankCode: result.bankCode || 'OTHER',
-        lastSynced: 'Just now'
-      };
-      await db.accounts.add(matchedAccount);
-    } else {
-      const updatedBalance = result.availableBalance != null
-        ? result.availableBalance
-        : Math.max(0, (matchedAccount.balance || 0) + netChange);
+    let totalImportedTxns = 0;
+    const summaryReports = [];
 
-      await db.accounts.update(matchedAccount.id, {
-        balance: updatedBalance,
-        lastSynced: 'Just now'
+    for (const [bankKey, items] of Object.entries(bankGroups)) {
+      // Find or create account for this bank
+      let matchedAccount = userAccounts.find(a => 
+        (a.bankCode && a.bankCode.toUpperCase() === bankKey) ||
+        (a.bankName && items[0].result.detectedBank && a.bankName.toLowerCase().includes(items[0].result.detectedBank.toLowerCase()))
+      );
+
+      // Sort items by statement date ascending so the last one is the latest
+      items.sort((a, b) => {
+        const dateA = a.result.statementDate || '';
+        const dateB = b.result.statementDate || '';
+        return dateA.localeCompare(dateB);
       });
+
+      // The statement with the latest date
+      const latestStatementItem = items[items.length - 1];
+      const latestResult = latestStatementItem.result;
+      const latestDate = latestResult.statementDate || '';
+      const latestBalance = latestResult.availableBalance;
+
+      // Calculate total net change if balance was null
+      let netChange = 0;
+      const allTxnsForBank = [];
+      for (const it of items) {
+        for (const t of it.result.transactions) {
+          allTxnsForBank.push(t);
+          netChange += (t.type === 'income' ? t.amount : -t.amount);
+        }
+      }
+
+      if (!matchedAccount) {
+        const newAccId = `acc-${userId}-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
+        matchedAccount = {
+          id: newAccId,
+          userId,
+          bankName: latestResult.detectedBank || 'Bank Account',
+          accountNumberMask: '•••• ' + Math.floor(1000 + Math.random() * 9000),
+          accountType: 'Savings Account',
+          balance: latestBalance != null ? latestBalance : Math.max(0, netChange),
+          bankCode: latestResult.bankCode || 'OTHER',
+          lastStatementDate: latestDate,
+          lastSynced: 'Just now'
+        };
+        await db.accounts.add(matchedAccount);
+        userAccounts.push(matchedAccount);
+      } else {
+        // Compare with existing account's lastStatementDate
+        const existingDate = matchedAccount.lastStatementDate || '';
+        let targetBalance = matchedAccount.balance;
+
+        if (latestBalance != null) {
+          // If this batch has a date >= existing date, or existing had no date, use latestBalance
+          if (!existingDate || latestDate >= existingDate) {
+            targetBalance = latestBalance;
+          }
+        } else if (targetBalance == null) {
+          targetBalance = Math.max(0, netChange);
+        }
+
+        const newLatestDate = (!existingDate || latestDate > existingDate) ? (latestDate || existingDate) : existingDate;
+
+        await db.accounts.update(matchedAccount.id, {
+          balance: targetBalance,
+          lastStatementDate: newLatestDate,
+          lastSynced: 'Just now'
+        });
+        matchedAccount.balance = targetBalance;
+        matchedAccount.lastStatementDate = newLatestDate;
+      }
+
+      // Add all transactions to ledger (avoid exact duplicates for this account)
+      const existingTxns = await db.transactions
+        .where('account_id')
+        .equals(matchedAccount.id)
+        .toArray();
+
+      const existingSet = new Set(existingTxns.map(t => `${t.date}_${t.amount}_${t.type}_${(t.merchant || '').toLowerCase()}`));
+
+      const newTxnsToInsert = [];
+      for (const t of allTxnsForBank) {
+        const sig = `${t.date}_${t.amount}_${t.type}_${(t.merchant || '').toLowerCase()}`;
+        if (!existingSet.has(sig)) {
+          existingSet.add(sig);
+          newTxnsToInsert.push({
+            ...t,
+            account_id: matchedAccount.id,
+            userId
+          });
+        }
+      }
+
+      if (newTxnsToInsert.length > 0) {
+        await db.transactions.bulkAdd(newTxnsToInsert);
+      }
+      totalImportedTxns += newTxnsToInsert.length;
+
+      const balLabel = matchedAccount.balance != null ? ` • Balance: ₹${matchedAccount.balance.toFixed(2)}` : '';
+      const dateLabel = matchedAccount.lastStatementDate ? ` (Latest: ${matchedAccount.lastStatementDate})` : '';
+      summaryReports.push(`${matchedAccount.bankName}${balLabel}${dateLabel}`);
     }
 
-    const tagged = result.transactions.map(t => ({
-      ...t,
-      account_id: matchedAccount.id,
-      userId
-    }));
-    await db.transactions.bulkAdd(tagged);
-    const balMsg = result.availableBalance != null ? ` • Balance: ₹${result.availableBalance.toFixed(2)}` : '';
+    // Record uploaded statements to history
+    const historyEntries = statementList.map(item => {
+      const fn = (item.file && item.file.name) || item.fileName || 'Bank_Statement.pdf';
+      const res = item.result || {};
+      return {
+        id: 'stmt-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6),
+        fileName: fn,
+        date: res.statementDate || new Date().toISOString().slice(0, 10),
+        uploadedAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        bank: res.detectedBank || 'Bank Statement',
+        txnCount: res.totalParsed || (res.transactions ? res.transactions.length : 0),
+        balance: res.availableBalance != null ? res.availableBalance : null,
+        status: 'Processed'
+      };
+    });
+    await addStatementUploadHistory(userId, historyEntries);
 
     // Create In-App Notification and check spending caps
     await addNotification(userId, {
-      title: `Statement Ingested: ${matchedAccount.bankName}`,
-      message: `Extracted ${result.totalParsed} transactions from statement.${balMsg}`,
+      title: `Statement Ingested (${statementList.length} files)`,
+      message: `Processed ${statementList.length} statement(s), added ${totalImportedTxns} new transactions. ${summaryReports.join(' | ')}`,
       type: 'sync',
       actionUrl: '#/transactions',
       actionLabel: 'View Ledger'
@@ -672,14 +829,30 @@ async function parseAndIngestPdfText(pdfText, showToast, refreshCallback) {
     await checkSpendingCaps(userId);
 
     showToast(
-      `Successfully ingested ${result.totalParsed} transactions (${result.formatDetected}) into ${matchedAccount.bankName}${balMsg}!`,
+      `Ingested ${totalImportedTxns} transactions from ${statementList.length} statement(s)! ${summaryReports.join('; ')}`,
       'success'
     );
 
     if (refreshCallback) refreshCallback();
   } catch (err) {
-    showToast('Failed to parse PDF text: ' + err.message, 'info');
+    console.error('Ingest multiple statements error:', err);
+    showToast('Failed to ingest statements: ' + (err.message || 'Unknown error'), 'warning');
   }
+}
+
+async function parseAndIngestPdfText(pdfText, showToast, refreshCallback) {
+  const curUser = await getCurrentUser();
+  if (!curUser || !curUser.id) {
+    showToast('Please sign in to import statements into your vault.', 'warning');
+    window.location.hash = '#/login';
+    return;
+  }
+  const parsed = BankPDFParser.parseTextToTransactions(pdfText);
+  if (parsed.transactions.length === 0) {
+    showToast('Decrypted PDF, but found no transaction rows to extract.', 'info');
+    return;
+  }
+  await ingestMultipleStatements([{ file: { name: 'statement.pdf' }, result: parsed }], curUser.id, showToast, refreshCallback);
 }
 
 async function processCsvText(csvText, targetAccId, showToast, refreshCallback) {
@@ -1478,6 +1651,85 @@ function confirmRemovePasskeyModal(userId, currentBank, showToast, refreshCallba
   };
 }
 
+/**
+ * Statement Upload History Modal (Popup Window)
+ */
+export function openStatementHistoryModal(historyList = []) {
+  const modalContainer = document.getElementById('global-modal-container');
+  if (!modalContainer) return;
+
+  modalContainer.innerHTML = `
+    <div class="modal-backdrop active" id="stmt-history-backdrop">
+      <div class="modal-sheet" style="max-width: 580px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="sheet-handle"></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-medium);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.4rem;">📁</span>
+            <div>
+              <div style="font-size: var(--text-base); font-weight: 800; color: var(--text-primary);">Statement Upload History</div>
+              <div style="font-size: 11px; color: var(--text-muted);">All bank statement PDFs uploaded to your private vault on this device</div>
+            </div>
+          </div>
+          <button id="close-stmt-history-btn" class="btn-icon btn-sm" aria-label="Close" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-medium); border-radius: var(--radius-full); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            ✕
+          </button>
+        </div>
+
+        <div style="overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; margin-bottom: 16px;">
+          ${historyList.length === 0 ? `
+            <div style="text-align: center; color: var(--text-muted); padding: 32px 16px; font-size: var(--text-xs);">
+              No past statement PDFs uploaded yet.
+            </div>
+          ` : historyList.map((item, i) => `
+            <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <span style="font-size: 1.1rem;">📄</span>
+                  <span style="font-weight: 700; color: var(--text-primary); font-family: monospace; font-size: 12px;" title="${escapeHtml(item.fileName)}">
+                    ${escapeHtml(item.fileName)}
+                  </span>
+                </div>
+                <span style="background: rgba(46, 125, 91, 0.12); color: var(--signal-income); padding: 2px 8px; border-radius: var(--radius-full); font-weight: 700; font-size: 10.5px; border: 1px solid rgba(46, 125, 91, 0.25); white-space: nowrap;">
+                  ✓ ${escapeHtml(item.status || 'Processed')}
+                </span>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-secondary); flex-wrap: wrap; gap: 6px; padding-top: 4px; border-top: 1px dashed var(--border-subtle);">
+                <div>
+                  <span>Bank: <strong>${escapeHtml(item.bank || 'Bank Account')}</strong></span>
+                  ${item.txnCount != null ? ` • <span>${item.txnCount} txns</span>` : ''}
+                  ${item.balance != null ? ` • <span>Balance: ₹${Number(item.balance).toFixed(2)}</span>` : ''}
+                </div>
+                <div style="color: var(--text-muted); font-size: 10.5px;">
+                  Uploaded: ${escapeHtml(item.uploadedAt || item.date || 'Recent')}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+          <button id="close-stmt-history-footer-btn" class="btn btn-secondary btn-sm" style="padding: 7px 18px;">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const closeBtn = document.getElementById('close-stmt-history-btn');
+  const footerCloseBtn = document.getElementById('close-stmt-history-footer-btn');
+  const backdrop = document.getElementById('stmt-history-backdrop');
+
+  const close = () => { modalContainer.innerHTML = ''; };
+  if (closeBtn) closeBtn.onclick = close;
+  if (footerCloseBtn) footerCloseBtn.onclick = close;
+  if (backdrop) {
+    backdrop.onclick = (e) => {
+      if (e.target === backdrop) close();
+    };
+  }
+}
+
 function escapeHtml(str) {
   return String(str)
     .replace(/&/g, '&amp;')
@@ -1487,4 +1739,5 @@ function escapeHtml(str) {
 
 if (typeof window !== 'undefined') {
   window.promptPinAuthModal = promptPinAuthModal;
+  window.openStatementHistoryModal = openStatementHistoryModal;
 }

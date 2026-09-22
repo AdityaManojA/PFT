@@ -13,17 +13,17 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="SBAFA" />
-  <meta name="theme-color" content="#0F172A" />
+  <meta name="theme-color" content="#181915" />
 
   <!-- App Icons & Web Manifest -->
-  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="icons/SBAFA_Logo.svg" />
+  <link rel="apple-touch-icon" href="icons/SBAFA_Logo.svg" />
   <link rel="manifest" href="manifest.json" />
 
-  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <!-- Google Fonts: Plus Jakarta Sans, Space Grotesk & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <!-- Core Design System CSS -->
   <link rel="stylesheet" href="css/design-tokens.css" />
@@ -55,7 +55,7 @@
     <!-- App Header -->
     <header class="app-header">
       <div class="header-brand" id="header-brand-link" role="button" tabindex="0" title="Go to Dashboard / Landing">
-        <div class="header-logo-icon">S</div>
+        <img src="icons/SBAFA_Logo.svg" alt="SBAFA" class="header-logo-img" />
         <div>
           <h1 class="header-title">SBAFA</h1>
           <div class="header-subtitle">Financial Enclave</div>
@@ -63,7 +63,7 @@
       </div>
 
       <div class="header-actions">
-        <button id="header-landing-btn" class="header-nav-btn" title="View Home Landing Page">
+        <button id="header-landing-btn" class="header-nav-btn header-desktop-only" title="View Home Landing Page">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           <span>Home</span>
         </button>

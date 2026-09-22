@@ -257,26 +257,33 @@ export async function renderLanding(container) {
 
         <!-- Foreground Hero Content -->
         <div class="landing-hero-content">
+          <!-- Geometric Contour Star Emblem (Meetgen Style) with SBAFA_Logo.svg -->
+          <div class="landing-sketch-card">
+            <img src="icons/SBAFA_Logo.svg" alt="SBAFA Emblem" class="landing-sketch-svg" style="width: 150px; height: 150px; border-radius: 34px; box-shadow: 0 16px 40px rgba(224, 76, 0, 0.4); display: block;" />
+          </div>
+
           <div class="landing-badge">
             <span class="landing-badge-dot"></span>
-            <span>Sovereign Financial Enclave &nbsp;·&nbsp; v1.6</span>
+            <span>Personal Finance Vault &nbsp;·&nbsp; Zero Telemetry</span>
           </div>
 
           <h1 class="landing-hero-title">
-            The Zero&#8209;Telemetry<br />Financial Vault.
+            Track your financial flow in zero seconds.
           </h1>
 
           <p class="landing-hero-subtitle">
-            Local-first personal finance engineered for India. Direct client-side PDF bank statement parsing, automated weekly Gmail sync, and 256-bit WebCrypto hardware-isolated memory.
+            Direct bank statement imports, offline IndexedDB ledger, and automated monthly spending caps.
           </p>
 
           <div class="landing-cta-group">
-            <button id="landing-launch-btn" class="btn btn-primary btn-lg">
+            <button id="landing-launch-btn" class="btn btn-primary btn-lg" style="border-radius: var(--radius-full); padding: 14px 32px; font-size: 15px; font-weight: 700;">
               ${ctaText}
             </button>
-            <button id="landing-explore-arch-btn" class="btn btn-secondary btn-lg">
-              Architecture Enclave ↓
-            </button>
+            ${!currentUser ? `
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                Have an account? <a href="#/login" style="color: var(--accent-primary); font-weight: 700; text-decoration: none;">Login</a>
+              </div>
+            ` : ''}
           </div>
 
           <div class="landing-trust-row">

@@ -121,6 +121,19 @@ export class BankPDFParser {
       }
     }
 
+    // Extract Statement Period End Date or Statement Date from header
+    let statementDate = null;
+    const periodMatch = fullText.match(/(?:for the period|statement period|period\s*:?)[^\n\r]*?(?:to|-)\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[\/\-\.][A-Za-z0-9]+[\/\-\.]\d{2,4})/i);
+    if (periodMatch) {
+      statementDate = this.normalizeDate(periodMatch[1]);
+    }
+    if (!statementDate) {
+      const asOnMatch = fullText.match(/(?:Statement\s+as\s+on|Balance\s+as\s+on|Date\s+of\s+Issue|Statement\s+Date|Generated\s+on)\s*:?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[\/\-\.][A-Za-z0-9]+[\/\-\.]\d{2,4})/i);
+      if (asOnMatch) {
+        statementDate = this.normalizeDate(asOnMatch[1]);
+      }
+    }
+
     // Regular expressions for Indian bank dates: DD/MM/YYYY or DD-MM-YYYY or DD-Mon-YYYY
     const numericDateRegex = /\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b/;
     const alphaDateRegex = /\b(\d{1,2}[\s\-](?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s\-]\d{2,4})\b/i;
@@ -198,11 +211,25 @@ export class BankPDFParser {
       });
     }
 
+    // Determine the latest transaction date in this statement
+    let maxTxnDate = '';
+    for (const t of transactions) {
+      if (t.date && t.date > maxTxnDate) {
+        maxTxnDate = t.date;
+      }
+    }
+
+    // Effective statement date: whichever is latest between header period and transactions
+    if (!statementDate || (maxTxnDate && maxTxnDate > statementDate)) {
+      statementDate = maxTxnDate || statementDate;
+    }
+
     return {
       formatDetected: detectedBank ? `${detectedBank.toUpperCase()} PDF` : 'BANK STATEMENT PDF',
       detectedBank,
       bankCode,
       availableBalance,
+      statementDate,
       totalParsed: transactions.length,
       transactions
     };
@@ -210,6 +237,12 @@ export class BankPDFParser {
 
   static normalizeDate(str) {
     const clean = String(str).trim();
+    if (!clean) return new Date().toISOString().split('T')[0];
+
+    // Already YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+      return clean;
+    }
     
     // Check alpha month e.g. 01-APR-2025 or 15 Jan 24
     const monthNames = {
@@ -227,6 +260,10 @@ export class BankPDFParser {
 
     const parts = clean.split(/[\/\-\.]/);
     if (parts.length === 3) {
+      // If first part is 4-digit year e.g. 2025/04/01
+      if (parts[0].length === 4) {
+        return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+      }
       let year = parts[2];
       if (year.length === 2) year = '20' + year;
       return `${year}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;

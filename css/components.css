@@ -5,12 +5,12 @@
 
 /* Cards & Containers */
 .card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 18px;
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .card:hover {
@@ -18,14 +18,13 @@
 }
 
 .glass-card {
-  background: var(--bg-glass-card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
   border-radius: var(--radius-xl);
   padding: 20px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-card);
   transition: border-color var(--transition-fast);
 }
 
@@ -151,18 +150,20 @@
   box-shadow: none !important;
 }
 
-/* Primary Vault Action Button */
+/* Primary Action Button - Warm Terracotta Tangerine (as in Meetgen design) */
 .btn-primary {
-  background: var(--text-primary);
-  color: var(--text-inverse);
-  border: 1px solid var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  background: var(--accent-primary);
+  color: #FFFFFF;
+  border: 1px solid var(--accent-primary);
+  box-shadow: 0 4px 16px rgba(232, 96, 52, 0.35);
   font-weight: 700;
+  border-radius: var(--radius-md);
 }
 
 .btn-primary:hover:not(:disabled) {
-  opacity: 0.94;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  background: var(--accent-primary-hover);
+  border-color: var(--accent-primary-hover);
+  box-shadow: 0 6px 20px rgba(232, 96, 52, 0.45);
   transform: translateY(-1px);
 }
 
@@ -370,31 +371,39 @@
   color: var(--text-primary);
 }
 
-/* Segmented Control */
+/* Segmented Control - Tactile Pill Bar (as in Meetgen reference) */
 .segmented-control {
   display: flex;
-  background: var(--accent-subtle);
-  padding: 3px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  gap: 2px;
+  background: var(--bg-surface-elevated);
+  padding: 4px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-medium);
+  gap: 4px;
 }
 
 .segment-btn {
   flex: 1;
-  padding: 7px 12px;
+  padding: 8px 14px;
   font-size: var(--text-xs);
   font-weight: 600;
   color: var(--text-muted);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   transition: all var(--transition-fast);
   text-align: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.segment-btn:hover {
+  color: var(--text-primary);
 }
 
 .segment-btn.active {
-  background: var(--text-primary);
-  color: var(--text-inverse);
-  box-shadow: var(--shadow-sm);
+  background: var(--accent-primary);
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(232, 96, 52, 0.35);
 }
 
 /* Modals & Bottom Sheets */

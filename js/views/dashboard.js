@@ -26,16 +26,31 @@ export async function renderDashboard(container) {
   const now = new Date();
   const currentMonthPrefix = now.toISOString().slice(0, 7); // YYYY-MM
   
-  // Discover all months with transactions, latest first
-  const availableMonths = [...new Set(
-    allTxns
-      .filter(t => t.date && /^\d{4}-\d{2}/.test(t.date))
-      .map(t => t.date.slice(0, 7))
-  )].sort().reverse();
+  // Robust transaction month parser
+  const parseTxnMonth = (t) => {
+    if (!t || !t.date) return null;
+    const clean = String(t.date).trim();
+    if (/^\d{4}-\d{2}/.test(clean)) return clean.slice(0, 7);
+    const dmy = clean.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
+    if (dmy) return `${dmy[3]}-${dmy[2].padStart(2, '0')}`;
+    return null;
+  };
+
+  // Discover all months with transactions, latest first, along with metadata
+  const monthStats = {};
+  for (const t of allTxns) {
+    const ym = parseTxnMonth(t);
+    if (ym) {
+      if (!monthStats[ym]) monthStats[ym] = { count: 0, spend: 0 };
+      monthStats[ym].count += 1;
+      if (t.type !== 'income') monthStats[ym].spend += (Number(t.amount) || 0);
+    }
+  }
+  const availableMonths = Object.keys(monthStats).sort().reverse();
 
   if (!selectedMonth || !availableMonths.includes(selectedMonth)) {
-    // Default to current calendar month if it has data, or the latest statement month
-    selectedMonth = availableMonths.includes(currentMonthPrefix)
+    // Default to current calendar month if it has data, or the latest statement month with data
+    selectedMonth = (availableMonths.includes(currentMonthPrefix) && monthStats[currentMonthPrefix]?.count > 0)
       ? currentMonthPrefix
       : (availableMonths[0] || currentMonthPrefix);
   }
@@ -45,10 +60,14 @@ export async function renderDashboard(container) {
   let periodLabel = 'Monthly Breakdown';
 
   if (currentPeriodFilter === 'month') {
-    activeTxns = allTxns.filter(t => t.date && t.date.startsWith(selectedMonth));
-    const [y, mon] = selectedMonth.split('-');
-    const mDate = new Date(parseInt(y, 10), parseInt(mon, 10) - 1, 1);
-    periodLabel = mDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    activeTxns = allTxns.filter(t => parseTxnMonth(t) === selectedMonth);
+    const parts = (selectedMonth || '').split('-');
+    if (parts.length === 2) {
+      const mDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, 1);
+      periodLabel = mDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    } else {
+      periodLabel = selectedMonth || 'This Month';
+    }
   } else {
     activeTxns = allTxns;
     periodLabel = 'All Time (' + allTxns.length + ' entries)';
@@ -104,6 +123,13 @@ export async function renderDashboard(container) {
   const displayIncome = isPrivacy ? '••••••' : formatINR(periodIncome);
   const displayExpense = isPrivacy ? '••••••' : formatINR(periodExpense);
 
+  const todayFormatted = new Date().toLocaleDateString('en-IN', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short'
+  });
+  const userName = user ? (user.name || 'Friend') : 'Guest';
+
   container.innerHTML = `
     ${!user ? `
       <!-- Logged-out Zero State Notice -->
@@ -117,12 +143,30 @@ export async function renderDashboard(container) {
         </div>
         <button id="banner-signin-btn" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 5px 12px;">Sign In</button>
       </div>
-    ` : ''}
+    ` : `
+      <!-- Personal Greeting & Status Bar (Meetgen Style) -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h2 style="font-family: var(--font-family-display); font-size: var(--text-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+              Ciao, ${escapeHtml(userName)}!
+            </h2>
+            <span style="font-size: 1.1rem;">✨</span>
+          </div>
+          <p style="font-size: var(--text-xs); color: var(--text-muted); margin: 3px 0 0 0;">
+            Track your income, expenses & statement flow
+          </p>
+        </div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--bg-surface-elevated); padding: 5px 12px; border-radius: var(--radius-full); border: 1px solid var(--border-medium); white-space: nowrap;">
+          ${todayFormatted}
+        </div>
+      </div>
+    `}
 
     <!-- Net Worth Hero Card -->
     <div class="hero-balance-card">
       <div class="hero-label-row">
-        <span class="hero-label">Total Net Worth</span>
+        <span class="hero-label">Current Balance</span>
         <button id="toggle-privacy-btn" class="hero-mask-toggle" title="Toggle balance privacy">
           ${isPrivacy ? '👁️ Show' : '🙈 Hide'}
         </button>
@@ -146,31 +190,31 @@ export async function renderDashboard(container) {
       </div>
     </div>
 
-    <!-- Quick Actions Row -->
+    <!-- Quick Actions Row (Warm Tactile Style) -->
     <div class="quick-actions-row">
       <button class="quick-action-btn" data-action="add">
-        <div class="quick-action-icon" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+        <div class="quick-action-icon" style="background: rgba(232, 96, 52, 0.12); color: var(--accent-primary);">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </div>
         <span class="quick-action-label">Log Spend</span>
       </button>
 
       <button class="quick-action-btn" data-action="statements">
-        <div class="quick-action-icon" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6;">
+        <div class="quick-action-icon" style="background: rgba(61, 107, 82, 0.12); color: var(--accent-sage);">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
         </div>
         <span class="quick-action-label">Statements</span>
       </button>
 
       <button class="quick-action-btn" data-action="gmail-sync">
-        <div class="quick-action-icon" style="background: rgba(234, 67, 53, 0.15); color: #EA4335;">
+        <div class="quick-action-icon" style="background: rgba(217, 130, 43, 0.12); color: var(--accent-ochre);">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
         <span class="quick-action-label">Gmail Sync</span>
       </button>
 
       <button class="quick-action-btn" data-action="budgets">
-        <div class="quick-action-icon" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
+        <div class="quick-action-icon" style="background: rgba(46, 125, 91, 0.12); color: var(--signal-income);">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
         </div>
         <span class="quick-action-label">Budgets</span>
@@ -191,10 +235,11 @@ export async function renderDashboard(container) {
           ${currentPeriodFilter === 'month' && availableMonths.length > 0 ? `
             <select id="spending-month-select" class="form-select" style="padding: 4px 10px; font-size: 11px; height: 30px; border-radius: var(--radius-sm); background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-medium); cursor: pointer; font-weight: 600;">
               ${availableMonths.map(m => {
-                const [y, mon] = m.split('-');
-                const d = new Date(parseInt(y, 10), parseInt(mon, 10) - 1, 1);
+                const parts = m.split('-');
+                const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, 1);
                 const label = d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
-                return `<option value="${m}" ${selectedMonth === m ? 'selected' : ''}>${label}</option>`;
+                const count = monthStats[m] ? monthStats[m].count : 0;
+                return `<option value="${m}" ${selectedMonth === m ? 'selected' : ''}>${label} (${count})</option>`;
               }).join('')}
             </select>
           ` : ''}
@@ -422,7 +467,7 @@ function renderCanvasDonutFallback(canvas, labels, data, isEmpty) {
 
   const total = data.reduce((a, b) => a + b, 0);
   let startAngle = -Math.PI / 2;
-  const colors = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#F43F5E', '#06B6D4', '#EC4899'];
+  const colors = ['#E86034', '#3D6B52', '#D9822B', '#2E7D5B', '#C2542E', '#7A8C53', '#B86B1C'];
 
   data.forEach((val, i) => {
     const sliceAngle = (val / total) * Math.PI * 2;

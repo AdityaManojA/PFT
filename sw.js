@@ -4,7 +4,7 @@
  * and Background Sync queue for offline expense logging.
  */
 
-const CACHE_NAME = 'sbafa-v2.9.6';
+const CACHE_NAME = 'sbafa-v3.2.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -22,6 +22,8 @@ const STATIC_ASSETS = [
   './js/parsers/categorizer.js',
   './js/parsers/pdf-parser.js',
   './js/services/gmail-sync.js',
+  './js/services/email-service.js',
+  './js/services/notification-center.js',
   './js/views/landing.js',
   './js/views/dashboard.js',
   './js/views/transactions.js',
@@ -29,6 +31,8 @@ const STATIC_ASSETS = [
   './js/views/accounts.js',
   './js/views/budgets.js',
   './js/views/login.js',
+  './icons/SBAFA_Logo.svg',
+  './icons/icon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];
