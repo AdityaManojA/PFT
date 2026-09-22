@@ -22,7 +22,8 @@ export function initPWAEngine(onNetworkChange, onSyncComplete) {
             if (installing) {
               installing.onstatechange = () => {
                 if (installing.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('New content is available; please refresh.');
+                  console.log('New content is available; refreshing to activate latest version.');
+                  window.location.reload();
                 }
               };
             }
@@ -31,6 +32,14 @@ export function initPWAEngine(onNetworkChange, onSyncComplete) {
         .catch((err) => {
           console.warn('Service Worker registration skipped or failed:', err);
         });
+
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
 
       // Listen for messages from Service Worker (e.g. background sync)
       navigator.serviceWorker.addEventListener('message', async (event) => {

@@ -1032,7 +1032,7 @@ export function promptPinAuthModal(user, actionTitle, onSuccess) {
 
         <form id="pin-auth-form">
           <div class="form-group" style="margin-bottom: 18px;">
-            <input type="password" id="pin-auth-input" class="form-input" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" placeholder="••••••" style="letter-spacing: 8px; font-size: 1.4rem; text-align: center; font-weight: 700;" required autofocus />
+            <input type="password" id="pin-auth-input" class="form-input" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" placeholder="••••••" style="letter-spacing: 8px; font-size: 1.4rem; text-align: center; font-weight: 700;" required />
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
@@ -1045,6 +1045,7 @@ export function promptPinAuthModal(user, actionTitle, onSuccess) {
   `;
 
   const input = document.getElementById('pin-auth-input');
+  if (input) setTimeout(() => input.focus(), 60);
   const errorDiv = document.getElementById('pin-modal-error');
   const cancelBtn = document.getElementById('pin-auth-cancel-btn');
   const form = document.getElementById('pin-auth-form');

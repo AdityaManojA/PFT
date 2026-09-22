@@ -5,6 +5,7 @@
  */
 
 const DexieClass = (typeof window !== 'undefined' && window.Dexie) ? window.Dexie : class { version() { return { stores() {} }; } };
+var authProvider = 'google';
 
 // Clean up stale v1 database if it exists to resolve primary key conflict
 if (typeof window !== 'undefined' && window.indexedDB) {
@@ -142,6 +143,7 @@ export async function registerUser(name, email, pin, bankSettings = {}) {
   const picture = bankSettings.picture || bankSettings.photoURL || '';
   const photoURL = picture;
   const googleEmail = bankSettings.googleEmail || '';
+  const authProvider = bankSettings.authProvider || 'google';
 
   const newUser = {
     id,

@@ -40,11 +40,8 @@ export class GmailStatementSyncService {
   static async syncStatementsFromGmail(bankName = 'Federal Bank', passkey = '', showToast, onProgress) {
     if (onProgress) onProgress('Connecting to Google OAuth...');
 
-    // Get active Google access token or trigger genuine Firebase popup with Gmail scope
-    let token = sessionStorage.getItem('google_access_token');
-    if (!token) {
-      token = await this.requestGoogleAccessToken();
-    }
+    // Acquire dedicated Google access token with Gmail scope
+    let token = await this.requestGoogleAccessToken();
 
     if (!token) {
       throw new Error(
@@ -64,15 +61,17 @@ export class GmailStatementSyncService {
     });
 
     if (!listRes.ok) {
-      if (listRes.status === 401) {
-        sessionStorage.removeItem('google_access_token');
-        throw new Error('Gmail access token expired. Please click Fetch & Sync to re-authorize.');
-      }
       let errDetail = '';
       try {
         const errJson = await listRes.json();
         errDetail = errJson?.error?.message || '';
       } catch (e) {}
+
+      if (listRes.status === 401 || errDetail.toLowerCase().includes('insufficient authentication scopes')) {
+        sessionStorage.removeItem('google_gmail_token');
+        sessionStorage.removeItem('google_access_token');
+        throw new Error('Gmail authorization missing or expired. Please click Fetch & Sync Statements to grant Gmail access.');
+      }
 
       if (listRes.status === 403) {
         if (errDetail.toLowerCase().includes('disabled') || errDetail.toLowerCase().includes('has not been used')) {

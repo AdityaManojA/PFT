@@ -119,6 +119,10 @@ class AppCoordinator {
         moonIcon.style.display = 'none';
       }
     }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('sbafa:theme-changed', { detail: { theme } }));
+    }
   }
 
   updateHeaderUserProfile(user) {

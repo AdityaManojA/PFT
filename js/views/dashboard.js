@@ -14,21 +14,39 @@ let currentPeriodFilter = 'month'; // 'month' | 'all'
 let selectedMonth = null;
 let currentChartType = 'donut'; // 'donut' | 'bar'
 
-// Curated high-contrast palette alternating warm & cool hues for maximum slice distinction
-const HIGH_CONTRAST_PALETTE = [
-  '#E86034', // Terracotta Orange (Brand)
-  '#0EA5E9', // Azure Sky Blue
-  '#10B981', // Sage Emerald
-  '#F59E0B', // Bright Amber
-  '#8B5CF6', // Royal Purple
-  '#EC4899', // Vivid Rose Pink
-  '#14B8A6', // Clean Teal
-  '#F97316', // Bright Tangerine
-  '#6366F1', // Indigo Cobalt
-  '#84CC16', // Spring Lime
-  '#06B6D4', // Deep Cyan
-  '#D946EF'  // Electric Fuchsia
-];
+// Warm Editorial Theme-Matching Palettes (Grounded in Terracotta, Sage, Ochre & Olive)
+const THEME_PALETTES = {
+  // Light Theme: Earthy, rich, high-contrast natural pigments on warm oatmeal linen
+  light: [
+    '#D45025', // Deep Terracotta (Brand)
+    '#226344', // Deep Forest Sage
+    '#B46816', // Warm Amber Ochre
+    '#1A5A55', // Deep Sea Teal
+    '#A03B1E', // Warm Sienna Rust
+    '#4A6026', // Earthy Deep Olive
+    '#6B4226', // Roasted Mocha
+    '#6D3B62', // Deep Plum Slate
+    '#8C5A20', // Burnt Ochre
+    '#B83E1E'  // Brick Terracotta
+  ],
+  // Dark Theme: Luminous, warm, vibrating pigments tailored for the lighter charcoal canvas
+  dark: [
+    '#FF6B3D', // Luminous Terracotta (Brand)
+    '#4ADE80', // Radiant Sage Forest
+    '#FBBF24', // Warm Golden Amber
+    '#2DD4BF', // Luminous Sea Teal
+    '#F87171', // Warm Terracotta Coral
+    '#E2B17A', // Golden Clay Sand
+    '#A3E635', // Fresh Olive Leaf
+    '#FB923C', // Bright Tangerine
+    '#38BDF8', // Luminous Sky Slate
+    '#C084FC'  // Warm Lavender Ash
+  ]
+};
+
+export function getThemePalette(isLight) {
+  return isLight ? THEME_PALETTES.light : THEME_PALETTES.dark;
+}
 
 export async function renderDashboard(container) {
   const isPrivacy = await BiometricAuthService.getPrivacyMode();
@@ -133,21 +151,23 @@ export async function renderDashboard(container) {
     }
   }
 
-  // Build sorted sectionized category list with alternating high-contrast colors
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const themePalette = getThemePalette(isLight);
+
+  // Build sorted sectionized category list with theme-matching editorial colors
   const categorySections = Object.values(categoryMap)
     .filter(c => c.amount > 0)
     .sort((a, b) => b.amount - a.amount)
     .map((c, i) => {
       const meta = getCategoryMeta(c.category);
       const percent = periodExpense > 0 ? Math.round((c.amount / periodExpense) * 100) : 0;
-      // Assign alternating hue so small adjacent slices never blend together
-      const contrastColor = HIGH_CONTRAST_PALETTE[i % HIGH_CONTRAST_PALETTE.length];
+      const themeColor = themePalette[i % themePalette.length];
       return {
         ...c,
         meta: {
           ...meta,
-          color: contrastColor,
-          bg: contrastColor + '20'
+          color: themeColor,
+          bg: themeColor + (isLight ? '1E' : '28')
         },
         percent
       };
@@ -572,6 +592,7 @@ function initSpendingChart(categorySections, periodExpense, isPrivacy) {
 
   if (window.Chart) {
     if (chartInstance) chartInstance.destroy();
+    window.Chart.defaults.color = isLight ? '#11120E' : '#FFFFFF';
 
     const ctx = canvas.getContext('2d');
 
@@ -684,6 +705,7 @@ function initSpendingChart(categorySections, periodExpense, isPrivacy) {
         },
         plugins: [centerCutoutPlugin],
         options: {
+          color: isLight ? '#11120E' : '#FFFFFF',
           responsive: true,
           maintainAspectRatio: false,
           cutout: '72%',
@@ -700,6 +722,7 @@ function initSpendingChart(categorySections, periodExpense, isPrivacy) {
                 usePointStyle: true,
                 pointStyle: 'circle',
                 color: isLight ? '#11120E' : '#FFFFFF',
+                fontColor: isLight ? '#11120E' : '#FFFFFF',
                 font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
                 padding: 10,
                 generateLabels: (chart) => {
@@ -714,6 +737,7 @@ function initSpendingChart(categorySections, periodExpense, isPrivacy) {
                     return {
                       text: textLabel,
                       fillStyle: datasets[0].backgroundColor[i],
+                      fontColor: isLight ? '#11120E' : '#FFFFFF',
                       strokeStyle: 'transparent',
                       lineWidth: 0,
                       hidden: isNaN(datasets[0].data[i]) || chart.getDatasetMeta(0).data[i]?.hidden,
@@ -831,4 +855,16 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+// Reactively re-render dashboard and charts when theme is toggled
+if (typeof window !== 'undefined' && !window._sbafaThemeDashboardBound) {
+  window._sbafaThemeDashboardBound = true;
+  window.addEventListener('sbafa:theme-changed', () => {
+    const dashboardScreen = document.getElementById('screen-dashboard');
+    if (dashboardScreen && dashboardScreen.classList.contains('active')) {
+      renderDashboard(dashboardScreen);
+    }
+  });
+}
+
 

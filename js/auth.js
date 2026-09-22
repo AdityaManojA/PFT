@@ -224,7 +224,9 @@ export class FirebaseAuthService {
       if (requestGmailScope) {
         provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
       }
-      provider.setCustomParameters({ prompt: 'select_account' });
+      provider.setCustomParameters({
+        prompt: requestGmailScope ? 'consent select_account' : 'select_account'
+      });
       const cred = await sdk.signInWithPopup(auth, provider);
       const user = cred.user;
 
@@ -232,6 +234,9 @@ export class FirebaseAuthService {
         const oauthCred = sdk.GoogleAuthProvider.credentialFromResult(cred);
         if (oauthCred && oauthCred.accessToken) {
           sessionStorage.setItem('google_access_token', oauthCred.accessToken);
+          if (requestGmailScope) {
+            sessionStorage.setItem('google_gmail_token', oauthCred.accessToken);
+          }
         }
       } catch (tokenErr) {
         console.warn('Could not extract Google access token:', tokenErr);
@@ -264,11 +269,11 @@ export class FirebaseAuthService {
    * Acquire an OAuth access token with Gmail readonly scope
    */
   static async getGmailAccessToken() {
-    const existing = sessionStorage.getItem('google_access_token');
+    const existing = sessionStorage.getItem('google_gmail_token');
     if (existing) return existing;
 
     await this.signInWithGoogle({ requestGmailScope: true });
-    const freshToken = sessionStorage.getItem('google_access_token');
+    const freshToken = sessionStorage.getItem('google_gmail_token');
     if (freshToken) return freshToken;
 
     throw new Error('Gmail authorization required. Please authorize Google access.');

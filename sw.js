@@ -4,7 +4,7 @@
  * and Background Sync queue for offline expense logging.
  */
 
-const CACHE_NAME = 'sbafa-v3.4.0';
+const CACHE_NAME = 'sbafa-v3.4.7';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -148,7 +148,7 @@ self.addEventListener('fetch', (event) => {
   // 3. JavaScript modules & Local scripts -> NetworkFirst (ensures fresh module exports)
   if (url.pathname.endsWith('.js') || url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
     event.respondWith(
-      fetch(request)
+      fetch(new Request(request.url, { cache: 'reload' }))
         .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             const copy = networkResponse.clone();
