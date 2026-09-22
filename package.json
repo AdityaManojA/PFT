@@ -1,7 +1,7 @@
 {
-  "name": "personal-finance-tracker-pwa",
+  "name": "sbafa",
   "version": "1.0.0",
-  "description": "Personal Finance Tracker PWA tailored for the Indian financial ecosystem",
+  "description": "SBAFA - Personal Finance Tracker PWA tailored for the Indian financial ecosystem",
   "main": "index.html",
   "scripts": {
     "dev": "npx -y serve . -l 8080",

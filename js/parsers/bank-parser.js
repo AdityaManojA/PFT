@@ -63,8 +63,20 @@ export class BankStatementParser {
       transactions.push(...this.parseGeneric(headers, dataRows, targetAccountId));
     }
 
+    let detectedBank = 'Bank Account';
+    let bankCode = 'OTHER';
+    if (bankFormat === 'hdfc') {
+      detectedBank = 'HDFC Bank';
+      bankCode = 'HDFC';
+    } else if (bankFormat === 'federal') {
+      detectedBank = 'Federal Bank';
+      bankCode = 'FEDERAL';
+    }
+
     return {
       formatDetected: bankFormat.toUpperCase(),
+      detectedBank,
+      bankCode,
       totalParsed: transactions.length,
       transactions
     };
@@ -104,7 +116,7 @@ export class BankStatementParser {
         type,
         amount,
         currency: 'INR',
-        account_id: accountId || 'hdfc-4921',
+        account_id: accountId || null,
         synced: true,
         created_at: new Date().toISOString()
       });
@@ -147,7 +159,7 @@ export class BankStatementParser {
         type,
         amount,
         currency: 'INR',
-        account_id: accountId || 'federal-8812',
+        account_id: accountId || null,
         synced: true,
         created_at: new Date().toISOString()
       });
@@ -198,7 +210,7 @@ export class BankStatementParser {
         type,
         amount,
         currency: 'INR',
-        account_id: accountId || 'hdfc-4921',
+        account_id: accountId || null,
         synced: true,
         created_at: new Date().toISOString()
       });

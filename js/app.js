@@ -7,6 +7,7 @@
 import { seedInitialDataIfNeeded, drainOfflineQueue, getCurrentUser, getAllUsers, setCurrentUser } from './db.js';
 import { BiometricAuthService } from './auth.js';
 import { initPWAEngine, promptPWAInstall, dismissIOSInstallBanner } from './pwa.js';
+import { BankPDFParser } from './parsers/pdf-parser.js';
 
 import { renderDashboard } from './views/dashboard.js';
 import { renderTransactions } from './views/transactions.js';
@@ -14,10 +15,11 @@ import { renderAddExpense } from './views/add-expense.js';
 import { renderAccounts } from './views/accounts.js';
 import { renderBudgets } from './views/budgets.js';
 import { renderLogin } from './views/login.js';
+import { renderLanding } from './views/landing.js';
 
 class AppCoordinator {
   constructor() {
-    this.currentRoute = 'dashboard';
+    this.currentRoute = 'landing';
     this.mainContainer = document.getElementById('view-container');
     this.bottomNav = document.querySelector('.bottom-nav');
     this.offlineBanner = document.getElementById('offline-sync-banner');
@@ -26,12 +28,15 @@ class AppCoordinator {
   }
 
   async init() {
-    console.log('Starting Personal Finance Tracker PWA with Multi-User support...');
+    console.log('Starting SBAFA Vault...');
 
     // 1. Initialize Dexie DB with seeds
     await seedInitialDataIfNeeded();
 
-    // 2. Setup PWA Engine & Service Worker
+    // 2. Initialize Theme (Modern Minimalist White / Dark)
+    this.initTheme();
+
+    // 3. Setup PWA Engine & Service Worker
     initPWAEngine(
       (isOnline) => this.handleNetworkChange(isOnline),
       (syncedCount) => {
@@ -42,16 +47,22 @@ class AppCoordinator {
       }
     );
 
-    // 3. Setup Navigation & Routing
+    // 4. Setup Navigation & Routing
     this.setupRouting();
     this.setupGlobalControls();
 
-    // 4. Check active user profile
+    // 5. Check active user profile
     const user = await getCurrentUser();
     this.updateHeaderUserProfile(user);
 
+    const currentHash = window.location.hash;
+
     if (!user) {
-      this.navigate('#/login');
+      if (currentHash === '#/login') {
+        this.navigate('#/login');
+      } else {
+        this.navigate(currentHash || '#/landing');
+      }
       return;
     }
 
@@ -64,10 +75,48 @@ class AppCoordinator {
     }
   }
 
+  initTheme() {
+    const savedTheme = localStorage.getItem('sbafa-theme') ||
+      (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    this.applyTheme(savedTheme);
+
+    const themeBtn = document.getElementById('header-theme-btn');
+    if (themeBtn) {
+      themeBtn.onclick = () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        this.applyTheme(next);
+        this.showToast(`${next === 'light' ? 'Light' : 'Dark'} theme activated`, 'info');
+      };
+    }
+  }
+
+  applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('sbafa-theme', theme);
+
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute('content', theme === 'light' ? '#FFFFFF' : '#08090C');
+    }
+
+    const sunIcon = document.querySelector('.theme-icon-sun');
+    const moonIcon = document.querySelector('.theme-icon-moon');
+    if (sunIcon && moonIcon) {
+      if (theme === 'light') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      }
+    }
+  }
+
   updateHeaderUserProfile(user) {
     const nameEl = document.getElementById('header-user-name');
     if (nameEl) {
-      nameEl.innerText = user ? user.name : 'Login';
+      nameEl.innerText = user ? user.name : 'Sign In';
     }
   }
 
@@ -85,13 +134,16 @@ class AppCoordinator {
     });
   }
 
-  navigate(hash = '#/dashboard') {
-    const route = hash.replace(/^#\/?/, '').split('?')[0] || 'dashboard';
+  async navigate(hash = '#/dashboard') {
+    const rawRoute = hash.replace(/^#\/?/, '').split('?')[0];
+    const user = await getCurrentUser();
+    const route = rawRoute || (user ? 'dashboard' : 'landing');
     this.currentRoute = route;
 
-    // Toggle bottom nav visibility on login screen
+    // Toggle bottom nav visibility on login or landing screens
     if (this.bottomNav) {
-      this.bottomNav.style.display = route === 'login' ? 'none' : 'flex';
+      const isStandaloneView = route === 'login' || route === 'landing';
+      this.bottomNav.style.display = isStandaloneView ? 'none' : 'flex';
     }
 
     // Update bottom nav active state
@@ -113,6 +165,9 @@ class AppCoordinator {
     this.mainContainer.innerHTML = '<div style="text-align: center; padding: 40px;"><div style="font-size: 1.8rem; animation: spin 1s infinite linear;">⚡</div></div>';
 
     switch (this.currentRoute) {
+      case 'landing':
+        await renderLanding(this.mainContainer);
+        break;
       case 'login':
         await renderLogin(this.mainContainer, (user) => this.handleLoginSuccess(user));
         break;
@@ -143,6 +198,30 @@ class AppCoordinator {
   }
 
   setupGlobalControls() {
+    // Logo Click -> Navigate to Home / Dashboard if logged in, or Landing if not
+    const brandLink = document.getElementById('header-brand-link');
+    if (brandLink) {
+      brandLink.onclick = async () => {
+        const user = await getCurrentUser();
+        window.location.hash = user ? '#/dashboard' : '#/landing';
+      };
+      brandLink.onkeydown = async (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const user = await getCurrentUser();
+          window.location.hash = user ? '#/dashboard' : '#/landing';
+        }
+      };
+    }
+
+    // Landing / Explore Header Button
+    const landingBtn = document.getElementById('header-landing-btn');
+    if (landingBtn) {
+      landingBtn.onclick = () => {
+        window.location.hash = '#/landing';
+      };
+    }
+
     // User Profile Switcher Click
     const userBtn = document.getElementById('header-user-btn');
     if (userBtn) {
@@ -225,6 +304,8 @@ class AppCoordinator {
     }
 
     const initial = (currentUser.name || 'U').charAt(0).toUpperCase();
+    const isAutofill = await BankPDFParser.isAutofillEnabled(currentUser.id);
+    const userBank = currentUser.primaryBank || 'HDFC';
 
     modalContainer.innerHTML = `
       <div class="modal-backdrop active" id="profile-sheet-backdrop">
@@ -249,6 +330,24 @@ class AppCoordinator {
               <span style="color: var(--text-muted);">Storage Location</span>
               <span style="font-weight: 600;">IndexedDB (Device Memory)</span>
             </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-subtle); padding-top: 8px;">
+              <span style="color: var(--text-muted);">Primary Bank</span>
+              <span style="font-weight: 600; color: var(--accent-blue);">${escapeHtml(userBank)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--text-muted);">Statement PDF Autofill</span>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="profile-autofill-chk" ${isAutofill ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-emerald);" />
+                <span id="profile-autofill-txt" style="font-weight: 600; color: ${isAutofill ? 'var(--accent-emerald)' : 'var(--text-muted)'};">${isAutofill ? 'Enabled' : 'Off'}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Note Below -->
+          <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 18px; font-size: 11px; line-height: 1.4; color: var(--text-secondary);">
+            <strong>💡 Statement PDF Passwords:</strong><br/>
+            Please enter the bank-provided password required to view your bank statement for protected PDFs.<br/>
+            <span style="color: var(--text-muted); font-size: 10px;">Turn autofill on or off anytime using the checkbox above.</span>
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -268,6 +367,20 @@ class AppCoordinator {
       if (e.target.id === 'profile-sheet-backdrop') modalContainer.innerHTML = '';
     };
 
+    const autofillChk = document.getElementById('profile-autofill-chk');
+    if (autofillChk) {
+      autofillChk.onchange = async () => {
+        const enabled = autofillChk.checked;
+        await BankPDFParser.setAutofillEnabled(enabled, currentUser.id);
+        const txt = document.getElementById('profile-autofill-txt');
+        if (txt) {
+          txt.innerText = enabled ? 'Enabled' : 'Off';
+          txt.style.color = enabled ? 'var(--accent-emerald)' : 'var(--text-muted)';
+        }
+        this.showToast(enabled ? 'Statement Autofill turned ON' : 'Statement Autofill turned OFF', 'info');
+      };
+    }
+
     document.getElementById('sheet-add-bank-btn').onclick = () => {
       modalContainer.innerHTML = '';
       window.location.hash = '#/accounts';
@@ -286,11 +399,6 @@ class AppCoordinator {
   handleNetworkChange(isOnline) {
     if (this.offlineBanner) {
       this.offlineBanner.style.display = isOnline ? 'none' : 'flex';
-    }
-    const statusPill = document.getElementById('header-network-pill');
-    if (statusPill) {
-      statusPill.className = `badge ${isOnline ? 'badge-blue' : 'badge-amber'}`;
-      statusPill.innerText = isOnline ? 'Online' : 'Offline';
     }
   }
 
@@ -322,7 +430,7 @@ class AppCoordinator {
         <div class="biometric-icon-glow">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2a10 10 0 0 0-10 10c0 5.52 4.48 10 10 10s10-4.48 10-10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"></path><path d="M12 6v6l4 2"></path></svg>
         </div>
-        <h2 style="font-size: var(--text-2xl); font-weight: 800; margin-bottom: 6px;">Finance Tracker</h2>
+        <h2 style="font-size: var(--text-2xl); font-weight: 800; margin-bottom: 6px;">SBAFA</h2>
         <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 24px;">
           Biometric authentication required to view financial records.
         </p>
@@ -335,11 +443,11 @@ class AppCoordinator {
         <div style="font-size: var(--text-xs); color: var(--text-secondary); margin: 12px 0;">— OR ENTER PIN —</div>
 
         <div style="display: flex; gap: 8px; margin-bottom: 16px; justify-content: center;">
-          <input type="password" id="pin-input" class="form-input" maxlength="4" placeholder="••••" style="width: 120px; text-align: center; font-size: 1.5rem; letter-spacing: 6px;" />
+          <input type="password" id="pin-input" class="form-input" maxlength="6" placeholder="••••••" style="width: 150px; text-align: center; font-size: 1.5rem; letter-spacing: 6px;" />
         </div>
 
         <button id="unlock-pin-btn" class="btn btn-secondary btn-block">
-          Unlock with PIN (Default: 1234)
+          Unlock with PIN
         </button>
       </div>
     `;
@@ -351,7 +459,7 @@ class AppCoordinator {
         modalContainer.innerHTML = '';
         this.showToast('Unlocked with Biometrics!', 'success');
       } else {
-        this.showToast('Biometric prompt was skipped or unavailable. Try PIN 1234.', 'info');
+        this.showToast('Biometric prompt was skipped or unavailable. Please enter your PIN.', 'info');
       }
     };
 
@@ -364,7 +472,7 @@ class AppCoordinator {
         modalContainer.innerHTML = '';
         this.showToast('Unlocked successfully!', 'success');
       } else {
-        this.showToast('Invalid PIN! Try default sandbox PIN: 1234', 'info');
+        this.showToast('Incorrect PIN. Please enter your 6-digit security PIN.', 'info');
       }
     };
   }

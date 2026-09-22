@@ -11,7 +11,23 @@ let activeCategory = 'Dining';
 
 export async function renderAddExpense(container, showToastCallback) {
   const user = await getCurrentUser();
-  const userId = user ? user.id : 'user-aditya';
+  if (!user) {
+    container.innerHTML = `
+      <div style="text-align: center; color: var(--text-muted); padding: 60px 20px;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">🔒</div>
+        <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Sign In Required</h3>
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 18px; max-width: 280px; margin-left: auto; margin-right: auto;">
+          Please sign in to your vault to log transactions into your private ledger.
+        </p>
+        <button id="add-signin-btn" class="btn btn-primary btn-sm">Sign In to Vault</button>
+      </div>
+    `;
+    const btn = container.querySelector('#add-signin-btn');
+    if (btn) btn.onclick = () => { window.location.hash = '#/login'; };
+    return;
+  }
+
+  const userId = user.id;
   const accounts = await getUserAccounts(userId);
   const todayISO = new Date().toISOString().split('T')[0];
 
@@ -52,10 +68,16 @@ export async function renderAddExpense(container, showToastCallback) {
       <div class="form-group">
         <label class="form-label" for="add-account-select">Account / Payment Method</label>
         <select id="add-account-select" class="form-select">
+          ${accounts.length === 0 ? '<option value="">No accounts linked yet</option>' : ''}
           ${accounts.map(a => `
             <option value="${a.id}">${escapeHtml(a.bankName)} (${a.accountNumberMask})</option>
           `).join('')}
         </select>
+        ${accounts.length === 0 ? `
+          <div style="font-size: 11px; color: var(--accent-amber); margin-top: 5px;">
+            ⚠️ You need to add a bank account before logging transactions. <a href="#/accounts" style="color: var(--accent-blue); text-decoration: underline;">+ Add Bank Account</a>
+          </div>
+        ` : ''}
       </div>
 
       <div class="form-group">

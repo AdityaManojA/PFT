@@ -52,13 +52,35 @@ export class BankPDFParser {
   /**
    * Parse extracted text into structured transactions
    */
-  static parseTextToTransactions(fullText, targetAccountId = 'hdfc-4921') {
+  static parseTextToTransactions(fullText, targetAccountId = null) {
     const lines = fullText.split('\n').map(l => l.trim()).filter(Boolean);
     const transactions = [];
 
     // Detect format
     const isHdfc = /hdfc\s*bank/i.test(fullText) || /narration/i.test(fullText);
     const isFederal = /federal\s*bank/i.test(fullText) || /particulars/i.test(fullText);
+    const isSbi = /state\s*bank\s*of\s*india|\bsbi\b/i.test(fullText);
+    const isIcici = /icici\s*bank/i.test(fullText);
+    const isAxis = /axis\s*bank/i.test(fullText);
+
+    let detectedBank = 'Bank Account';
+    let bankCode = 'OTHER';
+    if (isFederal) {
+      detectedBank = 'Federal Bank';
+      bankCode = 'FEDERAL';
+    } else if (isHdfc) {
+      detectedBank = 'HDFC Bank';
+      bankCode = 'HDFC';
+    } else if (isSbi) {
+      detectedBank = 'State Bank of India';
+      bankCode = 'SBI';
+    } else if (isIcici) {
+      detectedBank = 'ICICI Bank';
+      bankCode = 'ICICI';
+    } else if (isAxis) {
+      detectedBank = 'Axis Bank';
+      bankCode = 'AXIS';
+    }
 
     // Regular expressions for Indian bank dates: DD/MM/YYYY or DD-MM-YYYY or DD/MM/YY
     const dateRegex = /\b(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{2,4})\b/;
@@ -110,7 +132,7 @@ export class BankPDFParser {
         type,
         amount,
         currency: 'INR',
-        account_id: isFederal ? 'federal-8812' : (targetAccountId || 'hdfc-4921'),
+        account_id: targetAccountId || null,
         synced: true,
         source: 'PDF_IMPORT',
         created_at: new Date().toISOString()
@@ -118,7 +140,9 @@ export class BankPDFParser {
     }
 
     return {
-      formatDetected: isFederal ? 'FEDERAL BANK PDF' : isHdfc ? 'HDFC BANK PDF' : 'BANK STATEMENT PDF',
+      formatDetected: detectedBank ? `${detectedBank.toUpperCase()} PDF` : 'BANK STATEMENT PDF',
+      detectedBank,
+      bankCode,
       totalParsed: transactions.length,
       transactions
     };
@@ -136,13 +160,81 @@ export class BankPDFParser {
   }
 
   /**
-   * Retrieve saved bank statement password from Dexie settings
+   * Check if 1-tap statement autofill is enabled for user
    */
-  static async getSavedPassword(bankCode = 'HDFC', userId = 'default-user') {
+  static async isAutofillEnabled(userId = null) {
+    if (!userId) {
+      const curId = localStorage.getItem('pft_active_user_id');
+      userId = curId || null;
+    }
+    if (!userId) return false;
+
+    const pref = await db.settings.get(`pdf_autofill_${userId}`);
+    if (pref && typeof pref.value === 'boolean') {
+      return pref.value;
+    }
+    const user = await db.users.get(userId);
+    return user ? user.autofillEnabled !== false : true;
+  }
+
+  /**
+   * Toggle 1-tap statement autofill preference
+   */
+  static async setAutofillEnabled(enabled, userId = null) {
+    if (!userId) {
+      const curId = localStorage.getItem('pft_active_user_id');
+      userId = curId || null;
+    }
+    if (!userId) return;
+
+    await db.settings.put({ key: `pdf_autofill_${userId}`, value: Boolean(enabled), userId });
+    const user = await db.users.get(userId);
+    if (user) {
+      await db.users.update(userId, { autofillEnabled: Boolean(enabled) });
+    }
+  }
+
+  /**
+   * Get user primary bank
+   */
+  static async getPrimaryBank(userId = null) {
+    if (!userId) {
+      const curId = localStorage.getItem('pft_active_user_id');
+      userId = curId || null;
+    }
+    if (!userId) return 'HDFC';
+    const user = await db.users.get(userId);
+    return user && user.primaryBank ? user.primaryBank : 'HDFC';
+  }
+
+  /**
+   * Retrieve saved bank statement password from Dexie settings
+   * (Returns empty string if autofill has been turned off by the user)
+   */
+  static async getSavedPassword(bankCode = 'HDFC', userId = null) {
+    if (!userId) {
+      const curId = localStorage.getItem('pft_active_user_id');
+      userId = curId || null;
+    }
+    if (!userId) return '';
+
+    // If user turned off autofill, do not autofill
+    const isEnabled = await this.isAutofillEnabled(userId);
+    if (!isEnabled) return '';
+
     const key = `pdf_pwd_${bankCode}_${userId}`;
     const item = await db.settings.get(key);
-    if (item) return item.value;
-    // Fallback to legacy global key
+    if (item && item.value) return item.value;
+
+    // Check user object directly
+    const user = await db.users.get(userId);
+    if (user && user.pdfPassword) {
+      if (!user.primaryBank || user.primaryBank === bankCode) {
+        return user.pdfPassword;
+      }
+    }
+
+    // Fallback to legacy global key if any
     const legacy = await db.settings.get(`pdf_pwd_${bankCode}`);
     return legacy ? legacy.value : '';
   }
@@ -150,8 +242,89 @@ export class BankPDFParser {
   /**
    * Save bank statement password locally for automatic future unlocks
    */
-  static async savePassword(bankCode = 'HDFC', password = '', userId = 'default-user') {
+  static async savePassword(bankCode = 'HDFC', password = '', userId = null, enableAutofill = true) {
+    if (!userId) {
+      const curId = localStorage.getItem('pft_active_user_id');
+      userId = curId || null;
+    }
+    if (!userId) return;
+
     const key = `pdf_pwd_${bankCode}_${userId}`;
-    await db.settings.put({ key, value: password });
+    await db.settings.put({ key, value: password, userId });
+    await this.setAutofillEnabled(enableAutofill, userId);
+
+    const user = await db.users.get(userId);
+    if (user) {
+      await db.users.update(userId, {
+        primaryBank: bankCode,
+        pdfPassword: password,
+        autofillEnabled: Boolean(enableAutofill)
+      });
+    }
+  }
+
+  /**
+   * Retrieve saved statement password regardless of autofill state (for edit/management view)
+   */
+  static async getSavedPasswordRaw(bankCode = 'HDFC', userId = null) {
+    if (!userId) {
+      const curId = localStorage.getItem('pft_active_user_id');
+      userId = curId || null;
+    }
+    if (!userId) return '';
+
+    const key = `pdf_pwd_${bankCode}_${userId}`;
+    const item = await db.settings.get(key);
+    if (item && item.value) return item.value;
+
+    const user = await db.users.get(userId);
+    if (user && user.pdfPassword) {
+      return user.pdfPassword;
+    }
+
+    const legacy = await db.settings.get(`pdf_pwd_${bankCode}`);
+    if (legacy && legacy.value) return legacy.value;
+
+    // Check candidate bank keys if primary key was empty
+    const candidateBanks = ['HDFC', 'FEDERAL', 'SBI', 'ICICI', 'AXIS', 'KOTAK', 'OTHER'];
+    for (const b of candidateBanks) {
+      const bItem = await db.settings.get(`pdf_pwd_${b}_${userId}`);
+      if (bItem && bItem.value) return bItem.value;
+      const bLegacy = await db.settings.get(`pdf_pwd_${b}`);
+      if (bLegacy && bLegacy.value) return bLegacy.value;
+    }
+
+    return '';
+  }
+
+  /**
+   * Completely remove statement password and disable autofill
+   */
+  static async deletePassword(bankCode = 'HDFC', userId = null) {
+    if (!userId) {
+      const curId = localStorage.getItem('pft_active_user_id');
+      userId = curId || null;
+    }
+    if (!userId) return;
+
+    // Delete primary and legacy bank keys
+    await db.settings.delete(`pdf_pwd_${bankCode}_${userId}`);
+    await db.settings.delete(`pdf_pwd_${bankCode}`);
+
+    // Clean up any candidate bank keys
+    const candidateBanks = ['HDFC', 'FEDERAL', 'SBI', 'ICICI', 'AXIS', 'KOTAK', 'OTHER'];
+    for (const b of candidateBanks) {
+      await db.settings.delete(`pdf_pwd_${b}_${userId}`);
+      await db.settings.delete(`pdf_pwd_${b}`);
+    }
+
+    const user = await db.users.get(userId);
+    if (user) {
+      await db.users.update(userId, {
+        pdfPassword: '',
+        autofillEnabled: false
+      });
+    }
+    await this.setAutofillEnabled(false, userId);
   }
 }

@@ -12,21 +12,21 @@ let currentSearch = '';
 export async function renderTransactions(container) {
   const isPrivacy = await BiometricAuthService.getPrivacyMode();
   const user = await getCurrentUser();
-  const userId = user ? user.id : 'user-aditya';
+  const userId = user ? user.id : null;
 
-  const accounts = await getUserAccounts(userId);
+  const accounts = userId ? await getUserAccounts(userId) : [];
   const accountMap = {};
   accounts.forEach(a => { accountMap[a.id] = a.bankName; });
 
-  const allTxns = await getUserTransactions(userId);
+  const allTxns = userId ? await getUserTransactions(userId) : [];
 
   // Filter & Search logic
   let filtered = allTxns.filter(t => {
     if (currentFilter === 'expense' && t.type !== 'expense') return false;
     if (currentFilter === 'income' && t.type !== 'income') return false;
-    if (currentFilter === 'offline' && t.synced !== false) return false;
-    if (currentFilter === 'hdfc' && !String(t.account_id).includes('hdfc')) return false;
-    if (currentFilter === 'federal' && !String(t.account_id).includes('federal')) return false;
+    if (currentFilter !== 'all' && currentFilter !== 'expense' && currentFilter !== 'income' && currentFilter !== 'offline') {
+      if (t.account_id !== currentFilter) return false;
+    }
 
     if (currentSearch) {
       const q = currentSearch.toLowerCase();
@@ -43,6 +43,22 @@ export async function renderTransactions(container) {
   // Sort descending by date
   filtered.sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at));
 
+  let listContentHtml = '';
+  if (!user) {
+    listContentHtml = `
+      <div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: var(--text-sm);">
+        <div style="font-size: 2rem; margin-bottom: 8px;">🔒</div>
+        <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Vault Locked</div>
+        <p style="font-size: var(--text-xs); margin-bottom: 12px;">Sign in to view your ledger.</p>
+        <button id="txns-login-btn" class="btn btn-primary btn-sm">Sign In</button>
+      </div>
+    `;
+  } else if (filtered.length === 0) {
+    listContentHtml = '<div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: var(--text-sm);">No matching transactions found.</div>';
+  } else {
+    listContentHtml = renderGroupedList(filtered, isPrivacy, accountMap);
+  }
+
   container.innerHTML = `
     <!-- Search Bar -->
     <div class="txns-search-bar">
@@ -53,14 +69,15 @@ export async function renderTransactions(container) {
       <input type="text" id="txns-search-input" class="txns-search-input" placeholder="Search merchants, categories, or ₹..." value="${escapeHtml(currentSearch)}" />
     </div>
 
-    <!-- Filter Chips Scroll -->
+    <!-- Filter Chips Scroll (Dynamically driven by connected user accounts) -->
     <div class="filter-chips-scroll">
       <button class="filter-chip ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">All (${allTxns.length})</button>
       <button class="filter-chip ${currentFilter === 'expense' ? 'active' : ''}" data-filter="expense">Expenses</button>
       <button class="filter-chip ${currentFilter === 'income' ? 'active' : ''}" data-filter="income">Income</button>
       <button class="filter-chip ${currentFilter === 'offline' ? 'active' : ''}" data-filter="offline">Offline Pending</button>
-      <button class="filter-chip ${currentFilter === 'hdfc' ? 'active' : ''}" data-filter="hdfc">HDFC Bank</button>
-      <button class="filter-chip ${currentFilter === 'federal' ? 'active' : ''}" data-filter="federal">Federal Bank</button>
+      ${accounts.map(a => `
+        <button class="filter-chip ${currentFilter === a.id ? 'active' : ''}" data-filter="${escapeHtml(a.id)}">${escapeHtml(a.bankName)}</button>
+      `).join('')}
     </div>
 
     <!-- Export & Stats Row -->
@@ -74,11 +91,16 @@ export async function renderTransactions(container) {
 
     <!-- Grouped Transactions List -->
     <div id="txns-list-container">
-      ${filtered.length === 0 ? '<div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: var(--text-sm);">No matching transactions found.</div>' : renderGroupedList(filtered, isPrivacy, accountMap)}
+      ${listContentHtml}
     </div>
   `;
 
   // Attach search handler with debounce
+  const loginBtn = container.querySelector('#txns-login-btn');
+  if (loginBtn) {
+    loginBtn.onclick = () => { window.location.hash = '#/login'; };
+  }
+
   const searchInput = container.querySelector('#txns-search-input');
   searchInput.oninput = (e) => {
     currentSearch = e.target.value;
@@ -96,7 +118,7 @@ export async function renderTransactions(container) {
   // Export CSV handler
   const exportBtn = container.querySelector('#export-csv-btn');
   if (exportBtn) {
-    exportBtn.onclick = () => exportTransactionsCSV(filtered);
+    exportBtn.onclick = () => exportTransactionsCSV(filtered, accountMap);
   }
 
   // Transaction item click for details/delete
@@ -228,12 +250,12 @@ function showTransactionDetailModal(txn, accountMap) {
   document.getElementById('modal-delete-btn').onclick = async () => {
     await db.transactions.delete(txn.id);
     modalContainer.innerHTML = '';
-    const main = document.getElementById('view-transactions');
+    const main = document.getElementById('view-container');
     if (main) renderTransactions(main);
   };
 }
 
-function exportTransactionsCSV(transactions) {
+function exportTransactionsCSV(transactions, accountMap = {}) {
   if (transactions.length === 0) {
     alert('No transactions to export.');
     return;
@@ -241,13 +263,14 @@ function exportTransactionsCSV(transactions) {
 
   const csvRows = ['Date,Merchant,Category,Type,Amount,Account,Synced,Narration'];
   for (const t of transactions) {
+    const accLabel = accountMap[t.account_id] || t.account_id || '';
     csvRows.push([
       t.date || '',
       `"${(t.merchant || '').replace(/"/g, '""')}"`,
       t.category || '',
       t.type || 'expense',
       t.amount || 0,
-      t.account_id || '',
+      `"${accLabel.replace(/"/g, '""')}"`,
       t.synced ? 'YES' : 'NO',
       `"${(t.narration || '').replace(/"/g, '""')}"`
     ].join(','));

@@ -6,10 +6,15 @@
 
 const DexieClass = window.Dexie;
 
+// Clean up stale v1 database if it exists to resolve primary key conflict
+if (typeof window !== 'undefined' && window.indexedDB) {
+  try { window.indexedDB.deleteDatabase('FinanceTrackerPWA'); } catch (e) {}
+}
+
 class AppDatabase extends DexieClass {
   constructor() {
-    super('FinanceTrackerPWA');
-    this.version(2).stores({
+    super('FinanceTrackerVault');
+    this.version(1).stores({
       users: 'id, name, email, pin, createdAt',
       transactions: '++id, userId, date, category, synced, account_id, type',
       accounts: 'id, userId, bankName, accountNumberMask, balance, type, lastSynced',
@@ -35,17 +40,9 @@ export function formatINR(amount, hideDecimals = false) {
 // Active User Session Management
 export async function getCurrentUser() {
   const activeId = localStorage.getItem('pft_active_user_id');
-  if (activeId) {
-    const u = await db.users.get(activeId);
-    if (u) return u;
-  }
-  // Return the first available user or null
-  const first = await db.users.toCollection().first();
-  if (first) {
-    localStorage.setItem('pft_active_user_id', first.id);
-    return first;
-  }
-  return null;
+  if (!activeId) return null;
+  const u = await db.users.get(activeId);
+  return u || null;
 }
 
 export function setCurrentUser(user) {
@@ -60,7 +57,7 @@ export async function getAllUsers() {
   return await db.users.toArray();
 }
 
-export async function loginUser(nameOrEmail, pin) {
+export async function loginUser(nameOrEmail, pin, extraSettings = {}) {
   const search = String(nameOrEmail).trim().toLowerCase();
   const users = await db.users.toArray();
   const matched = users.find(u => 
@@ -73,20 +70,56 @@ export async function loginUser(nameOrEmail, pin) {
   }
 
   if (matched.pin && String(matched.pin) !== String(pin).trim()) {
-    throw new Error('Incorrect 4-digit PIN.');
+    throw new Error('Incorrect 6-digit PIN.');
+  }
+
+  // Update bank and statement password if provided during sign-in
+  if (extraSettings.pdfPassword || extraSettings.primaryBank || typeof extraSettings.autofillEnabled === 'boolean') {
+    const updates = {};
+    if (extraSettings.primaryBank) updates.primaryBank = extraSettings.primaryBank;
+    if (extraSettings.pdfPassword) updates.pdfPassword = extraSettings.pdfPassword;
+    if (typeof extraSettings.autofillEnabled === 'boolean') updates.autofillEnabled = extraSettings.autofillEnabled;
+    await db.users.update(matched.id, updates);
+    Object.assign(matched, updates);
+
+    if (extraSettings.pdfPassword && extraSettings.primaryBank) {
+      await db.settings.put({
+        key: `pdf_pwd_${extraSettings.primaryBank}_${matched.id}`,
+        value: extraSettings.pdfPassword,
+        userId: matched.id
+      });
+    }
+    if (typeof extraSettings.autofillEnabled === 'boolean') {
+      await db.settings.put({
+        key: `pdf_autofill_${matched.id}`,
+        value: extraSettings.autofillEnabled,
+        userId: matched.id
+      });
+    }
   }
 
   setCurrentUser(matched);
   return matched;
 }
 
-export async function registerUser(name, email, pin) {
+export async function findUserByEmail(email) {
+  if (!email) return null;
+  const clean = String(email).trim().toLowerCase();
+  const users = await db.users.toArray();
+  return users.find(u => u.email && u.email.toLowerCase() === clean) || null;
+}
+
+export async function registerUser(name, email, pin, bankSettings = {}) {
   const cleanName = String(name).trim();
   const cleanEmail = String(email || `${cleanName.toLowerCase()}@local.pft`).trim();
-  const cleanPin = String(pin || '1234').trim();
+  const cleanPin = String(pin || '').trim();
 
   if (!cleanName) {
     throw new Error('Please enter a display name.');
+  }
+
+  if (!cleanPin || cleanPin.length !== 6 || !/^\d{6}$/.test(cleanPin)) {
+    throw new Error('Please set a 6-digit security PIN (numbers only).');
   }
 
   const existing = await db.users.where('email').equals(cleanEmail).first();
@@ -95,248 +128,104 @@ export async function registerUser(name, email, pin) {
   }
 
   const id = 'user-' + Date.now().toString(36);
+  const primaryBank = bankSettings.primaryBank || 'HDFC';
+  const pdfPassword = bankSettings.pdfPassword || '';
+  const autofillEnabled = bankSettings.autofillEnabled !== false;
+  const authProvider = bankSettings.authProvider || 'local';
+  const picture = bankSettings.picture || '';
+
   const newUser = {
     id,
     name: cleanName,
     email: cleanEmail,
     pin: cleanPin,
+    primaryBank,
+    pdfPassword,
+    autofillEnabled,
+    authProvider,
+    picture,
     createdAt: new Date().toISOString()
   };
 
   await db.users.add(newUser);
 
-  // New users start with a clean slate (0 accounts, 0 transactions).
-  // They add their own bank accounts using the + icon in the Accounts tab!
+  // Store bank statement password and autofill settings
+  if (pdfPassword) {
+    await db.settings.put({
+      key: `pdf_pwd_${primaryBank}_${id}`,
+      value: pdfPassword,
+      userId: id
+    });
+  }
+  await db.settings.put({
+    key: `pdf_autofill_${id}`,
+    value: autofillEnabled,
+    userId: id
+  });
 
-  // Seed default budgets for new user
+  // New users start with a clean production slate (0 accounts, 0 transactions).
+  // They add their own bank accounts using the + icon in the Accounts tab.
+
+  // Initialize standard budget categories with 0 limit (customizable anytime)
   await db.budgets.bulkAdd([
-    { id: `${id}-b-dining`, userId: id, category: 'Dining', monthlyLimit: 10000, icon: '🍔' },
-    { id: `${id}-b-groceries`, userId: id, category: 'Groceries', monthlyLimit: 12000, icon: '🛒' },
-    { id: `${id}-b-shopping`, userId: id, category: 'Shopping', monthlyLimit: 8000, icon: '🛍️' },
-    { id: `${id}-b-investments`, userId: id, category: 'Investments', monthlyLimit: 20000, icon: '📈' },
-    { id: `${id}-b-utilities`, userId: id, category: 'Utilities', monthlyLimit: 5000, icon: '⚡' },
-    { id: `${id}-b-transport`, userId: id, category: 'Transport', monthlyLimit: 4000, icon: '🚗' },
-    { id: `${id}-b-entertainment`, userId: id, category: 'Entertainment', monthlyLimit: 3000, icon: '🍿' }
+    { id: `${id}-b-dining`, userId: id, category: 'Dining', monthlyLimit: 0, icon: '🍔' },
+    { id: `${id}-b-groceries`, userId: id, category: 'Groceries', monthlyLimit: 0, icon: '🛒' },
+    { id: `${id}-b-shopping`, userId: id, category: 'Shopping', monthlyLimit: 0, icon: '🛍️' },
+    { id: `${id}-b-investments`, userId: id, category: 'Investments', monthlyLimit: 0, icon: '📈' },
+    { id: `${id}-b-utilities`, userId: id, category: 'Utilities', monthlyLimit: 0, icon: '⚡' },
+    { id: `${id}-b-transport`, userId: id, category: 'Transport', monthlyLimit: 0, icon: '🚗' },
+    { id: `${id}-b-entertainment`, userId: id, category: 'Entertainment', monthlyLimit: 0, icon: '🍿' }
   ]);
 
   setCurrentUser(newUser);
   return newUser;
 }
 
-// Initial Seed Data for Default User
+// Production Database Initialization (Zero mock data, clean slate)
 export async function seedInitialDataIfNeeded() {
-  const usersCount = await db.users.count();
-  const defaultUserId = 'user-aditya';
-
-  if (usersCount === 0) {
-    console.log('Seeding default user profile (Aditya)...');
-    await db.users.add({
-      id: defaultUserId,
-      name: 'Aditya',
-      email: 'aditya@pft.local',
-      pin: '1234',
-      createdAt: new Date().toISOString()
-    });
-    localStorage.setItem('pft_active_user_id', defaultUserId);
+  // Purge any development mock/dummy data if present on client
+  try {
+    const legacyAditya = await db.users.get('user-aditya');
+    if (legacyAditya) {
+      await db.users.delete('user-aditya');
+      await db.accounts.where('userId').equals('user-aditya').delete();
+      await db.transactions.where('userId').equals('user-aditya').delete();
+      await db.budgets.where('userId').equals('user-aditya').delete();
+      if (localStorage.getItem('pft_active_user_id') === 'user-aditya') {
+        localStorage.removeItem('pft_active_user_id');
+      }
+      console.log('Legacy development mock data cleared.');
+    }
+  } catch (err) {
+    console.warn('Initial cleanup check:', err);
   }
 
-  const accountsCount = await db.accounts.count();
-  if (accountsCount === 0) {
-    console.log('Seeding initial accounts for default user...');
-    await db.accounts.bulkAdd([
-      {
-        id: 'hdfc-4921',
-        userId: defaultUserId,
-        bankName: 'HDFC Bank',
-        accountNumberMask: '•••• 4921',
-        accountType: 'Savings Account',
-        balance: 124510.50,
-        bankCode: 'HDFC',
-        lastSynced: 'Just now'
-      },
-      {
-        id: 'federal-8812',
-        userId: defaultUserId,
-        bankName: 'Federal Bank',
-        accountNumberMask: '•••• 8812',
-        accountType: 'FedNet Savings',
-        balance: 48210.00,
-        bankCode: 'FEDERAL',
-        lastSynced: '10 mins ago'
-      },
-      {
-        id: 'icici-3104',
-        userId: defaultUserId,
-        bankName: 'ICICI Bank',
-        accountNumberMask: '•••• 3104',
-        accountType: 'Salary Account',
-        balance: 65400.00,
-        bankCode: 'ICICI',
-        lastSynced: '1 hour ago'
-      },
-      {
-        id: 'cash-wallet',
-        userId: defaultUserId,
-        bankName: 'Cash Wallet',
-        accountNumberMask: 'Physical Cash',
-        accountType: 'Wallet',
-        balance: 3850.00,
-        bankCode: 'CASH',
-        lastSynced: 'Manual'
-      }
-    ]);
-
-    await db.budgets.bulkAdd([
-      { id: `${defaultUserId}-b-dining`, userId: defaultUserId, category: 'Dining', monthlyLimit: 12000, icon: '🍔' },
-      { id: `${defaultUserId}-b-groceries`, userId: defaultUserId, category: 'Groceries', monthlyLimit: 15000, icon: '🛒' },
-      { id: `${defaultUserId}-b-shopping`, userId: defaultUserId, category: 'Shopping', monthlyLimit: 10000, icon: '🛍️' },
-      { id: `${defaultUserId}-b-investments`, userId: defaultUserId, category: 'Investments', monthlyLimit: 30000, icon: '📈' },
-      { id: `${defaultUserId}-b-utilities`, userId: defaultUserId, category: 'Utilities', monthlyLimit: 6000, icon: '⚡' },
-      { id: `${defaultUserId}-b-transport`, userId: defaultUserId, category: 'Transport', monthlyLimit: 5000, icon: '🚗' },
-      { id: `${defaultUserId}-b-entertainment`, userId: defaultUserId, category: 'Entertainment', monthlyLimit: 4000, icon: '🍿' }
-    ]);
-
-    // Seed realistic transactions
-    const now = new Date();
-    const getISO = (daysAgo) => {
-      const d = new Date(now);
-      d.setDate(d.getDate() - daysAgo);
-      return d.toISOString().split('T')[0];
-    };
-
-    await db.transactions.bulkAdd([
-      {
-        userId: defaultUserId,
-        amount: 485.00,
-        currency: 'INR',
-        category: 'Dining',
-        merchant: 'Swiggy Food Delivery',
-        narration: 'UPI-SWIGGY-BANGALORE-UPI/428194829104@icici',
-        type: 'expense',
-        date: getISO(0),
-        account_id: 'hdfc-4921',
-        synced: true,
-        created_at: new Date().toISOString()
-      },
-      {
-        userId: defaultUserId,
-        amount: 420.00,
-        currency: 'INR',
-        category: 'Groceries',
-        merchant: 'Zepto Quick Commerce',
-        narration: 'UPI/DR/492019284719/ZEPTO QUICK COMM',
-        type: 'expense',
-        date: getISO(0),
-        account_id: 'federal-8812',
-        synced: true,
-        created_at: new Date().toISOString()
-      },
-      {
-        userId: defaultUserId,
-        amount: 115000.00,
-        currency: 'INR',
-        category: 'Salary',
-        merchant: 'TCS Limited Payroll',
-        narration: 'ACH C-TCS LIMITED SALARY CR-SALARY FOR AUG 2026',
-        type: 'income',
-        date: getISO(1),
-        account_id: 'hdfc-4921',
-        synced: true,
-        created_at: new Date().toISOString()
-      },
-      {
-        userId: defaultUserId,
-        amount: 15000.00,
-        currency: 'INR',
-        category: 'Investments',
-        merchant: 'Zerodha Broking SIP',
-        narration: 'UPI-ZERODHA BROKING-ZERODHA@HDFC-INVESTMENT SIP',
-        type: 'expense',
-        date: getISO(2),
-        account_id: 'hdfc-4921',
-        synced: true,
-        created_at: new Date().toISOString()
-      },
-      {
-        userId: defaultUserId,
-        amount: 840.00,
-        currency: 'INR',
-        category: 'Groceries',
-        merchant: 'Blinkit Instant Groceries',
-        narration: 'UPI-BLINKIT GROCERIES-BLINKIT@YESBANK',
-        type: 'expense',
-        date: getISO(3),
-        account_id: 'hdfc-4921',
-        synced: true,
-        created_at: new Date().toISOString()
-      },
-      {
-        userId: defaultUserId,
-        amount: 1899.00,
-        currency: 'INR',
-        category: 'Shopping',
-        merchant: 'Amazon India Pay',
-        narration: 'UPI-AMAZON PAY INDIA-AMAZON@APL-SHOPPING',
-        type: 'expense',
-        date: getISO(4),
-        account_id: 'hdfc-4921',
-        synced: true,
-        created_at: new Date().toISOString()
-      },
-      {
-        userId: defaultUserId,
-        amount: 649.00,
-        currency: 'INR',
-        category: 'Entertainment',
-        merchant: 'Netflix Subscription',
-        narration: 'NETFLIX ENTERTAINMENT SERVICES MUMBAI',
-        type: 'expense',
-        date: getISO(5),
-        account_id: 'hdfc-4921',
-        synced: true,
-        created_at: new Date().toISOString()
-      },
-      {
-        userId: defaultUserId,
-        amount: 345.00,
-        currency: 'INR',
-        category: 'Transport',
-        merchant: 'Uber India Trip',
-        narration: 'UPI-UBER INDIA TECHNOLOGY-UBER@ICICI-TRIP',
-        type: 'expense',
-        date: getISO(6),
-        account_id: 'hdfc-4921',
-        synced: true,
-        created_at: new Date().toISOString()
-      }
-    ]);
-  } else {
-    // Migration: assign any legacy unassigned records to default user
-    await db.accounts.where('userId').equals('').or('userId').equals(undefined).modify({ userId: defaultUserId });
-    await db.transactions.where('userId').equals('').or('userId').equals(undefined).modify({ userId: defaultUserId });
-    await db.budgets.where('userId').equals('').or('userId').equals(undefined).modify({ userId: defaultUserId });
-  }
-
-  console.log('Database initialized with multi-user support.');
+  console.log('SBAFA production database ready (clean zero state).');
 }
 
-// User-scoped queries
+// User-scoped queries (Strict vault isolation; returns empty if logged out)
 export async function getUserAccounts(userId) {
-  return await db.accounts.filter(a => !a.userId || a.userId === userId).toArray();
+  if (!userId) return [];
+  return await db.accounts.where('userId').equals(userId).toArray();
 }
 
 export async function getUserTransactions(userId) {
-  return await db.transactions.filter(t => !t.userId || t.userId === userId).toArray();
+  if (!userId) return [];
+  return await db.transactions.where('userId').equals(userId).toArray();
 }
 
 export async function getUserBudgets(userId) {
-  return await db.budgets.filter(b => !b.userId || b.userId === userId).toArray();
+  if (!userId) return [];
+  return await db.budgets.where('userId').equals(userId).toArray();
 }
 
 // Add transaction scoped to active user
 export async function addTransaction(transaction) {
   const user = await getCurrentUser();
-  const userId = user ? user.id : 'user-aditya';
+  if (!user || !user.id) {
+    throw new Error('Please sign in to log a transaction.');
+  }
+  const userId = user.id;
   const isOnline = navigator.onLine;
 
   const newTxn = {

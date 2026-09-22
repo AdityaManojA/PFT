@@ -1,0 +1,140 @@
+{
+  "firebase.json": {
+    "mtime": 1790077942.3400838,
+    "seen": 1790078987.6687117,
+    "ast_hash": "ceb3227e948a2fffb08892a8749cf74e",
+    "semantic_hash": "ceb3227e948a2fffb08892a8749cf74e"
+  },
+  "generate_icons.ps1": {
+    "mtime": 1790066072.5639708,
+    "seen": 1790078987.6687117,
+    "ast_hash": "838b0dd97463150c6f5dbb4b8c94721c",
+    "semantic_hash": "838b0dd97463150c6f5dbb4b8c94721c"
+  },
+  "js/app.js": {
+    "mtime": 1790078383.6139257,
+    "seen": 1790078987.6687117,
+    "ast_hash": "456651ad372c20a7c8234965964b9062",
+    "semantic_hash": "456651ad372c20a7c8234965964b9062"
+  },
+  "js/auth.js": {
+    "mtime": 1790077155.153245,
+    "seen": 1790078987.6687117,
+    "ast_hash": "b558fb09dc48d08005885f081cf89325",
+    "semantic_hash": "b558fb09dc48d08005885f081cf89325"
+  },
+  "js/db.js": {
+    "mtime": 1790074676.7863922,
+    "seen": 1790078987.6687117,
+    "ast_hash": "bf24ac5b6be6eba05b2ec8ab2207f8f8",
+    "semantic_hash": "bf24ac5b6be6eba05b2ec8ab2207f8f8"
+  },
+  "js/parsers/bank-parser.js": {
+    "mtime": 1790072827.1018326,
+    "seen": 1790078987.6687117,
+    "ast_hash": "0a51fbf50ec9804ee5c8dbfba4708485",
+    "semantic_hash": "0a51fbf50ec9804ee5c8dbfba4708485"
+  },
+  "js/parsers/categorizer.js": {
+    "mtime": 1790066171.6817,
+    "seen": 1790078987.6687117,
+    "ast_hash": "4863ffdf6cc8d52f42340c03f5549ae7",
+    "semantic_hash": "4863ffdf6cc8d52f42340c03f5549ae7"
+  },
+  "js/parsers/pdf-parser.js": {
+    "mtime": 1790078634.7335322,
+    "seen": 1790078987.6687117,
+    "ast_hash": "8ea09a36a6eaa94a2312c773a279fc79",
+    "semantic_hash": "8ea09a36a6eaa94a2312c773a279fc79"
+  },
+  "js/pwa.js": {
+    "mtime": 1790066206.1846054,
+    "seen": 1790078987.6687117,
+    "ast_hash": "702128dc01bc9eb943f11d946b26edc1",
+    "semantic_hash": "702128dc01bc9eb943f11d946b26edc1"
+  },
+  "js/services/setu-aa.js": {
+    "mtime": 1790072851.2915702,
+    "seen": 1790078987.6687117,
+    "ast_hash": "0e5e75cf04e6f1dea25f226801e135f8",
+    "semantic_hash": "0e5e75cf04e6f1dea25f226801e135f8"
+  },
+  "js/views/accounts.js": {
+    "mtime": 1790078693.415628,
+    "seen": 1790078987.6687117,
+    "ast_hash": "88abc84a8ec7bd08a189d5bf34549e51",
+    "semantic_hash": "88abc84a8ec7bd08a189d5bf34549e51"
+  },
+  "js/views/add-expense.js": {
+    "mtime": 1790072546.937398,
+    "seen": 1790078987.6687117,
+    "ast_hash": "5c17450105ce2d2b00429b22b9bbfd6b",
+    "semantic_hash": "5c17450105ce2d2b00429b22b9bbfd6b"
+  },
+  "js/views/budgets.js": {
+    "mtime": 1790073323.806425,
+    "seen": 1790078987.6687117,
+    "ast_hash": "0804b2457fe7d18ff6ccaab1db97e80b",
+    "semantic_hash": "0804b2457fe7d18ff6ccaab1db97e80b"
+  },
+  "js/views/dashboard.js": {
+    "mtime": 1790078368.9605806,
+    "seen": 1790078987.6687117,
+    "ast_hash": "b36b3760b5de5e5e584a4574328ed0ac",
+    "semantic_hash": "b36b3760b5de5e5e584a4574328ed0ac"
+  },
+  "js/views/landing.js": {
+    "mtime": 1790078234.0768306,
+    "seen": 1790078987.6687117,
+    "ast_hash": "e2fd55bf23fa055099e83b65db03ea91",
+    "semantic_hash": "e2fd55bf23fa055099e83b65db03ea91"
+  },
+  "js/views/login.js": {
+    "mtime": 1790078314.5724797,
+    "seen": 1790078987.6687117,
+    "ast_hash": "ee87f96a17083648091e97b2b2db21e3",
+    "semantic_hash": "ee87f96a17083648091e97b2b2db21e3"
+  },
+  "js/views/transactions.js": {
+    "mtime": 1790073557.384591,
+    "seen": 1790078987.6687117,
+    "ast_hash": "f3445439d3ce3bd3f8c033f63042b82a",
+    "semantic_hash": "f3445439d3ce3bd3f8c033f63042b82a"
+  },
+  "manifest.json": {
+    "mtime": 1790070864.703719,
+    "seen": 1790078987.6687117,
+    "ast_hash": "33a820c4d05a63c3f1d574f11cb04323",
+    "semantic_hash": "33a820c4d05a63c3f1d574f11cb04323"
+  },
+  "package.json": {
+    "mtime": 1790070917.6492174,
+    "seen": 1790078987.6687117,
+    "ast_hash": "090a5644522cae51716986cdcc3f5fc6",
+    "semantic_hash": "090a5644522cae51716986cdcc3f5fc6"
+  },
+  "scripts/email_pdf_streamline.py": {
+    "mtime": 1790068808.2357452,
+    "seen": 1790078987.6687117,
+    "ast_hash": "d202ee8211a444a6afd7d7d9258c609c",
+    "semantic_hash": "d202ee8211a444a6afd7d7d9258c609c"
+  },
+  "scripts/unprotect_pdf.ps1": {
+    "mtime": 1790068536.127013,
+    "seen": 1790078987.6687117,
+    "ast_hash": "d2c78dd62423f78500f05e87bb33ad8a",
+    "semantic_hash": "d2c78dd62423f78500f05e87bb33ad8a"
+  },
+  "server.ps1": {
+    "mtime": 1790068294.0060837,
+    "seen": 1790078987.6687117,
+    "ast_hash": "ee4b85b73cbba1067f5fb73593b10b82",
+    "semantic_hash": "ee4b85b73cbba1067f5fb73593b10b82"
+  },
+  "sw.js": {
+    "mtime": 1790078703.1619353,
+    "seen": 1790078987.6687117,
+    "ast_hash": "7a707bf45662b79f496df553c8e0a53f",
+    "semantic_hash": "7a707bf45662b79f496df553c8e0a53f"
+  }
+}

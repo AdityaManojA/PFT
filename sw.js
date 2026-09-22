@@ -4,7 +4,7 @@
  * and Background Sync queue for offline expense logging.
  */
 
-const CACHE_NAME = 'finance-tracker-v1.0.0';
+const CACHE_NAME = 'sbafa-v1.9.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -19,26 +19,30 @@ const STATIC_ASSETS = [
   './js/pwa.js',
   './js/parsers/bank-parser.js',
   './js/parsers/categorizer.js',
+  './js/parsers/pdf-parser.js',
   './js/services/setu-aa.js',
+  './js/views/landing.js',
   './js/views/dashboard.js',
   './js/views/transactions.js',
   './js/views/add-expense.js',
   './js/views/accounts.js',
   './js/views/budgets.js',
+  './js/views/login.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
   './icons/add-icon.png',
-  './icons/icon.svg',
-  './sample-data/hdfc_sample_statement.csv',
-  './sample-data/federal_sample_statement.csv'
+  './icons/icon.svg'
 ];
 
-// External vendor libraries (Dexie.js, PapaParse, Chart.js) cached with CacheFirst
+// External vendor libraries (Dexie.js, PapaParse, Chart.js, PDF.js, Google GSI) cached with CacheFirst
 const VENDOR_URLS = [
   'https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js',
   'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js',
-  'https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js'
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+  'https://accounts.google.com/gsi/client'
 ];
 
 // Install Event: Pre-cache app shell and core assets

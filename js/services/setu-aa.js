@@ -64,46 +64,52 @@ export class SetuAccountAggregatorService {
       {
         amount: 320.00,
         currency: 'INR',
-        narration: 'UPI-SWIGGY-BANGALORE-UPI/592019482910@hdfcbank',
+        narration: 'UPI-SWIGGY-BANGALORE-UPI/592019482910@bank',
         type: 'expense',
-        date: today,
-        account_id: 'hdfc-4921'
+        date: today
       },
       {
         amount: 2450.00,
         currency: 'INR',
         narration: 'UPI-MYNTRA DESIGNS-MYNTRA@AXIS-APPAREL',
         type: 'expense',
-        date: today,
-        account_id: 'federal-8812'
+        date: today
       },
       {
         amount: 5000.00,
         currency: 'INR',
         narration: 'NEFT CR-MUTUAL FUND REDEMPTION-UTI NIFTY 50',
         type: 'income',
-        date: today,
-        account_id: 'hdfc-4921'
+        date: today
       },
       {
         amount: 680.00,
         currency: 'INR',
         narration: 'UPI-SHELL PETROL-SHELL@KBL-FUEL',
         type: 'expense',
-        date: today,
-        account_id: 'federal-8812'
+        date: today
       }
     ];
 
     let insertedCount = 0;
 
     const user = await getCurrentUser();
-    const userId = user ? user.id : 'user-aditya';
+    if (!user || !user.id) {
+      throw new Error('Please sign in to sync accounts via Setu AA.');
+    }
+    const userId = user.id;
+
+    const userAccounts = await db.accounts.where('userId').equals(userId).toArray();
+    if (userAccounts.length === 0) {
+      throw new Error('Please add a bank account first using "+ Add Account" before running AA Sync.');
+    }
+    const targetAccountId = userAccounts[0].id;
 
     for (const item of liveStream) {
       const { category, cleanMerchant } = categorizeTransaction(item.narration, item.type);
       await db.transactions.add({
         ...item,
+        account_id: targetAccountId,
         userId,
         category,
         merchant: cleanMerchant,
@@ -114,10 +120,10 @@ export class SetuAccountAggregatorService {
       insertedCount++;
 
       // Adjust account balance
-      const acc = await db.accounts.get(item.account_id);
+      const acc = await db.accounts.get(targetAccountId);
       if (acc) {
         const diff = item.type === 'income' ? item.amount : -item.amount;
-        await db.accounts.update(item.account_id, {
+        await db.accounts.update(targetAccountId, {
           balance: (acc.balance || 0) + diff,
           lastSynced: 'Just now (Setu AA)'
         });

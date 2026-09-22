@@ -7,12 +7,12 @@ import { db, formatINR, getCurrentUser, getUserBudgets, getUserTransactions } fr
 
 export async function renderBudgets(container, showToastCallback) {
   const user = await getCurrentUser();
-  const userId = user ? user.id : 'user-aditya';
-  const budgets = await getUserBudgets(userId);
+  const userId = user ? user.id : null;
+  const budgets = userId ? await getUserBudgets(userId) : [];
 
   // Get current month's transactions for this user
   const currentMonthPrefix = new Date().toISOString().slice(0, 7);
-  const allTxns = await getUserTransactions(userId);
+  const allTxns = userId ? await getUserTransactions(userId) : [];
   const monthExpenses = allTxns.filter(t => t.type === 'expense' && t.date && t.date.startsWith(currentMonthPrefix));
 
   // Compute spent by category
@@ -31,6 +31,53 @@ export async function renderBudgets(container, showToastCallback) {
   });
 
   const overallPercent = totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0;
+
+  let budgetCardsHtml = '';
+  if (!user) {
+    budgetCardsHtml = `
+      <div style="text-align: center; color: var(--text-muted); padding: 30px 16px; font-size: var(--text-xs); background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px dashed var(--border-medium);">
+        <div style="font-size: 1.6rem; margin-bottom: 6px;">🔒</div>
+        <p style="margin-bottom: 10px;">Sign in to view and set your personalized category limits.</p>
+        <button id="budgets-signin-btn" class="btn btn-primary btn-sm" style="font-size: 11px;">Sign In</button>
+      </div>
+    `;
+  } else if (budgets.length === 0) {
+    budgetCardsHtml = '<div style="text-align: center; color: var(--text-muted); padding: 30px 16px; font-size: var(--text-xs);">No category budgets set.</div>';
+  } else {
+    budgetCardsHtml = budgets.map(b => {
+      const spent = categorySpentMap[b.category] || 0;
+      const limit = b.monthlyLimit || 0;
+      const pct = limit > 0 ? Math.round((spent / limit) * 100) : 0;
+      const isOver = limit > 0 && pct > 100;
+      const isWarn = limit > 0 && pct >= 75 && pct <= 100;
+      const statusClass = isOver ? 'danger' : isWarn ? 'warning' : 'normal';
+
+      return `
+        <div class="budget-card">
+          <div class="budget-card-header">
+            <div class="budget-category-name">
+              <span>${b.icon || '🏷️'}</span>
+              <span>${escapeHtml(b.category)}</span>
+            </div>
+            <div class="budget-amounts">
+              <strong>${formatINR(spent)}</strong> / ${formatINR(limit)}
+            </div>
+          </div>
+          <div class="budget-progress-track">
+            <div class="budget-progress-fill ${statusClass}" style="width: ${Math.min(100, pct)}%;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px;">
+            <span style="color: ${isOver ? 'var(--signal-expense)' : isWarn ? 'var(--signal-warning)' : 'var(--text-muted)'};">
+              ${limit === 0 ? 'No limit set (Tap + Edit Limits)' : (isOver ? '⚠️ Overbudget by ' + formatINR(spent - limit) : isWarn ? '⚡ Approaching limit' : formatINR(limit - spent) + ' remaining')}
+            </span>
+            <span style="font-weight: 700; color: ${isOver ? 'var(--signal-expense)' : isWarn ? 'var(--signal-warning)' : 'var(--accent-emerald)'};">
+              ${pct}%
+            </span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
 
   container.innerHTML = `
     <!-- Overall Budget Meter Card -->
@@ -56,50 +103,29 @@ export async function renderBudgets(container, showToastCallback) {
       <button id="add-budget-btn" class="btn btn-outline btn-sm">+ Edit Limits</button>
     </div>
     <div class="budget-cards-list">
-      ${budgets.map(b => {
-        const spent = categorySpentMap[b.category] || 0;
-        const limit = b.monthlyLimit || 1;
-        const pct = Math.round((spent / limit) * 100);
-        const isOver = pct > 100;
-        const isWarn = pct >= 75 && pct <= 100;
-        const statusClass = isOver ? 'danger' : isWarn ? 'warning' : 'normal';
-
-        return `
-          <div class="budget-card">
-            <div class="budget-card-header">
-              <div class="budget-category-name">
-                <span>${b.icon || '🏷️'}</span>
-                <span>${escapeHtml(b.category)}</span>
-              </div>
-              <div class="budget-amounts">
-                <strong>${formatINR(spent)}</strong> / ${formatINR(limit)}
-              </div>
-            </div>
-            <div class="budget-progress-track">
-              <div class="budget-progress-fill ${statusClass}" style="width: ${Math.min(100, pct)}%;"></div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px;">
-              <span style="color: ${isOver ? 'var(--signal-expense)' : isWarn ? 'var(--signal-warning)' : 'var(--text-muted)'};">
-                ${isOver ? '⚠️ Overbudget by ' + formatINR(spent - limit) : isWarn ? '⚡ Approaching limit' : formatINR(limit - spent) + ' remaining'}
-              </span>
-              <span style="font-weight: 700; color: ${isOver ? 'var(--signal-expense)' : isWarn ? 'var(--signal-warning)' : 'var(--accent-emerald)'};">
-                ${pct}%
-              </span>
-            </div>
-          </div>
-        `;
-      }).join('')}
+      ${budgetCardsHtml}
     </div>
   `;
 
   // Attach Edit Limits Modal
+  const signinBtn = container.querySelector('#budgets-signin-btn');
+  if (signinBtn) {
+    signinBtn.onclick = () => { window.location.hash = '#/login'; };
+  }
+
   const addBtn = container.querySelector('#add-budget-btn');
   if (addBtn) {
-    addBtn.onclick = () => openBudgetEditModal(budgets, showToastCallback, () => renderBudgets(container, showToastCallback));
+    addBtn.onclick = () => {
+      if (!user) {
+        window.location.hash = '#/login';
+        return;
+      }
+      openBudgetEditModal(userId, budgets, showToastCallback, () => renderBudgets(container, showToastCallback));
+    };
   }
 }
 
-function openBudgetEditModal(budgets, showToast, refreshCallback) {
+function openBudgetEditModal(userId, budgets, showToast, refreshCallback) {
   const modalContainer = document.getElementById('global-modal-container');
   if (!modalContainer) return;
 
@@ -137,8 +163,9 @@ function openBudgetEditModal(budgets, showToast, refreshCallback) {
     const inputs = modalContainer.querySelectorAll('.budget-input-field');
     for (const input of inputs) {
       const cat = input.dataset.cat;
-      const limit = parseFloat(input.value) || 1000;
-      await db.budgets.where('category').equals(cat).modify({ monthlyLimit: limit });
+      const parsed = parseFloat(input.value);
+      const limit = isNaN(parsed) || parsed < 0 ? 0 : parsed;
+      await db.budgets.where('userId').equals(userId).filter(b => b.category === cat).modify({ monthlyLimit: limit });
     }
     modalContainer.innerHTML = '';
     showToast('Budget limits updated successfully!', 'success');

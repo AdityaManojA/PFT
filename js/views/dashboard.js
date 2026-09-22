@@ -11,16 +11,16 @@ let chartInstance = null;
 export async function renderDashboard(container) {
   const isPrivacy = await BiometricAuthService.getPrivacyMode();
   const user = await getCurrentUser();
-  const userId = user ? user.id : 'user-aditya';
+  const userId = user ? user.id : null;
 
-  // Fetch user-scoped accounts to calculate net worth
-  const accounts = await getUserAccounts(userId);
+  // Fetch user-scoped accounts to calculate net worth (0 if logged out)
+  const accounts = userId ? await getUserAccounts(userId) : [];
   const totalBalance = accounts.reduce((acc, a) => acc + (a.balance || 0), 0);
 
-  // Fetch this month's transactions for this user
+  // Fetch this month's transactions for this user (empty if logged out)
   const now = new Date();
   const currentMonthPrefix = now.toISOString().slice(0, 7); // YYYY-MM
-  const allTxns = await getUserTransactions(userId);
+  const allTxns = userId ? await getUserTransactions(userId) : [];
   const monthTxns = allTxns.filter(t => t.date && t.date.startsWith(currentMonthPrefix));
 
   let monthIncome = 0;
@@ -48,6 +48,20 @@ export async function renderDashboard(container) {
   const displayExpense = isPrivacy ? '••••••' : formatINR(monthExpense);
 
   container.innerHTML = `
+    ${!user ? `
+      <!-- Logged-out Zero State Notice -->
+      <div class="glass-card" style="margin-bottom: 16px; border: 1px solid var(--border-medium); background: var(--bg-surface-elevated); display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.2rem;">🔒</span>
+          <div>
+            <div style="font-size: var(--text-xs); font-weight: 700; color: var(--text-primary);">Logged Out (Values at ₹0)</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Sign in to unlock your private vault & transactions.</div>
+          </div>
+        </div>
+        <button id="banner-signin-btn" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 5px 12px;">Sign In</button>
+      </div>
+    ` : ''}
+
     <!-- Net Worth Hero Card -->
     <div class="hero-balance-card">
       <div class="hero-label-row">
@@ -126,6 +140,11 @@ export async function renderDashboard(container) {
   `;
 
   // Attach event handlers
+  const bannerSignIn = container.querySelector('#banner-signin-btn');
+  if (bannerSignIn) {
+    bannerSignIn.onclick = () => { window.location.hash = '#/login'; };
+  }
+
   const privacyBtn = container.querySelector('#toggle-privacy-btn');
   if (privacyBtn) {
     privacyBtn.onclick = async () => {
@@ -198,10 +217,13 @@ function initSpendingChart(categoryTotals) {
   const labels = Object.keys(categoryTotals);
   const data = Object.values(categoryTotals);
 
-  if (labels.length === 0) {
-    labels.push('Groceries', 'Dining', 'Investments', 'Shopping');
-    data.push(1260, 1075, 15000, 4349);
-  }
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const isEmpty = labels.length === 0 || data.every(v => v === 0);
+  const chartLabels = isEmpty ? ['No Expenses (₹0)'] : labels;
+  const chartData = isEmpty ? [1] : data;
+  const chartColors = isEmpty ? [isLight ? '#E2E8F0' : '#1E293B'] : [
+    '#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#F43F5E', '#06B6D4', '#EC4899'
+  ];
 
   // Check if Chart.js is loaded
   if (window.Chart) {
@@ -211,15 +233,13 @@ function initSpendingChart(categoryTotals) {
     chartInstance = new window.Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: labels,
+        labels: chartLabels,
         datasets: [{
-          data: data,
-          backgroundColor: [
-            '#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#F43F5E', '#06B6D4', '#EC4899'
-          ],
-          borderColor: '#0F172A',
+          data: chartData,
+          backgroundColor: chartColors,
+          borderColor: isLight ? '#FFFFFF' : '#0F172A',
           borderWidth: 3,
-          hoverOffset: 6
+          hoverOffset: isEmpty ? 0 : 6
         }]
       },
       options: {
@@ -231,14 +251,14 @@ function initSpendingChart(categoryTotals) {
             position: 'right',
             labels: {
               boxWidth: 10,
-              color: '#94A3B8',
-              font: { family: 'Plus Jakarta Sans', size: 11, weight: '500' },
+              color: isLight ? '#334155' : '#94A3B8',
+              font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
               padding: 10
             }
           },
           tooltip: {
             callbacks: {
-              label: (context) => ` ${context.label}: ${formatINR(context.raw)}`
+              label: (context) => isEmpty ? ' No expenses recorded (₹0.00)' : ` ${context.label}: ${formatINR(context.raw)}`
             }
           }
         }
@@ -246,11 +266,11 @@ function initSpendingChart(categoryTotals) {
     });
   } else {
     // Fallback Canvas Donut renderer if Chart.js CDN is unavailable
-    renderCanvasDonutFallback(canvas, labels, data);
+    renderCanvasDonutFallback(canvas, chartLabels, chartData, isEmpty);
   }
 }
 
-function renderCanvasDonutFallback(canvas, labels, data) {
+function renderCanvasDonutFallback(canvas, labels, data, isEmpty = false) {
   const ctx = canvas.getContext('2d');
   const width = canvas.width;
   const height = canvas.height;
@@ -258,10 +278,32 @@ function renderCanvasDonutFallback(canvas, labels, data) {
   const centerY = height * 0.5;
   const radius = Math.min(width, height) * 0.4;
   const innerRadius = radius * 0.65;
-  const total = data.reduce((a, b) => a + b, 0) || 1;
 
   ctx.clearRect(0, 0, width, height);
 
+  if (isEmpty) {
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.arc(centerX, centerY, innerRadius, 2 * Math.PI, 0, true);
+    ctx.closePath();
+    ctx.fillStyle = '#1E293B';
+    ctx.fill();
+
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillStyle = '#64748B';
+    ctx.textAlign = 'center';
+    ctx.fillText('₹0', centerX, centerY + 4);
+
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#1E293B';
+    ctx.fillRect(width * 0.68, 80, 8, 8);
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillText('No Expenses (₹0)', width * 0.68 + 14, 88);
+    return;
+  }
+
+  const total = data.reduce((a, b) => a + b, 0) || 1;
   const colors = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#F43F5E', '#06B6D4', '#EC4899'];
   let startAngle = -Math.PI / 2;
 

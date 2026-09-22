@@ -1,0 +1,365 @@
+{
+  "communities": {
+    "0": [
+      "firebase_app_js",
+      "firebase_auth_js",
+      "js_app",
+      "js_app_escapehtml",
+      "js_auth",
+      "js_auth_googleauthservice",
+      "js_db",
+      "js_db_appdatabase",
+      "js_db_appdatabase_constructor",
+      "js_db_drainofflinequeue",
+      "js_db_finduserbyemail",
+      "js_db_getallusers",
+      "js_db_getpendingcount",
+      "js_db_loginuser",
+      "js_db_registeruser",
+      "js_db_seedinitialdataifneeded",
+      "js_db_setcurrentuser",
+      "js_pwa",
+      "js_pwa_checkandrenderiosinstallprompt",
+      "js_pwa_dismissiosinstallbanner",
+      "js_pwa_initpwaengine",
+      "js_pwa_promptpwainstall",
+      "js_views_login",
+      "js_views_login_escapehtml",
+      "js_views_login_promptgooglepinsetup",
+      "js_views_login_renderlogin"
+    ],
+    "1": [
+      "js_db_getcurrentuser",
+      "js_parsers_pdf_parser_bankpdfparser",
+      "js_parsers_pdf_parser_bankpdfparser_deletepassword",
+      "js_parsers_pdf_parser_bankpdfparser_extractpdftext",
+      "js_parsers_pdf_parser_bankpdfparser_getprimarybank",
+      "js_parsers_pdf_parser_bankpdfparser_getsavedpassword",
+      "js_parsers_pdf_parser_bankpdfparser_getsavedpasswordraw",
+      "js_parsers_pdf_parser_bankpdfparser_isautofillenabled",
+      "js_parsers_pdf_parser_bankpdfparser_normalizedate",
+      "js_parsers_pdf_parser_bankpdfparser_parsetexttotransactions",
+      "js_parsers_pdf_parser_bankpdfparser_savepassword",
+      "js_parsers_pdf_parser_bankpdfparser_setautofillenabled",
+      "js_views_accounts",
+      "js_views_accounts_confirmdeleteaccountmodal",
+      "js_views_accounts_confirmremovepasskeymodal",
+      "js_views_accounts_escapehtml",
+      "js_views_accounts_handlepdffile",
+      "js_views_accounts_handleuploadedfile",
+      "js_views_accounts_openaddaccountmodal",
+      "js_views_accounts_openeditaccountmodal",
+      "js_views_accounts_openeditpasskeymodal",
+      "js_views_accounts_parseandingestpdftext",
+      "js_views_accounts_processcsvtext",
+      "js_views_accounts_promptpdfpasswordmodal",
+      "js_views_accounts_renderaccounts",
+      "js_views_accounts_renderbankcardhtml"
+    ],
+    "2": [
+      "js_app_appcoordinator",
+      "js_app_appcoordinator_applytheme",
+      "js_app_appcoordinator_constructor",
+      "js_app_appcoordinator_handleloginsuccess",
+      "js_app_appcoordinator_handlenetworkchange",
+      "js_app_appcoordinator_init",
+      "js_app_appcoordinator_inittheme",
+      "js_app_appcoordinator_navigate",
+      "js_app_appcoordinator_refreshcurrentview",
+      "js_app_appcoordinator_setupglobalcontrols",
+      "js_app_appcoordinator_setuprouting",
+      "js_app_appcoordinator_showbiometriclockscreen",
+      "js_app_appcoordinator_showtoast",
+      "js_app_appcoordinator_showuserprofilesheet",
+      "js_app_appcoordinator_updateheaderuserprofile",
+      "js_auth_biometricauthservice",
+      "js_auth_biometricauthservice_authenticatebiometrics",
+      "js_auth_biometricauthservice_isbiometricavailable",
+      "js_auth_biometricauthservice_isbiometriclockenabled",
+      "js_auth_biometricauthservice_setbiometriclockenabled",
+      "js_auth_biometricauthservice_verifypin"
+    ],
+    "3": [
+      "js_auth_biometricauthservice_getprivacymode",
+      "js_auth_biometricauthservice_toggleprivacymode",
+      "js_db_formatinr",
+      "js_db_getuserbudgets",
+      "js_db_getusertransactions",
+      "js_views_budgets",
+      "js_views_budgets_escapehtml",
+      "js_views_budgets_openbudgeteditmodal",
+      "js_views_budgets_renderbudgets",
+      "js_views_dashboard",
+      "js_views_dashboard_escapehtml",
+      "js_views_dashboard_initspendingchart",
+      "js_views_dashboard_rendercanvasdonutfallback",
+      "js_views_dashboard_renderdashboard",
+      "js_views_dashboard_rendertxnitemhtml",
+      "js_views_transactions",
+      "js_views_transactions_escapehtml",
+      "js_views_transactions_exporttransactionscsv",
+      "js_views_transactions_rendergroupedlist",
+      "js_views_transactions_rendertransactions",
+      "js_views_transactions_showtransactiondetailmodal"
+    ],
+    "4": [
+      "js_db_db",
+      "js_parsers_bank_parser",
+      "js_parsers_bank_parser_bankstatementparser",
+      "js_parsers_bank_parser_bankstatementparser_normalizedate",
+      "js_parsers_bank_parser_bankstatementparser_parse",
+      "js_parsers_bank_parser_bankstatementparser_parsefederal",
+      "js_parsers_bank_parser_bankstatementparser_parsegeneric",
+      "js_parsers_bank_parser_bankstatementparser_parsehdfc",
+      "js_parsers_categorizer",
+      "js_parsers_categorizer_categorizetransaction",
+      "js_parsers_categorizer_category_rules",
+      "js_parsers_categorizer_extractcleanmerchant",
+      "js_parsers_categorizer_formattitlecase",
+      "js_parsers_pdf_parser",
+      "js_services_setu_aa",
+      "js_services_setu_aa_setuaccountaggregatorservice",
+      "js_services_setu_aa_setuaccountaggregatorservice_createconsentrequest",
+      "js_services_setu_aa_setuaccountaggregatorservice_synclivefinancialdata",
+      "js_services_setu_aa_setuaccountaggregatorservice_verifyconsentotp",
+      "js_views_accounts_opensetuaamodal"
+    ],
+    "5": [
+      "manifest",
+      "manifest_background_color",
+      "manifest_categories",
+      "manifest_description",
+      "manifest_display",
+      "manifest_display_override",
+      "manifest_icons",
+      "manifest_id",
+      "manifest_lang",
+      "manifest_name",
+      "manifest_orientation",
+      "manifest_scope",
+      "manifest_short_name",
+      "manifest_shortcuts",
+      "manifest_start_url",
+      "manifest_theme_color"
+    ],
+    "6": [
+      "package",
+      "package_author",
+      "package_description",
+      "package_keywords",
+      "package_license",
+      "package_main",
+      "package_name",
+      "package_scripts",
+      "package_scripts_dev",
+      "package_scripts_serve",
+      "package_scripts_start",
+      "package_version"
+    ],
+    "7": [
+      "csv",
+      "os",
+      "pypdf",
+      "re",
+      "scripts_email_pdf_streamline",
+      "scripts_email_pdf_streamline_batch_decrypt_directory",
+      "scripts_email_pdf_streamline_decrypt_pdf",
+      "scripts_email_pdf_streamline_rationale_1",
+      "scripts_email_pdf_streamline_rationale_43",
+      "scripts_email_pdf_streamline_rationale_60"
+    ],
+    "8": [
+      "js_auth_firebaseauthservice",
+      "js_auth_firebaseauthservice_getauth",
+      "js_auth_firebaseauthservice_getfirebaseconfig",
+      "js_auth_firebaseauthservice_isconfigured",
+      "js_auth_firebaseauthservice_loadfirebasesdk",
+      "js_auth_firebaseauthservice_promptfirebaseconfigmodal",
+      "js_auth_firebaseauthservice_setfirebaseconfig",
+      "js_auth_firebaseauthservice_signinwithgoogle",
+      "ref_https"
+    ],
+    "9": [
+      "js_views_landing",
+      "js_views_landing_createparticlemesh",
+      "js_views_landing_createparticlemesh_draw",
+      "js_views_landing_createparticlemesh_makeparticle",
+      "js_views_landing_createparticlemesh_onmousemove",
+      "js_views_landing_createparticlemesh_onscroll",
+      "js_views_landing_createparticlemesh_ontouchmove",
+      "js_views_landing_createparticlemesh_resize",
+      "js_views_landing_renderlanding"
+    ],
+    "10": [
+      "js_db_addtransaction",
+      "js_db_getuseraccounts",
+      "js_parsers_categorizer_all_categories",
+      "js_views_add_expense",
+      "js_views_add_expense_escapehtml",
+      "js_views_add_expense_renderaddexpense"
+    ],
+    "11": [
+      "sw",
+      "sw_static_assets",
+      "sw_vendor_urls"
+    ],
+    "12": [
+      "generate_icons",
+      "generate_icons_create_appicon"
+    ],
+    "13": [
+      "scripts_unprotect_pdf"
+    ],
+    "14": [
+      "server"
+    ]
+  },
+  "cohesion": {
+    "0": 0.16615384615384615,
+    "1": 0.2123076923076923,
+    "2": 0.21904761904761905,
+    "3": 0.22857142857142856,
+    "4": 0.19473684210526315,
+    "5": 0.125,
+    "6": 0.16666666666666666,
+    "7": 0.2222222222222222,
+    "8": 0.4444444444444444,
+    "9": 0.25,
+    "10": 0.5333333333333333,
+    "11": 0.6666666666666666,
+    "12": 1.0,
+    "13": 1.0,
+    "14": 1.0
+  },
+  "gods": [
+    {
+      "id": "js_db_getcurrentuser",
+      "label": "getCurrentUser()",
+      "degree": 26
+    },
+    {
+      "id": "js_views_accounts_renderaccounts",
+      "label": "renderAccounts()",
+      "degree": 21
+    },
+    {
+      "id": "js_app_appcoordinator",
+      "label": "AppCoordinator",
+      "degree": 15
+    },
+    {
+      "id": "js_parsers_pdf_parser_bankpdfparser",
+      "label": "BankPDFParser",
+      "degree": 13
+    },
+    {
+      "id": "js_db_formatinr",
+      "label": "formatINR()",
+      "degree": 13
+    },
+    {
+      "id": "js_views_dashboard_renderdashboard",
+      "label": "renderDashboard()",
+      "degree": 13
+    },
+    {
+      "id": "js_views_transactions_rendertransactions",
+      "label": "renderTransactions()",
+      "degree": 13
+    },
+    {
+      "id": "js_auth_biometricauthservice",
+      "label": "BiometricAuthService",
+      "degree": 12
+    },
+    {
+      "id": "js_views_budgets_renderbudgets",
+      "label": "renderBudgets()",
+      "degree": 11
+    },
+    {
+      "id": "js_parsers_categorizer_categorizetransaction",
+      "label": "categorizeTransaction()",
+      "degree": 10
+    }
+  ],
+  "surprises": [
+    {
+      "source": "renderAddExpense()",
+      "target": "getCurrentUser()",
+      "source_files": [
+        "js/views/add-expense.js",
+        "js/db.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "renderBudgets()",
+      "target": "getCurrentUser()",
+      "source_files": [
+        "js/views/budgets.js",
+        "js/db.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "renderDashboard()",
+      "target": "getCurrentUser()",
+      "source_files": [
+        "js/views/dashboard.js",
+        "js/db.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "renderLanding()",
+      "target": "getCurrentUser()",
+      "source_files": [
+        "js/views/landing.js",
+        "js/db.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "renderTransactions()",
+      "target": "getCurrentUser()",
+      "source_files": [
+        "js/views/transactions.js",
+        "js/db.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `getCurrentUser()` connect `accounts.js` to `app.js`, `AppCoordinator`, `dashboard.js`, `categorizeTransaction`, `createParticleMesh`, `add-expense.js`?",
+      "why": "High betweenness centrality (0.088) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `FirebaseAuthService` connect `FirebaseAuthService` to `app.js`?",
+      "why": "High betweenness centrality (0.063) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `STATIC_ASSETS`, `VENDOR_URLS`, `CATEGORY_RULES` to the rest of the system?",
+      "why": "28 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `manifest.json` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.125 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

@@ -5,13 +5,14 @@
   <!-- Mobile Viewport & Safe Areas for iPhone Notch / Home Bar (Section 3) -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
-  <title>Personal Finance Tracker | Indian PWA</title>
+  <title>SBAFA | Personal Finance Tracker</title>
   <meta name="description" content="Track expenses, HDFC/Federal bank connections, and budgets offline and online." />
 
-  <!-- iOS PWA Standalone Mode (Section 3) -->
+  <!-- PWA Standalone Mode -->
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="FinanceTracker" />
+  <meta name="apple-mobile-web-app-title" content="SBAFA" />
   <meta name="theme-color" content="#0F172A" />
 
   <!-- App Icons & Web Manifest -->
@@ -19,10 +20,10 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <link rel="manifest" href="manifest.json" />
 
-  <!-- Google Fonts: Plus Jakarta Sans -->
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <!-- Core Design System CSS -->
   <link rel="stylesheet" href="css/design-tokens.css" />
@@ -30,11 +31,12 @@
   <link rel="stylesheet" href="css/components.css" />
   <link rel="stylesheet" href="css/views.css" />
 
-  <!-- External Vendor Libraries (Dexie.js, PapaParse, Chart.js, PDF.js) -->
+  <!-- External Vendor Libraries (Dexie.js, PapaParse, Chart.js, PDF.js, Google GSI) -->
   <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -52,28 +54,35 @@
 
     <!-- App Header -->
     <header class="app-header">
-      <div class="header-brand">
-        <div class="header-logo-icon">₹</div>
+      <div class="header-brand" id="header-brand-link" role="button" tabindex="0" title="Go to Dashboard / Landing">
+        <div class="header-logo-icon">S</div>
         <div>
-          <h1 class="header-title">FinanceTracker</h1>
-          <div class="header-subtitle">Indian Personal Wealth</div>
+          <h1 class="header-title">SBAFA</h1>
+          <div class="header-subtitle">Financial Enclave</div>
         </div>
       </div>
 
       <div class="header-actions">
-        <button id="header-user-btn" class="badge badge-emerald" style="cursor: pointer; padding: 4px 8px; font-size: 11px; display: flex; align-items: center; gap: 4px;" title="Switch Profile or Log out">
-          <span>👤</span>
-          <span id="header-user-name">Aditya</span>
+        <button id="header-landing-btn" class="header-nav-btn" title="View Home Landing Page">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Home</span>
         </button>
-        <span id="header-network-pill" class="badge badge-blue">Online</span>
-        <button id="header-install-btn" class="btn btn-outline btn-sm" style="display: none; padding: 4px 8px; font-size: 11px;">
+        <button id="header-user-btn" class="header-user-pill" title="Switch Profile or Log out">
+          <span class="user-status-dot"></span>
+          <span id="header-user-name">Sign In</span>
+        </button>
+        <button id="header-theme-btn" class="header-icon-btn" title="Toggle Light / Dark Mode" aria-label="Toggle theme">
+          <svg class="theme-icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="theme-icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button id="header-install-btn" class="btn btn-outline btn-sm header-desktop-only" style="display: none; padding: 4px 8px; font-size: 11px;">
           ⬇️ Install
         </button>
-        <button id="header-screen-toggle-btn" class="btn btn-outline btn-sm" style="font-size: 11px; padding: 4px 8px;" title="Toggle between desktop layout and mobile phone simulator">
-          📱 Phone View
+        <button id="header-screen-toggle-btn" class="header-nav-btn header-desktop-only" style="font-size: 11px; padding: 4px 8px;" title="Toggle between desktop layout and mobile phone simulator">
+          📱 Phone
         </button>
-        <button id="header-lock-btn" class="btn-icon" title="Lock App with Biometrics">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <button id="header-lock-btn" class="header-icon-btn" title="Lock App with Biometrics">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
         </button>
       </div>
     </header>
@@ -100,27 +109,27 @@
     <!-- Bottom Mobile Dock / Tab Bar (Section 8) -->
     <nav class="bottom-nav">
       <button class="nav-item active" data-route="dashboard">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
         <span>Overview</span>
       </button>
 
       <button class="nav-item" data-route="transactions">
-        <svg viewBox="0 0 24 24" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
         <span>Ledger</span>
       </button>
 
       <!-- Center Tactile Add Action Button -->
       <button class="nav-item nav-add-btn" data-route="add" title="Log Expense">
-        <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
       </button>
 
       <button class="nav-item" data-route="accounts">
-        <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
         <span>Banks & AA</span>
       </button>
 
       <button class="nav-item" data-route="budgets">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         <span>Budgets</span>
       </button>
     </nav>
