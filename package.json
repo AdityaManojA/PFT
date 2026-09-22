@@ -1,0 +1,20 @@
+{
+  "name": "personal-finance-tracker-pwa",
+  "version": "1.0.0",
+  "description": "Personal Finance Tracker PWA tailored for the Indian financial ecosystem",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y serve . -l 8080",
+    "start": "npx -y serve . -l 8080",
+    "serve": "powershell -ExecutionPolicy Bypass -File ./server.ps1"
+  },
+  "keywords": [
+    "pwa",
+    "finance-tracker",
+    "dexie",
+    "account-aggregator",
+    "india"
+  ],
+  "author": "",
+  "license": "MIT"
+}

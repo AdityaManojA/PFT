@@ -1,0 +1,72 @@
+{
+  "short_name": "FinanceTracker",
+  "name": "Personal Finance Tracker",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ],
+  "id": "./?source=pwa",
+  "start_url": "./?source=pwa",
+  "background_color": "#0F172A",
+  "theme_color": "#0F172A",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  "orientation": "any",
+  "scope": "./",
+  "lang": "en-IN",
+  "categories": [
+    "finance",
+    "productivity",
+    "utilities"
+  ],
+  "description": "Cross-platform offline-first Personal Finance Tracker for Indian banking ecosystem (HDFC, Federal Bank, ICICI, SBI).",
+  "shortcuts": [
+    {
+      "name": "Add Expense",
+      "short_name": "Add",
+      "description": "Log a manual expense",
+      "url": "./?source=shortcut#/add",
+      "icons": [{ "src": "icons/add-icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "View Ledger",
+      "short_name": "Ledger",
+      "description": "Search transactions",
+      "url": "./?source=shortcut#/transactions",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

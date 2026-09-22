@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Mobile Viewport & Safe Areas for iPhone Notch / Home Bar (Section 3) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+  <title>Personal Finance Tracker | Indian PWA</title>
+  <meta name="description" content="Track expenses, HDFC/Federal bank connections, and budgets offline and online." />
+
+  <!-- iOS PWA Standalone Mode (Section 3) -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FinanceTracker" />
+  <meta name="theme-color" content="#0F172A" />
+
+  <!-- App Icons & Web Manifest -->
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Core Design System CSS -->
+  <link rel="stylesheet" href="css/design-tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+
+  <!-- External Vendor Libraries (Dexie.js, PapaParse, Chart.js, PDF.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+  <!-- App Frame Container (Constrained on desktop, full-bleed on mobile) -->
+  <div id="app-container">
+
+    <!-- Offline Notification Banner (Section 5) -->
+    <div id="offline-sync-banner" class="offline-banner" style="display: none;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span>⚡</span>
+        <span>Offline Mode: Logging to IndexedDB queue</span>
+      </div>
+      <span style="font-size: 10px; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px;">Will auto-sync</span>
+    </div>
+
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="header-logo-icon">₹</div>
+        <div>
+          <h1 class="header-title">FinanceTracker</h1>
+          <div class="header-subtitle">Indian Personal Wealth</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="header-user-btn" class="badge badge-emerald" style="cursor: pointer; padding: 4px 8px; font-size: 11px; display: flex; align-items: center; gap: 4px;" title="Switch Profile or Log out">
+          <span>👤</span>
+          <span id="header-user-name">Aditya</span>
+        </button>
+        <span id="header-network-pill" class="badge badge-blue">Online</span>
+        <button id="header-install-btn" class="btn btn-outline btn-sm" style="display: none; padding: 4px 8px; font-size: 11px;">
+          ⬇️ Install
+        </button>
+        <button id="header-screen-toggle-btn" class="btn btn-outline btn-sm" style="font-size: 11px; padding: 4px 8px;" title="Toggle between desktop layout and mobile phone simulator">
+          📱 Phone View
+        </button>
+        <button id="header-lock-btn" class="btn-icon" title="Lock App with Biometrics">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Scrollable Content Area -->
+    <main class="app-main" id="view-container">
+      <!-- Dynamic Views Render Here -->
+    </main>
+
+    <!-- iOS Custom Install Prompt Banner (Section 7) -->
+    <div id="ios-install-banner" class="ios-install-banner" style="display: none;">
+      <div class="ios-install-header">
+        <div class="ios-install-title">
+          <span>📲</span>
+          <span>Install on your iPhone</span>
+        </div>
+        <button id="ios-banner-dismiss-btn" style="color: var(--text-muted); font-size: 16px; line-height: 1;">✕</button>
+      </div>
+      <p class="ios-install-text">
+        Tap the <strong>Share</strong> button in Safari, then scroll down and select <strong>Add to Home Screen</strong>.
+      </p>
+    </div>
+
+    <!-- Bottom Mobile Dock / Tab Bar (Section 8) -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-route="dashboard">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>Overview</span>
+      </button>
+
+      <button class="nav-item" data-route="transactions">
+        <svg viewBox="0 0 24 24" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+        <span>Ledger</span>
+      </button>
+
+      <!-- Center Tactile Add Action Button -->
+      <button class="nav-item nav-add-btn" data-route="add" title="Log Expense">
+        <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+
+      <button class="nav-item" data-route="accounts">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+        <span>Banks & AA</span>
+      </button>
+
+      <button class="nav-item" data-route="budgets">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span>Budgets</span>
+      </button>
+    </nav>
+
+    <!-- Global Modal Sheet & Toast Container -->
+    <div id="global-modal-container"></div>
+    <div id="toast-container" class="toast-container"></div>
+
+  </div>
+
+  <!-- Main ES Module Application Entrypoint -->
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>

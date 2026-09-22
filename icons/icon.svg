@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="pwaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#10B981" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="#0F172A" />
+  <rect x="48" y="48" width="416" height="416" rx="96" fill="url(#pwaGrad)" filter="url(#glow)" />
+  <path d="M180 150 h152 v32 h-152 z M180 205 h152 v32 h-152 z M240 237 v150 h-38 v-150 z" fill="#FFFFFF" opacity="0.15" />
+  <text x="256" y="325" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="230" font-weight="900" fill="#FFFFFF" text-anchor="middle">₹</text>
+</svg>
