@@ -50,10 +50,10 @@
   --border-accent: rgba(232, 96, 52, 0.40);
 
   /* High Legibility Clean Typography */
-  --text-primary: #F8FAFC;
+  --text-primary: #FFFFFF;
   --text-secondary: #CBD5E1;
   --text-muted: #94A3B8;
-  --text-dim: #64748B;
+  --text-dim: #7E8799;
   --text-inverse: #1E2126;
 
   /* Typography Families */
@@ -125,11 +125,11 @@
   --border-focus: rgba(232, 96, 52, 0.6);
   --border-accent: rgba(232, 96, 52, 0.4);
 
-  /* Deep Charcoal Typography */
-  --text-primary: #191A16;
-  --text-secondary: #585750;
-  --text-muted: #828078;
-  --text-dim: #A6A49C;
+  /* Deep High-Contrast Charcoal Typography */
+  --text-primary: #11120E;
+  --text-secondary: #3E3D36;
+  --text-muted: #5C5950;
+  --text-dim: #78756C;
   --text-inverse: #FFFFFF;
 
   /* Signals tailored for light linen */

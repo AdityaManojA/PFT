@@ -545,3 +545,21 @@ export async function addStatementUploadHistory(userId, newEntries) {
   });
   return updated;
 }
+
+// -------------------------------------------------------------
+// Global Active Account Filter State (Synchronized across tabs)
+// -------------------------------------------------------------
+export function getActiveAccountFilter() {
+  if (typeof localStorage === 'undefined') return 'all';
+  return localStorage.getItem('sbafa_active_account_filter') || 'all';
+}
+
+export function setActiveAccountFilter(accountId) {
+  if (typeof localStorage === 'undefined') return;
+  const cleanId = (!accountId || accountId === 'all') ? 'all' : String(accountId).trim();
+  localStorage.setItem('sbafa_active_account_filter', cleanId);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('sbafa:account-changed', { detail: { accountId: cleanId } }));
+  }
+}
+

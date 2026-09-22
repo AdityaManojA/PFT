@@ -6,9 +6,9 @@
     "semantic_hash": ""
   },
   "js/app.js": {
-    "mtime": 1790102303.846569,
-    "seen": 1790102388.9265308,
-    "ast_hash": "2b69567422c8783cfc07f48b07698eeb",
+    "mtime": 1790100187.169193,
+    "seen": 1790100857.8151426,
+    "ast_hash": "595bdd9f8bf44de9b0875e59a406fa18",
     "semantic_hash": ""
   },
   "js/auth.js": {
@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   "js/db.js": {
-    "mtime": 1790102241.8311508,
-    "seen": 1790102388.9265308,
-    "ast_hash": "4c1bae49a936fb9759df3573533ea153",
+    "mtime": 1790100209.104764,
+    "seen": 1790100857.8151426,
+    "ast_hash": "8915b88eb01fc137b70fb655335be8c9",
     "semantic_hash": ""
   },
   "js/parsers/bank-parser.js": {
@@ -30,15 +30,15 @@
     "semantic_hash": "0a51fbf50ec9804ee5c8dbfba4708485"
   },
   "js/parsers/categorizer.js": {
-    "mtime": 1790102107.816439,
-    "seen": 1790102388.9265308,
-    "ast_hash": "8a405bcd5bad509357066ae0541a8668",
+    "mtime": 1790100173.2735424,
+    "seen": 1790100857.8151426,
+    "ast_hash": "93b0fa8c269362b989e24266d956cca8",
     "semantic_hash": ""
   },
   "js/parsers/pdf-parser.js": {
-    "mtime": 1790101321.698801,
-    "seen": 1790102388.9265308,
-    "ast_hash": "51a54d4b69c3958d1bea2d97c8232bb4",
+    "mtime": 1790096602.6767297,
+    "seen": 1790100857.8151426,
+    "ast_hash": "f4598986a0f278715b8cebe918c150f0",
     "semantic_hash": ""
   },
   "js/pwa.js": {
@@ -48,9 +48,9 @@
     "semantic_hash": "702128dc01bc9eb943f11d946b26edc1"
   },
   "js/views/accounts.js": {
-    "mtime": 1790101382.7355373,
-    "seen": 1790102388.9265308,
-    "ast_hash": "fe0fa7e0ec943fe0bf6b6dd1ce230b7e",
+    "mtime": 1790100387.8471339,
+    "seen": 1790100857.8151426,
+    "ast_hash": "f0c1bb44c2718fbf640760d0198b9ff8",
     "semantic_hash": ""
   },
   "js/views/add-expense.js": {
@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "js/views/dashboard.js": {
-    "mtime": 1790102208.891743,
-    "seen": 1790102388.9265308,
-    "ast_hash": "e6bf056d897d96f308f23dd874ee2cb5",
+    "mtime": 1790100254.0387404,
+    "seen": 1790100857.8151426,
+    "ast_hash": "08bfc752649d7170fb09d8389112fb1e",
     "semantic_hash": ""
   },
   "js/views/landing.js": {
@@ -78,21 +78,21 @@
     "semantic_hash": ""
   },
   "js/views/login.js": {
-    "mtime": 1790102262.2777412,
-    "seen": 1790102388.9265308,
-    "ast_hash": "08228c17035fa767bff81b9dca4c7d01",
+    "mtime": 1790096548.8429224,
+    "seen": 1790100857.8151426,
+    "ast_hash": "94d7bbcff9dc662d2506269b6ddd7339",
     "semantic_hash": ""
   },
   "js/views/transactions.js": {
-    "mtime": 1790101497.6945357,
-    "seen": 1790102388.9265308,
-    "ast_hash": "b1a07bdc49f8d29dec99067ef5d80929",
+    "mtime": 1790092150.2444592,
+    "seen": 1790092514.5620651,
+    "ast_hash": "299005076f1acf2acdb9599329730470",
     "semantic_hash": ""
   },
   "manifest.json": {
-    "mtime": 1790101911.0692205,
-    "seen": 1790102388.9265308,
-    "ast_hash": "56af639b320c899d65be16f0529d66a4",
+    "mtime": 1790099706.7428138,
+    "seen": 1790100857.8151426,
+    "ast_hash": "8dae0c3164cfd29ccb24378dda56676f",
     "semantic_hash": ""
   },
   "package.json": {
@@ -120,9 +120,9 @@
     "semantic_hash": "ee4b85b73cbba1067f5fb73593b10b82"
   },
   "sw.js": {
-    "mtime": 1790102314.804273,
-    "seen": 1790102388.9265308,
-    "ast_hash": "23f0943797531b05e070ccac36744409",
+    "mtime": 1790099723.6061935,
+    "seen": 1790100857.8151426,
+    "ast_hash": "c05c29a23c8ea5abfdddae63ebf0eb98",
     "semantic_hash": ""
   },
   "js/firebase-config.js": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1790101897.6539328,
-    "seen": 1790102388.9265308,
-    "ast_hash": "4f595a1ba2297e03ae934184f7273052",
+    "mtime": 1790096493.3827543,
+    "seen": 1790100857.8151426,
+    "ast_hash": "3d7b969d4e5c1ddac49ef0d22d486ffb",
     "semantic_hash": ""
   },
   "public/index.html": {
@@ -173,9 +173,33 @@
     "ast_hash": "48166621f12ac55dc364c97b9e95d59d",
     "semantic_hash": ""
   },
+  "icons/add-icon.png": {
+    "mtime": 1790066078.7046785,
+    "seen": 1790079017.5818367,
+    "ast_hash": "3c36e3c290cdea63c96e27866ae9eea3",
+    "semantic_hash": ""
+  },
+  "icons/apple-touch-icon.png": {
+    "mtime": 1790066078.695589,
+    "seen": 1790079017.5818367,
+    "ast_hash": "e26ec35e2a9b58a35635eaabba2c059a",
+    "semantic_hash": ""
+  },
+  "icons/icon-192.png": {
+    "mtime": 1790066078.6696522,
+    "seen": 1790079017.5818367,
+    "ast_hash": "37b676e902f363163797e6d8b3881fb3",
+    "semantic_hash": ""
+  },
+  "icons/icon-512.png": {
+    "mtime": 1790066078.6881554,
+    "seen": 1790079017.5818367,
+    "ast_hash": "305d8063c32cf89d4d91fed66cd4a855",
+    "semantic_hash": ""
+  },
   "icons/icon.svg": {
-    "mtime": 1790101398.5063047,
-    "seen": 1790102388.9265308,
+    "mtime": 1790096474.2417436,
+    "seen": 1790100857.8151426,
     "ast_hash": "3f6d339b56f111c6b1c662a1abe484e2",
     "semantic_hash": ""
   },
@@ -243,24 +267,6 @@
     "mtime": 1790095707.2755885,
     "seen": 1790100857.8151426,
     "ast_hash": "3f6d339b56f111c6b1c662a1abe484e2",
-    "semantic_hash": ""
-  },
-  "js/components/edit-category-modal.js": {
-    "mtime": 1790101890.2604527,
-    "seen": 1790102388.9265308,
-    "ast_hash": "76fd76028f5be214b5a70510c5acff45",
-    "semantic_hash": ""
-  },
-  "scratch/test_regexes.ps1": {
-    "mtime": 1790101175.3191,
-    "seen": 1790102388.9265308,
-    "ast_hash": "f1a9bf97a6ea1355bca513b4f37a9aec",
-    "semantic_hash": ""
-  },
-  "scratch/test_strict_categorizer.mjs": {
-    "mtime": 1790101141.749637,
-    "seen": 1790102388.9265308,
-    "ast_hash": "24abaa2ba0f33a703b46b84add71f4ad",
     "semantic_hash": ""
   }
 }
