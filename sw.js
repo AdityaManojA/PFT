@@ -4,7 +4,7 @@
  * and Background Sync queue for offline expense logging.
  */
 
-const CACHE_NAME = 'sbafa-v3.3.2';
+const CACHE_NAME = 'sbafa-v3.4.0';
 const STATIC_ASSETS = [
   './',
   './index.html',

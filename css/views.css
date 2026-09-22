@@ -1210,3 +1210,109 @@
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
   }
 }
+
+/* ==========================================================================
+   Mobile Responsive Spacing & Comfort Pass (<= 480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+  /* Dashboard Hero Card */
+  .hero-balance-card {
+    padding: 18px 16px;
+    margin-bottom: 14px;
+    border-radius: var(--radius-xl);
+  }
+
+  .hero-amount {
+    font-size: 2.2rem;
+    margin-bottom: 14px;
+  }
+
+  .hero-cashflow-grid {
+    gap: 12px;
+    padding-top: 12px;
+  }
+
+  /* Quick Actions Grid */
+  .quick-actions-row {
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .quick-action-btn {
+    padding: 10px 4px;
+    border-radius: var(--radius-sm);
+    gap: 4px;
+  }
+
+  .quick-action-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .quick-action-label {
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  /* Chart & Spending Cards */
+  .chart-card {
+    padding: 16px 14px;
+    margin-bottom: 16px;
+    border-radius: var(--radius-xl);
+  }
+
+  .spending-period-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .spending-period-bar > div:last-child {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .spending-cat-row {
+    padding: 10px 6px;
+  }
+
+  .spending-cat-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .spending-cat-title {
+    font-size: 12.5px;
+  }
+
+  .spending-cat-amount {
+    font-size: 13px;
+  }
+
+  /* Transactions Ledger */
+  .txns-search-bar {
+    margin-bottom: 10px;
+  }
+
+  .filter-chips-scroll {
+    gap: 5px;
+    padding-bottom: 4px;
+    margin-bottom: 10px;
+  }
+
+  .filter-chip {
+    padding: 5px 11px;
+    font-size: 11px;
+  }
+
+  .txn-item {
+    padding: 10px 10px;
+    gap: 10px;
+  }
+}
+

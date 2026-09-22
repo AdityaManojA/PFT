@@ -678,6 +678,47 @@ function promptPdfPasswordModal(arrayBuffer, fileName, showToast, refreshCallbac
 }
 
 /**
+ * Segregate and find account by Bank Code/Name and Account Number Last 4 digits.
+ * Prevents account overwrites when a user has multiple accounts under the same bank.
+ */
+function findAccountByBankAndLast4(userAccounts, bankCode, detectedBank, targetLast4) {
+  const normBankCode = (bankCode || '').toUpperCase();
+  const normBankName = (detectedBank || '').toLowerCase();
+
+  const isBankMatch = (a) => {
+    return (a.bankCode && normBankCode && a.bankCode.toUpperCase() === normBankCode) ||
+           (a.bankName && normBankName && a.bankName.toLowerCase().includes(normBankName));
+  };
+
+  // 1. Exact match on bank AND last 4 digits
+  if (targetLast4) {
+    const exact = userAccounts.find(a => {
+      if (!isBankMatch(a)) return false;
+      const accLast4 = a.accountNumberLast4 || (a.accountNumberMask ? a.accountNumberMask.replace(/\D/g, '').slice(-4) : '');
+      return accLast4 === targetLast4;
+    });
+    if (exact) return exact;
+
+    // 2. Unassigned or demo account of this bank
+    const unassigned = userAccounts.find(a => {
+      if (!isBankMatch(a)) return false;
+      const accLast4 = a.accountNumberLast4 || (a.accountNumberMask ? a.accountNumberMask.replace(/\D/g, '').slice(-4) : '');
+      return !accLast4 || /1234|0000|DEMO/i.test(accLast4);
+    });
+    if (unassigned) return unassigned;
+
+    // Target last 4 is known and does not match existing accounts: return null to create separate account!
+    return null;
+  }
+
+  // 3. Fallback when targetLast4 is unknown: only match if user has exactly ONE account of this bank
+  const sameBank = userAccounts.filter(isBankMatch);
+  if (sameBank.length === 1) return sameBank[0];
+
+  return null;
+}
+
+/**
  * Ingest multiple parsed statements and for each bank account,
  * always take the available balance from the statement with the LATEST date.
  */
@@ -708,16 +749,15 @@ async function ingestMultipleStatements(statementList, userId, showToast, refres
       const targetLast4 = firstResult.accountNumberLast4;
 
       // Find or create account matching BOTH bank and last 4 digits
-      let matchedAccount = userAccounts.find(a => {
-        const sameBank = (a.bankCode && a.bankCode.toUpperCase() === bankCode) ||
-                         (a.bankName && firstResult.detectedBank && a.bankName.toLowerCase().includes(firstResult.detectedBank.toLowerCase()));
-        if (!sameBank) return false;
-        if (targetLast4) {
-          const accLast4 = a.accountNumberLast4 || (a.accountNumberMask ? a.accountNumberMask.replace(/\D/g, '').slice(-4) : '');
-          return accLast4 === targetLast4;
-        }
-        return true;
-      });
+      let matchedAccount = findAccountByBankAndLast4(userAccounts, bankCode, firstResult.detectedBank, targetLast4);
+      if (matchedAccount && targetLast4 && (!matchedAccount.accountNumberLast4 || /1234|0000|DEMO/i.test(matchedAccount.accountNumberLast4))) {
+        await db.accounts.update(matchedAccount.id, {
+          accountNumberMask: `•••• ${targetLast4}`,
+          accountNumberLast4: targetLast4
+        });
+        matchedAccount.accountNumberMask = `•••• ${targetLast4}`;
+        matchedAccount.accountNumberLast4 = targetLast4;
+      }
 
       // Sort items by statement date ascending so the last one is the latest
       items.sort((a, b) => {
@@ -891,10 +931,16 @@ async function processCsvText(csvText, targetAccId, showToast, refreshCallback) 
       matchedAccount = userAccounts.find(a => a.id === targetAccId);
     }
     if (!matchedAccount) {
-      matchedAccount = userAccounts.find(a => 
-        (a.bankCode && parseResult.bankCode && a.bankCode.toLowerCase() === parseResult.bankCode.toLowerCase()) ||
-        (a.bankName && parseResult.detectedBank && a.bankName.toLowerCase().includes(parseResult.detectedBank.toLowerCase()))
-      );
+      const targetLast4 = parseResult.accountNumberLast4;
+      matchedAccount = findAccountByBankAndLast4(userAccounts, parseResult.bankCode, parseResult.detectedBank, targetLast4);
+      if (matchedAccount && targetLast4 && (!matchedAccount.accountNumberLast4 || /1234|0000|DEMO/i.test(matchedAccount.accountNumberLast4))) {
+        await db.accounts.update(matchedAccount.id, {
+          accountNumberMask: `•••• ${targetLast4}`,
+          accountNumberLast4: targetLast4
+        });
+        matchedAccount.accountNumberMask = `•••• ${targetLast4}`;
+        matchedAccount.accountNumberLast4 = targetLast4;
+      }
     }
 
     let netChange = 0;
@@ -903,20 +949,22 @@ async function processCsvText(csvText, targetAccId, showToast, refreshCallback) 
     }
 
     if (!matchedAccount) {
-      const newAccId = `acc-${userId}-${Date.now().toString(36)}`;
+      const newAccId = `acc-${userId}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+      const targetLast4 = parseResult.accountNumberLast4;
       matchedAccount = {
         id: newAccId,
         userId,
         bankName: parseResult.detectedBank || 'Bank Account',
-        accountNumberMask: '•••• ' + Math.floor(1000 + Math.random() * 9000),
+        accountNumberMask: targetLast4 ? `•••• ${targetLast4}` : (parseResult.accountNumberMask || '•••• ' + Math.floor(1000 + Math.random() * 9000)),
+        accountNumberLast4: targetLast4 || null,
         accountType: 'Savings Account',
-        balance: Math.max(0, netChange),
+        balance: parseResult.availableBalance != null ? parseResult.availableBalance : Math.max(0, netChange),
         bankCode: parseResult.bankCode || 'OTHER',
         lastSynced: 'Just now'
       };
       await db.accounts.add(matchedAccount);
     } else {
-      const updatedBalance = Math.max(0, (matchedAccount.balance || 0) + netChange);
+      const updatedBalance = parseResult.availableBalance != null ? parseResult.availableBalance : Math.max(0, (matchedAccount.balance || 0) + netChange);
       await db.accounts.update(matchedAccount.id, {
         balance: updatedBalance,
         lastSynced: 'Just now'
@@ -1132,33 +1180,35 @@ function openGmailSyncModal(userId, userBank, savedPasskey, showToast, refreshCa
         return;
       }
 
-      // Ingest the fetched transactions with account segregation
+      // Ingest the fetched transactions with robust account segregation
       const userAccounts = await db.accounts.where('userId').equals(userId).toArray();
-      const targetLast4 = result.accountNumberLast4;
-      let matchedAccount = userAccounts.find(a => {
-        const sameBank = (a.bankCode && result.bankCode && a.bankCode.toLowerCase() === result.bankCode.toLowerCase()) ||
-                         (a.bankName && result.detectedBank && a.bankName.toLowerCase().includes(result.detectedBank.toLowerCase()));
-        if (!sameBank) return false;
-        if (targetLast4) {
-          const accLast4 = a.accountNumberLast4 || (a.accountNumberMask ? a.accountNumberMask.replace(/\D/g, '').slice(-4) : '');
-          return accLast4 === targetLast4;
-        }
-        return true;
-      });
+      const targetLast4 = result.accountNumberLast4 || (result.accountNumberMask ? result.accountNumberMask.replace(/\D/g, '').slice(-4) : null);
+      const detectedBankCode = (result.bankCode || 'FEDERAL').toUpperCase();
+      const detectedBankName = result.detectedBank || bankName;
+
+      let matchedAccount = findAccountByBankAndLast4(userAccounts, detectedBankCode, detectedBankName, targetLast4);
+      if (matchedAccount && targetLast4 && (!matchedAccount.accountNumberLast4 || /1234|0000|DEMO/i.test(matchedAccount.accountNumberLast4))) {
+        await db.accounts.update(matchedAccount.id, {
+          accountNumberMask: `•••• ${targetLast4}`,
+          accountNumberLast4: targetLast4
+        });
+        matchedAccount.accountNumberMask = `•••• ${targetLast4}`;
+        matchedAccount.accountNumberLast4 = targetLast4;
+      }
 
       const assignedMask = result.accountNumberMask || (targetLast4 ? `•••• ${targetLast4}` : '•••• ' + Math.floor(1000 + Math.random() * 9000));
 
       if (!matchedAccount) {
-        const newAccId = `acc-${userId}-${Date.now().toString(36)}`;
+        const newAccId = `acc-${userId}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
         matchedAccount = {
           id: newAccId,
           userId,
-          bankName: result.detectedBank || bankName,
+          bankName: detectedBankName,
           accountNumberMask: assignedMask,
           accountNumberLast4: targetLast4 || null,
           accountType: 'Savings Account',
           balance: result.availableBalance != null ? result.availableBalance : 0,
-          bankCode: result.bankCode || 'FEDERAL',
+          bankCode: detectedBankCode,
           lastSynced: 'Just now (Gmail)'
         };
         await db.accounts.add(matchedAccount);

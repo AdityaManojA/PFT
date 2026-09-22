@@ -159,7 +159,24 @@ export class GmailStatementSyncService {
       throw new Error(`Statement PDF retrieved for ${bankName}, but decryption failed. Please verify your PDF password.`);
     }
 
-    const parsed = BankPDFParser.parseTextToTransactions(pdfText);
+    const fileName = pdfPart.filename || `${cleanBank}_Statement.pdf`;
+    const parsed = BankPDFParser.parseTextToTransactions(pdfText, null, fileName);
+
+    // If PDF text didn't yield last 4 digits, check email subject and snippet
+    let finalLast4 = parsed.accountNumberLast4;
+    let finalMask = parsed.accountNumberMask;
+
+    if (!finalLast4) {
+      const subjHeader = msgData.payload?.headers?.find(h => h.name?.toLowerCase() === 'subject')?.value || '';
+      const subjMatch = (subjHeader + ' ' + (msgData.snippet || '')).match(/(?:ending\s+in|ending\s+with|A\/c\s*(?:no\.?)?|Account\s*(?:no\.?)?)\s*[:\-\s]?\s*([0-9Xx\*]{4,20})/i);
+      if (subjMatch) {
+        const d = subjMatch[1].replace(/\D/g, '');
+        if (d.length >= 4) {
+          finalLast4 = d.slice(-4);
+          finalMask = '•••• ' + finalLast4;
+        }
+      }
+    }
 
     // Save timestamp
     localStorage.setItem('sbafa_last_gmail_sync', Date.now().toString());
@@ -168,9 +185,13 @@ export class GmailStatementSyncService {
       count: parsed.totalParsed,
       transactions: parsed.transactions,
       availableBalance: parsed.availableBalance,
+      statementDate: parsed.statementDate,
+      accountNumberMask: finalMask,
+      accountNumberLast4: finalLast4,
       detectedBank: parsed.detectedBank,
       bankCode: parsed.bankCode,
-      message: `Fetched ${parsed.totalParsed} transactions from ${parsed.detectedBank} statement email!`
+      fileName,
+      message: `Fetched ${parsed.totalParsed} transactions for ${parsed.detectedBank} (${finalMask})!`
     };
   }
 

@@ -77,7 +77,7 @@ export class BankPDFParser {
   /**
    * Parse extracted text into structured transactions
    */
-  static parseTextToTransactions(fullText, targetAccountId = null) {
+  static parseTextToTransactions(fullText, targetAccountId = null, fileName = '') {
     const lines = fullText.split('\n').map(l => l.trim()).filter(Boolean);
     const transactions = [];
 
@@ -123,9 +123,9 @@ export class BankPDFParser {
 
     // Extract Statement Period End Date or Statement Date from header
     let statementDate = null;
-    const periodMatch = fullText.match(/(?:for the period|statement period|period\s*:?)[^\n\r]*?(?:to|-)\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[\/\-\.][A-Za-z0-9]+[\/\-\.]\d{2,4})/i);
-    if (periodMatch) {
-      statementDate = this.normalizeDate(periodMatch[1]);
+    const dateMatchHeader = fullText.match(/(?:Statement\s+Period\s*:?\s*\d{4}-\d{2}-\d{2}\s+to\s+(\d{4}-\d{2}-\d{2}))/i);
+    if (dateMatchHeader) {
+      statementDate = dateMatchHeader[1];
     }
     if (!statementDate) {
       const asOnMatch = fullText.match(/(?:Statement\s+as\s+on|Balance\s+as\s+on|Date\s+of\s+Issue|Statement\s+Date|Generated\s+on)\s*:?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[\/\-\.][A-Za-z0-9]+[\/\-\.]\d{2,4})/i);
@@ -137,19 +137,42 @@ export class BankPDFParser {
     // Extract Account Number / Last 4 Digits from statement header
     let accountNumberMask = '•••• ' + Math.floor(1000 + Math.random() * 9000);
     let accountNumberLast4 = null;
-    const accMatch = fullText.match(/(?:Account\s*(?:Number|No\.?)|A\/c\s*(?:No\.?|Number)|SB\s*A\/c)\s*:?\s*([A-Za-z0-9\*\-]{4,25})/i);
-    if (accMatch) {
-      const digitsOnly = accMatch[1].replace(/\D/g, '');
-      if (digitsOnly.length >= 4) {
-        accountNumberLast4 = digitsOnly.slice(-4);
+
+    // Enhanced multi-bank account number regex patterns
+    const accPatterns = [
+      /(?:Account\s*(?:Number|No\.?|#)|A\/c\s*(?:No\.?|Number|#)|Acc\s*No\.?|SB\s*A\/c(?:\s*No\.?)?)\s*[:\-\s]?\s*([0-9Xx\*\s\-]{4,32})/i,
+      /(?:A\/C\s*)\s*[:\-\s]?\s*([0-9Xx\*\s\-]{4,32})/i,
+      /(?:Account)\s*[:\-]\s*([0-9Xx\*\s\-]{4,32})/i,
+      /(?:ending\s+in|ending\s+with)\s*[:\-\s]?\s*(\d{4})\b/i
+    ];
+    for (const pat of accPatterns) {
+      const match = fullText.match(pat);
+      if (match) {
+        const digits = match[1].replace(/[\s\-]/g, '');
+        const last4Match = digits.match(/(\d{4})$/) || digits.replace(/\D/g, '').slice(-4);
+        const last4 = typeof last4Match === 'string' ? last4Match : (last4Match ? last4Match[1] : null);
+        if (last4 && last4.length === 4) {
+          accountNumberLast4 = last4;
+          accountNumberMask = '•••• ' + accountNumberLast4;
+          break;
+        }
+      }
+    }
+
+    // Fallback: check Customer ID or Branch IFSC if explicit A/c No is omitted
+    if (!accountNumberLast4) {
+      const custMatch = fullText.match(/(?:Customer\s*ID|Cust\s*ID)\s*[:\-\s]?\s*(\d{4,16})/i);
+      if (custMatch) {
+        accountNumberLast4 = custMatch[1].slice(-4);
         accountNumberMask = '•••• ' + accountNumberLast4;
       }
     }
-    // Fallback: check Customer ID or Branch IFSC if explicit A/c No is omitted
-    if (!accountNumberLast4) {
-      const custMatch = fullText.match(/(?:Customer\s*ID|Cust\s*ID)\s*:?\s*(\d{4,12})/i);
-      if (custMatch) {
-        accountNumberLast4 = custMatch[1].slice(-4);
+
+    // Fallback: check filename if supplied e.g. Statement_1234.pdf
+    if (!accountNumberLast4 && fileName) {
+      const fnMatch = String(fileName).match(/(?:_|-|\b)(\d{4})(?:_|-|\.pdf|\b)/i);
+      if (fnMatch) {
+        accountNumberLast4 = fnMatch[1];
         accountNumberMask = '•••• ' + accountNumberLast4;
       }
     }

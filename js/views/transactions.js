@@ -3,7 +3,7 @@
  * Filterable, searchable ledger with sync status badges and export capability.
  */
 
-import { db, formatINR, getCurrentUser, getUserAccounts, getUserTransactions } from '../db.js';
+import { db, formatINR, getCurrentUser, getUserAccounts, getUserTransactions, getActiveAccountFilter, setActiveAccountFilter } from '../db.js';
 import { BiometricAuthService } from '../auth.js';
 import { openEditTransactionModal } from '../components/edit-category-modal.js';
 
@@ -28,6 +28,12 @@ export async function renderTransactions(container) {
     const catParam = params.get('category');
     if (catParam) {
       currentFilter = `cat:${catParam}`;
+    }
+  } else if (!currentFilter.startsWith('cat:') && currentFilter !== 'expense' && currentFilter !== 'income') {
+    // If not filtering by category or expense/income, sync with global active account filter
+    const globalAcc = getActiveAccountFilter();
+    if (globalAcc && (globalAcc === 'all' || accounts.some(a => a.id === globalAcc))) {
+      currentFilter = globalAcc;
     }
   }
 
@@ -129,7 +135,12 @@ export async function renderTransactions(container) {
   // Filter chips click
   container.querySelectorAll('.filter-chip').forEach(btn => {
     btn.onclick = () => {
-      currentFilter = btn.dataset.filter;
+      const f = btn.dataset.filter;
+      currentFilter = f;
+      // If clicking an account chip or 'all', sync global filter across tabs
+      if (f === 'all' || accounts.some(a => a.id === f)) {
+        setActiveAccountFilter(f);
+      }
       renderTransactions(container);
     };
   });

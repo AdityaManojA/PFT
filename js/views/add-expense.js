@@ -3,7 +3,7 @@
  * Fast tactile logger storing directly to IndexedDB with optimistic UI.
  */
 
-import { db, addTransaction, getCurrentUser, getUserAccounts } from '../db.js';
+import { db, addTransaction, getCurrentUser, getUserAccounts, getActiveAccountFilter } from '../db.js';
 import { ALL_CATEGORIES } from '../parsers/categorizer.js';
 import { checkSpendingCaps } from '../services/notification-center.js';
 
@@ -30,6 +30,7 @@ export async function renderAddExpense(container, showToastCallback) {
 
   const userId = user.id;
   const accounts = await getUserAccounts(userId);
+  const activeAccFilter = getActiveAccountFilter();
   const todayISO = new Date().toISOString().split('T')[0];
 
   container.innerHTML = `
@@ -71,7 +72,7 @@ export async function renderAddExpense(container, showToastCallback) {
         <select id="add-account-select" class="form-select">
           ${accounts.length === 0 ? '<option value="">No accounts linked yet</option>' : ''}
           ${accounts.map(a => `
-            <option value="${a.id}">${escapeHtml(a.bankName)} (${a.accountNumberMask})</option>
+            <option value="${a.id}" ${activeAccFilter === a.id ? 'selected' : ''}>${escapeHtml(a.bankName)} (${a.accountNumberMask})</option>
           `).join('')}
         </select>
         ${accounts.length === 0 ? `

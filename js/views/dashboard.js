@@ -4,7 +4,7 @@
  * interactive category breakdown bars, and recent activity.
  */
 
-import { db, formatINR, getCurrentUser, getUserAccounts, getUserTransactions } from '../db.js';
+import { db, formatINR, getCurrentUser, getUserAccounts, getUserTransactions, getActiveAccountFilter, setActiveAccountFilter } from '../db.js';
 import { BiometricAuthService } from '../auth.js';
 import { getCategoryMeta } from '../parsers/categorizer.js';
 import { openEditTransactionModal } from '../components/edit-category-modal.js';
@@ -14,17 +14,51 @@ let currentPeriodFilter = 'month'; // 'month' | 'all'
 let selectedMonth = null;
 let currentChartType = 'donut'; // 'donut' | 'bar'
 
+// Curated high-contrast palette alternating warm & cool hues for maximum slice distinction
+const HIGH_CONTRAST_PALETTE = [
+  '#E86034', // Terracotta Orange (Brand)
+  '#0EA5E9', // Azure Sky Blue
+  '#10B981', // Sage Emerald
+  '#F59E0B', // Bright Amber
+  '#8B5CF6', // Royal Purple
+  '#EC4899', // Vivid Rose Pink
+  '#14B8A6', // Clean Teal
+  '#F97316', // Bright Tangerine
+  '#6366F1', // Indigo Cobalt
+  '#84CC16', // Spring Lime
+  '#06B6D4', // Deep Cyan
+  '#D946EF'  // Electric Fuchsia
+];
+
 export async function renderDashboard(container) {
   const isPrivacy = await BiometricAuthService.getPrivacyMode();
   const user = await getCurrentUser();
   const userId = user ? user.id : null;
 
-  // Fetch user-scoped accounts to calculate net worth (0 if logged out)
+  // Fetch user-scoped accounts
   const accounts = userId ? await getUserAccounts(userId) : [];
-  const totalBalance = accounts.reduce((acc, a) => acc + (a.balance || 0), 0);
 
-  // Fetch all transactions for this user
-  const allTxns = userId ? await getUserTransactions(userId) : [];
+  // Validate active account filter
+  let rawActiveAccount = getActiveAccountFilter();
+  if (rawActiveAccount !== 'all' && !accounts.some(a => String(a.id) === String(rawActiveAccount))) {
+    rawActiveAccount = 'all';
+    setActiveAccountFilter('all');
+  }
+  const activeAccount = rawActiveAccount;
+  const selectedAccountObj = accounts.find(a => String(a.id) === String(activeAccount));
+
+  // Calculate Net Worth / Current Balance:
+  // If specific account selected, show that account's balance; otherwise sum of all accounts
+  const displayTotalNum = activeAccount === 'all'
+    ? accounts.reduce((acc, a) => acc + (a.balance || 0), 0)
+    : (selectedAccountObj ? (selectedAccountObj.balance || 0) : 0);
+
+  // Fetch all transactions for this user, scoped to active account if selected
+  const userTxns = userId ? await getUserTransactions(userId) : [];
+  const allTxns = activeAccount === 'all'
+    ? userTxns
+    : userTxns.filter(t => String(t.account_id) === String(activeAccount));
+
   const now = new Date();
   const currentMonthPrefix = now.toISOString().slice(0, 7); // YYYY-MM
   
@@ -99,21 +133,27 @@ export async function renderDashboard(container) {
     }
   }
 
-  // Build sorted sectionized category list (Strict Descending Sort: Highest Spend First)
+  // Build sorted sectionized category list with alternating high-contrast colors
   const categorySections = Object.values(categoryMap)
     .filter(c => c.amount > 0)
     .sort((a, b) => b.amount - a.amount)
-    .map(c => {
+    .map((c, i) => {
       const meta = getCategoryMeta(c.category);
       const percent = periodExpense > 0 ? Math.round((c.amount / periodExpense) * 100) : 0;
+      // Assign alternating hue so small adjacent slices never blend together
+      const contrastColor = HIGH_CONTRAST_PALETTE[i % HIGH_CONTRAST_PALETTE.length];
       return {
         ...c,
-        meta,
+        meta: {
+          ...meta,
+          color: contrastColor,
+          bg: contrastColor + '20'
+        },
         percent
       };
     });
 
-  const displayBalance = isPrivacy ? '••••••••' : formatINR(totalBalance);
+  const displayBalance = isPrivacy ? '••••••••' : formatINR(displayTotalNum);
   const displayIncome = isPrivacy ? '••••' : formatINR(periodIncome);
   const displayExpense = isPrivacy ? '••••' : formatINR(periodExpense);
 
@@ -125,6 +165,59 @@ export async function renderDashboard(container) {
     month: 'short'
   });
   const userName = user ? (user.name || 'Friend') : 'Guest';
+
+  // Build Account Switcher UI at top:
+  // If <= 1 account: show nothing
+  // If === 2 accounts: toggle pills
+  // If > 2 accounts: styled dropdown
+  let accountSwitcherHtml = '';
+  if (accounts.length === 2) {
+    accountSwitcherHtml = `
+      <div class="account-switcher-wrapper">
+        <div class="account-switcher-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <span>Account</span>
+        </div>
+        <div class="account-toggle-pills" id="dashboard-account-toggle-group">
+          <button type="button" class="account-toggle-pill ${activeAccount === 'all' ? 'active' : ''}" data-account-id="all">
+            All Accounts
+          </button>
+          ${accounts.map(acc => {
+            const digits = String(acc.accountNumberMask || '').replace(/[^0-9]/g, '');
+            const last4 = digits ? digits.slice(-4) : '••••';
+            return `
+              <button type="button" class="account-toggle-pill ${activeAccount === String(acc.id) ? 'active' : ''}" data-account-id="${escapeHtml(acc.id)}" title="${escapeHtml(acc.bankName)} (${escapeHtml(acc.accountNumberMask)})">
+                🏛️ ${escapeHtml(acc.bankName)} (${last4})
+              </button>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  } else if (accounts.length > 2) {
+    accountSwitcherHtml = `
+      <div class="account-switcher-wrapper">
+        <div class="account-switcher-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <span>Active Account</span>
+        </div>
+        <div class="account-switcher-dropdown-container">
+          <select id="dashboard-account-select" class="account-switcher-select">
+            <option value="all" ${activeAccount === 'all' ? 'selected' : ''}>All Accounts (${accounts.length})</option>
+            ${accounts.map(acc => {
+              const digits = String(acc.accountNumberMask || '').replace(/[^0-9]/g, '');
+              const last4 = digits ? digits.slice(-4) : '••••';
+              return `
+                <option value="${escapeHtml(acc.id)}" ${activeAccount === String(acc.id) ? 'selected' : ''}>
+                  ${escapeHtml(acc.bankName)} (${last4}) — ${formatINR(acc.balance || 0, true)}
+                </option>
+              `;
+            }).join('')}
+          </select>
+        </div>
+      </div>
+    `;
+  }
 
   container.innerHTML = `
     ${!user ? `
@@ -154,7 +247,7 @@ export async function renderDashboard(container) {
               <span style="font-size: 1.1rem;">✨</span>
             </div>
             <p style="font-size: var(--text-xs); color: var(--text-muted); margin: 3px 0 0 0;">
-              Track your income, expenses &amp; statement flow
+              ${selectedAccountObj ? `${escapeHtml(selectedAccountObj.bankName)} (${selectedAccountObj.accountNumberMask})` : 'Track your income, expenses & statement flow'}
             </p>
           </div>
         </div>
@@ -164,10 +257,15 @@ export async function renderDashboard(container) {
       </div>
     `}
 
+    <!-- Account Switcher at Top of Dashboard (Toggle if 2, Dropdown if >2, None if <=1) -->
+    ${accountSwitcherHtml}
+
     <!-- Net Worth Hero Card -->
     <div class="hero-balance-card">
       <div class="hero-label-row">
-        <span class="hero-label">Current Balance</span>
+        <span class="hero-label">
+          ${selectedAccountObj ? `${escapeHtml(selectedAccountObj.bankName)} Balance` : 'Current Balance'}
+        </span>
         <button id="toggle-privacy-btn" class="hero-mask-toggle" title="Toggle balance privacy">
           ${isPrivacy ? '👁️ Show' : '🙈 Hide'}
         </button>
@@ -256,19 +354,19 @@ export async function renderDashboard(container) {
         </div>
       </div>
 
-      <!-- Interactive Chart with Cute Graph Type Switcher -->
+      <!-- Interactive Chart with Graph Type Switcher -->
       <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; margin-bottom: 8px; padding: 0 4px;">
         <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
           Visual Spend Breakdown
         </span>
-        <button type="button" id="toggle-chart-type-btn" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 10px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 6px; font-weight: 600;" title="Click to change graph type">
-          <span>${currentChartType === 'donut' ? '🍩 Donut' : '📊 Cute Bars'}</span>
+        <button type="button" id="toggle-chart-type-btn" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 10px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 6px; font-weight: 600;" title="Switch between Donut Graph and Bar Graph">
+          <span>${currentChartType === 'donut' ? '🍩 Donut Graph' : '📊 Bar Graph'}</span>
           <span style="font-size: 10px; color: var(--accent-primary);">⇄ Change</span>
         </button>
       </div>
 
-      <div class="chart-container" style="min-height: 200px;">
-        <canvas id="categoryChart" width="340" height="200"></canvas>
+      <div class="chart-container" style="min-height: 220px; position: relative;">
+        <canvas id="categoryChart" width="340" height="220"></canvas>
       </div>
 
       <!-- Sectionized Category Progress List (Modern Fintech View) -->
@@ -323,6 +421,26 @@ export async function renderDashboard(container) {
   if (privacyBtn) {
     privacyBtn.onclick = async () => {
       await BiometricAuthService.togglePrivacyMode();
+      renderDashboard(container);
+    };
+  }
+
+  // Handle 2-account toggle pill buttons
+  container.querySelectorAll('.account-toggle-pill').forEach(btn => {
+    btn.onclick = () => {
+      const accId = btn.dataset.accountId;
+      if (accId) {
+        setActiveAccountFilter(accId);
+        renderDashboard(container);
+      }
+    };
+  });
+
+  // Handle >2 account dropdown selector
+  const accSelect = container.querySelector('#dashboard-account-select');
+  if (accSelect) {
+    accSelect.onchange = (e) => {
+      setActiveAccountFilter(e.target.value);
       renderDashboard(container);
     };
   }
@@ -388,8 +506,8 @@ export async function renderDashboard(container) {
     };
   });
 
-  // Initialize Category Breakdown Chart
-  initSpendingChart(categorySections);
+  // Initialize Category Breakdown Chart with crisp visibility for 1% / 5% micro-slices
+  initSpendingChart(categorySections, periodExpense, isPrivacy);
 }
 
 function renderTxnItemHtml(t, isPrivacy) {
@@ -422,7 +540,7 @@ function renderTxnItemHtml(t, isPrivacy) {
   `;
 }
 
-function initSpendingChart(categorySections) {
+function initSpendingChart(categorySections, periodExpense, isPrivacy) {
   const canvas = document.getElementById('categoryChart');
   if (!canvas) return;
 
@@ -432,9 +550,25 @@ function initSpendingChart(categorySections) {
 
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
   const isEmpty = labels.length === 0 || data.every(v => v === 0);
-  const chartLabels = isEmpty ? ['No Expenses (₹0)'] : labels;
+  const chartLabels = isEmpty ? ['No Expenses'] : labels;
   const chartData = isEmpty ? [1] : data;
-  const chartColors = isEmpty ? [isLight ? '#E2E8F0' : '#333742'] : colors;
+  const chartColors = isEmpty ? [isLight ? '#CBD5E1' : '#3E4452'] : colors;
+
+  const chartContainer = canvas.parentElement;
+  const isFewCategories = !isEmpty && chartLabels.length <= 3;
+  if (chartContainer) {
+    if (currentChartType === 'bar' && isFewCategories) {
+      // Group bars tightly together in center when there are only 1, 2, or 3 categories
+      const groupedWidth = chartLabels.length === 1 ? '180px' : (chartLabels.length === 2 ? '300px' : '420px');
+      chartContainer.style.maxWidth = groupedWidth;
+      chartContainer.style.marginLeft = 'auto';
+      chartContainer.style.marginRight = 'auto';
+    } else {
+      chartContainer.style.maxWidth = currentChartType === 'donut' ? '380px' : '100%';
+      chartContainer.style.marginLeft = 'auto';
+      chartContainer.style.marginRight = 'auto';
+    }
+  }
 
   if (window.Chart) {
     if (chartInstance) chartInstance.destroy();
@@ -442,7 +576,7 @@ function initSpendingChart(categorySections) {
     const ctx = canvas.getContext('2d');
 
     if (currentChartType === 'bar' && !isEmpty) {
-      // Cute Rounded Bar Graph View
+      // Bar Graph View (tightly grouped for few categories)
       chartInstance = new window.Chart(ctx, {
         type: 'bar',
         data: {
@@ -455,15 +589,17 @@ function initSpendingChart(categorySections) {
             backgroundColor: chartColors,
             borderRadius: 8,
             borderSkipped: false,
-            barThickness: Math.min(26, Math.max(14, Math.floor(220 / (chartLabels.length || 1)))),
-            maxBarThickness: 32
+            barPercentage: isFewCategories ? 0.65 : 0.85,
+            categoryPercentage: isFewCategories ? 0.75 : 0.8,
+            barThickness: isFewCategories ? 36 : Math.min(26, Math.max(14, Math.floor(220 / (chartLabels.length || 1)))),
+            maxBarThickness: 40
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           animation: {
-            duration: 650,
+            duration: 550,
             easing: 'easeOutQuart'
           },
           plugins: {
@@ -478,7 +614,7 @@ function initSpendingChart(categorySections) {
             x: {
               grid: { display: false },
               ticks: {
-                color: isLight ? '#475569' : '#CBD5E1',
+                color: isLight ? '#11120E' : '#FFFFFF',
                 font: { family: 'Plus Jakarta Sans', size: 10.5, weight: '600' },
                 maxRotation: 32,
                 minRotation: 0
@@ -489,8 +625,8 @@ function initSpendingChart(categorySections) {
                 color: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'
               },
               ticks: {
-                color: isLight ? '#64748B' : '#94A3B8',
-                font: { family: 'Plus Jakarta Sans', size: 10 },
+                color: isLight ? '#3E3D36' : '#CBD5E1',
+                font: { family: 'Plus Jakarta Sans', size: 10, weight: '600' },
                 callback: (v) => '₹' + v
               }
             }
@@ -498,7 +634,40 @@ function initSpendingChart(categorySections) {
         }
       });
     } else {
-      // Donut view without thick border lines (Clean & Seamless)
+      // Completely Redesigned Donut Chart:
+      // Physical wedge separation (spacing: 4), rounded slice ends (borderRadius: 6),
+      // center cutout text display, and clear percentage labels in legend for 1% / 5% slices.
+      const centerCutoutPlugin = {
+        id: 'centerSpendText',
+        beforeDraw: (chart) => {
+          if (currentChartType !== 'donut') return;
+          const { ctx, width, height } = chart;
+          ctx.save();
+          const meta = chart.getDatasetMeta(0);
+          const cx = (meta && meta.data && meta.data[0]) ? meta.data[0].x : width / 2;
+          const cy = (meta && meta.data && meta.data[0]) ? meta.data[0].y : height / 2;
+
+          const textColor = isLight ? '#11120E' : '#FFFFFF';
+          const subColor = isLight ? '#5C5950' : '#94A3B8';
+
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          // "TOTAL SPENT" Header
+          ctx.font = '700 10px "Plus Jakarta Sans", sans-serif';
+          ctx.fillStyle = subColor;
+          ctx.fillText('TOTAL SPEND', cx, cy - 9);
+
+          // Value in Center
+          ctx.font = '800 15px "Space Grotesk", "Plus Jakarta Sans", sans-serif';
+          ctx.fillStyle = textColor;
+          const centerText = isPrivacy ? '••••' : (isEmpty ? '₹0' : formatINR(periodExpense, true));
+          ctx.fillText(centerText, cx, cy + 9);
+
+          ctx.restore();
+        }
+      };
+
       chartInstance = new window.Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -506,32 +675,69 @@ function initSpendingChart(categorySections) {
           datasets: [{
             data: chartData,
             backgroundColor: chartColors,
-            borderColor: 'transparent',
-            borderWidth: 0,
-            hoverOffset: isEmpty ? 0 : 5
+            borderColor: isLight ? '#FFFFFF' : '#272A32',
+            borderWidth: isEmpty ? 0 : 2,
+            spacing: isEmpty ? 0 : 4,         // Physical gap between slices for extreme micro-slice visibility
+            borderRadius: isEmpty ? 0 : 6,    // Rounded pill ends
+            hoverOffset: isEmpty ? 0 : 8
           }]
         },
+        plugins: [centerCutoutPlugin],
         options: {
           responsive: true,
           maintainAspectRatio: false,
           cutout: '72%',
           animation: {
-            duration: 650,
+            duration: 550,
             easing: 'easeOutQuart'
           },
           plugins: {
             legend: {
               position: 'right',
               labels: {
-                boxWidth: 10,
-                color: isLight ? '#334155' : '#CBD5E1',
+                boxWidth: 8,
+                boxHeight: 8,
+                usePointStyle: true,
+                pointStyle: 'circle',
+                color: isLight ? '#11120E' : '#FFFFFF',
                 font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
-                padding: 10
+                padding: 10,
+                generateLabels: (chart) => {
+                  const datasets = chart.data.datasets;
+                  return chart.data.labels.map((label, i) => {
+                    const val = datasets[0].data[i];
+                    const pct = periodExpense > 0 ? Math.max(1, Math.round((val / periodExpense) * 100)) : 0;
+                    const sec = categorySections.find(s => s.category === label);
+                    const icon = sec?.meta?.icon ? `${sec.meta.icon} ` : '';
+                    // Display exact percentage prominently so 1% and 5% are immediately distinguishable!
+                    const textLabel = isEmpty ? label : `${icon}${label} • ${pct}%`;
+                    return {
+                      text: textLabel,
+                      fillStyle: datasets[0].backgroundColor[i],
+                      strokeStyle: 'transparent',
+                      lineWidth: 0,
+                      hidden: isNaN(datasets[0].data[i]) || chart.getDatasetMeta(0).data[i]?.hidden,
+                      index: i
+                    };
+                  });
+                }
               }
             },
             tooltip: {
+              backgroundColor: isLight ? '#FFFFFF' : '#1E2126',
+              titleColor: isLight ? '#11120E' : '#FFFFFF',
+              bodyColor: isLight ? '#3E3D36' : '#CBD5E1',
+              borderColor: isLight ? '#CBD5E1' : '#3E4452',
+              borderWidth: 1,
+              padding: 10,
+              cornerRadius: 8,
               callbacks: {
-                label: (context) => isEmpty ? ' No expenses recorded (₹0.00)' : ` ${context.label}: ${formatINR(context.raw)}`
+                label: (context) => {
+                  if (isEmpty) return ' No expenses recorded (₹0)';
+                  const val = context.raw || 0;
+                  const pct = periodExpense > 0 ? Math.round((val / periodExpense) * 100) : 0;
+                  return ` ${context.label}: ${formatINR(val)} (${pct}%)`;
+                }
               }
             }
           }
@@ -539,25 +745,29 @@ function initSpendingChart(categorySections) {
       });
     }
   } else {
-    renderCanvasChartFallback(canvas, chartLabels, chartData, chartColors, isEmpty, currentChartType);
+    renderCanvasChartFallback(canvas, chartLabels, chartData, chartColors, isEmpty, currentChartType, periodExpense, isPrivacy);
   }
 }
 
-function renderCanvasChartFallback(canvas, labels, data, colors, isEmpty, chartType) {
+function renderCanvasChartFallback(canvas, labels, data, colors, isEmpty, chartType, periodExpense, isPrivacy) {
   const ctx = canvas.getContext('2d');
   const w = canvas.width;
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
 
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+
   if (chartType === 'bar' && !isEmpty) {
-    // Cute Canvas Bar Fallback
     const maxVal = Math.max(...data, 1);
-    const barWidth = Math.min(24, (w - 40) / labels.length - 8);
-    const startX = 20;
+    const isFew = labels.length <= 3;
+    const barWidth = isFew ? 32 : Math.min(24, (w - 40) / labels.length - 8);
+    const gap = isFew ? 18 : 8;
+    const totalW = labels.length * barWidth + (labels.length - 1) * gap;
+    const startX = isFew ? Math.max(16, (w - totalW) / 2) : 20;
     const baseLine = h - 25;
 
     data.forEach((val, i) => {
-      const x = startX + i * (barWidth + 8);
+      const x = startX + i * (barWidth + gap);
       const barH = (val / maxVal) * (h - 50);
       const y = baseLine - barH;
 
@@ -569,7 +779,7 @@ function renderCanvasChartFallback(canvas, labels, data, colors, isEmpty, chartT
     return;
   }
 
-  // Donut fallback without thick stroke lines
+  // Redesigned Donut fallback with angular spacing gaps & center spend text
   const cx = w / 2;
   const cy = h / 2;
   const radius = Math.min(cx, cy) - 20;
@@ -579,23 +789,39 @@ function renderCanvasChartFallback(canvas, labels, data, colors, isEmpty, chartT
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.arc(cx, cy, innerRadius, Math.PI * 2, 0, true);
-    ctx.fillStyle = '#323742';
+    ctx.fillStyle = isLight ? '#E2E8F0' : '#3E4452';
     ctx.fill();
     return;
   }
 
   const total = data.reduce((a, b) => a + b, 0);
   let startAngle = -Math.PI / 2;
+  const sliceGap = 0.05; // Angular gap between slices for micro-slice separation
 
   data.forEach((val, i) => {
     const sliceAngle = (val / total) * Math.PI * 2;
+    const effectiveAngle = Math.max(0.04, sliceAngle - sliceGap);
+
     ctx.beginPath();
-    ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
-    ctx.arc(cx, cy, innerRadius, startAngle + sliceAngle, startAngle, true);
+    ctx.arc(cx, cy, radius, startAngle + sliceGap / 2, startAngle + sliceGap / 2 + effectiveAngle);
+    ctx.arc(cx, cy, innerRadius, startAngle + sliceGap / 2 + effectiveAngle, startAngle + sliceGap / 2, true);
+    ctx.closePath();
     ctx.fillStyle = colors[i % colors.length];
     ctx.fill();
+
     startAngle += sliceAngle;
   });
+
+  // Center cutout text in canvas fallback
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '700 10px sans-serif';
+  ctx.fillStyle = isLight ? '#5C5950' : '#94A3B8';
+  ctx.fillText('TOTAL SPEND', cx, cy - 8);
+
+  ctx.font = '800 14px sans-serif';
+  ctx.fillStyle = isLight ? '#11120E' : '#FFFFFF';
+  ctx.fillText(isPrivacy ? '••••' : formatINR(periodExpense, true), cx, cy + 8);
 }
 
 function escapeHtml(str) {
@@ -605,3 +831,4 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
