@@ -96,19 +96,35 @@ export class BiometricAuthService {
  * Google OAuth popup authentication with automatic domain handling
  * and seamless fallback for local environments.
  */
+import { firebaseConfig as staticFirebaseConfig, loadFirebaseConfig } from './firebase-config.js';
+
 let firebaseAppInstance = null;
 let firebaseAuthInstance = null;
 
 export class FirebaseAuthService {
   /**
-   * Retrieve saved Firebase Configuration
+   * Retrieve saved Firebase Configuration (asynchronously checks .env, localStorage, and hosting)
    */
-  static getFirebaseConfig() {
+  static async getFirebaseConfig() {
+    // 1. Check if loaded via .env or hosting
+    const loaded = await loadFirebaseConfig();
+    if (loaded && loaded.apiKey) {
+      return loaded;
+    }
+
+    // 2. Check localStorage cache
     try {
       const raw = localStorage.getItem('sbafa_firebase_config');
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.apiKey) return parsed;
+      }
     } catch (e) {
       console.warn('Failed to parse stored Firebase config:', e);
+    }
+
+    if (staticFirebaseConfig && staticFirebaseConfig.apiKey) {
+      return staticFirebaseConfig;
     }
     return null;
   }
@@ -129,10 +145,32 @@ export class FirebaseAuthService {
   }
 
   /**
+   * Auto-detect Firebase Hosting initialization if deployed
+   */
+  static async detectHostingConfig() {
+    try {
+      const res = await fetch('/__/firebase/init.json');
+      if (res.ok) {
+        const config = await res.json();
+        if (config && config.apiKey) {
+          this.setFirebaseConfig(config);
+          return config;
+        }
+      }
+    } catch (e) {
+      // Running locally or offline
+    }
+    return null;
+  }
+
+  /**
    * Check if Firebase is configured
    */
-  static isConfigured() {
-    const config = this.getFirebaseConfig();
+  static async isConfigured() {
+    let config = await this.getFirebaseConfig();
+    if (!config || !config.apiKey) {
+      config = await this.detectHostingConfig();
+    }
     return Boolean(config && config.apiKey && (config.projectId || config.authDomain));
   }
 
@@ -149,7 +187,7 @@ export class FirebaseAuthService {
    * Initialize or retrieve Firebase Auth instance
    */
   static async getAuth() {
-    const config = this.getFirebaseConfig();
+    const config = await this.getFirebaseConfig();
     if (!config) throw new Error('Firebase configuration missing.');
 
     const sdk = await this.loadFirebaseSdk();
@@ -164,9 +202,12 @@ export class FirebaseAuthService {
 
   /**
    * Trigger Google Sign-In with Firebase Popup
+   * Optionally requests Gmail readonly scope for statement sync
    */
-  static async signInWithGoogle() {
-    if (!this.isConfigured()) {
+  static async signInWithGoogle(options = {}) {
+    const { requestGmailScope = false } = options;
+    const configured = await this.isConfigured();
+    if (!configured) {
       const result = await this.promptFirebaseConfigModal();
       if (!result) {
         throw new Error('Firebase authentication setup was cancelled.');
@@ -180,9 +221,21 @@ export class FirebaseAuthService {
     try {
       const { auth, sdk } = await this.getAuth();
       const provider = new sdk.GoogleAuthProvider();
+      if (requestGmailScope) {
+        provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
+      }
       provider.setCustomParameters({ prompt: 'select_account' });
       const cred = await sdk.signInWithPopup(auth, provider);
       const user = cred.user;
+
+      try {
+        const oauthCred = sdk.GoogleAuthProvider.credentialFromResult(cred);
+        if (oauthCred && oauthCred.accessToken) {
+          sessionStorage.setItem('google_access_token', oauthCred.accessToken);
+        }
+      } catch (tokenErr) {
+        console.warn('Could not extract Google access token:', tokenErr);
+      }
 
       return {
         name: user.displayName || (user.email ? user.email.split('@')[0] : 'Google User'),
@@ -197,14 +250,28 @@ export class FirebaseAuthService {
         throw new Error('Google sign-in popup was closed before completing.');
       }
       if (err.code === 'auth/unauthorized-domain') {
-        throw new Error('This domain is not authorized in your Firebase Console. Go to Firebase Console > Authentication > Settings > Authorized domains and add localhost.');
+        throw new Error('This domain (localhost) is not authorized yet. Go to Firebase Console > Authentication > Settings > Authorized domains and ensure localhost is listed.');
       }
       if (err.code === 'auth/configuration-not-found' || err.code === 'auth/invalid-api-key') {
         this.setFirebaseConfig(null);
-        throw new Error('Invalid Firebase API key or configuration. Please re-enter your config.');
+        throw new Error('Invalid Firebase API key or configuration. Please check your key from Firebase Console.');
       }
       throw err;
     }
+  }
+
+  /**
+   * Acquire an OAuth access token with Gmail readonly scope
+   */
+  static async getGmailAccessToken() {
+    const existing = sessionStorage.getItem('google_access_token');
+    if (existing) return existing;
+
+    await this.signInWithGoogle({ requestGmailScope: true });
+    const freshToken = sessionStorage.getItem('google_access_token');
+    if (freshToken) return freshToken;
+
+    throw new Error('Gmail authorization required. Please authorize Google access.');
   }
 
   /**
@@ -230,46 +297,41 @@ export class FirebaseAuthService {
                 </svg>
               </div>
               <div>
-                <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text-primary);">Connect to Firebase</h3>
-                <div style="font-size: 11px; color: var(--text-muted);">Enable live Google OAuth authentication</div>
+                <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text-primary);">Connect Firebase Google Auth</h3>
+                <div style="font-size: 11px; color: var(--text-muted);">Project: <strong>sbafa-ft</strong></div>
               </div>
             </div>
 
-            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">
-              Google authentication uses <strong>Firebase Auth</strong> for secure popup sign-in. Enter your project config from the
-              <a href="https://console.firebase.google.com" target="_blank" rel="noopener" style="color: var(--accent-blue); text-decoration: underline;">Firebase Console</a>.
-            </p>
+            <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 14px; font-size: 11px; color: var(--text-secondary); line-height: 1.5;">
+              <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">🚀 2-Minute Setup in Firebase:</div>
+              <div>1. <a href="https://console.firebase.google.com/project/sbafa-ft/authentication/providers" target="_blank" rel="noopener" style="color: var(--accent-blue); text-decoration: underline;">Enable Google Sign-in</a> under Authentication &gt; Sign-in method.</div>
+              <div>2. Go to <a href="https://console.firebase.google.com/project/sbafa-ft/settings/general" target="_blank" rel="noopener" style="color: var(--accent-blue); text-decoration: underline;">Project Settings &gt; General</a>, under <em>Your apps</em> copy your Web API Key.</div>
+              <div>3. Paste your Web API key below to sign in directly with Gmail!</div>
+            </div>
+
+            <div id="firebase-config-error" style="display: none; color: var(--signal-expense); font-size: 11.5px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 12px; text-align: center;"></div>
 
             <form id="firebase-config-form">
               <div class="form-group" style="margin-bottom: 10px;">
                 <label class="form-label" style="display: flex; justify-content: space-between;">
-                  <span>Paste Firebase Config (JSON or snippet)</span>
-                  <span style="font-size: 10px; color: var(--text-muted);">Optional</span>
+                  <span>Paste Web API Key OR Config Snippet</span>
                 </label>
-                <textarea id="firebase-raw-json" class="form-textarea" rows="3" placeholder='const firebaseConfig = { apiKey: "...", authDomain: "...", projectId: "..." };' style="font-family: var(--font-family-mono); font-size: 11px;"></textarea>
+                <input type="text" id="firebase-api-key" class="form-input" placeholder="AIzaSy..." style="font-size: 12px;" />
               </div>
 
-              <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 10px;">— OR ENTER INDIVIDUAL KEYS —</div>
-
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label">API Key</label>
-                  <input type="text" id="firebase-api-key" class="form-input" placeholder="AIzaSy..." style="font-size: 12px;" />
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label">Project ID</label>
-                  <input type="text" id="firebase-project-id" class="form-input" placeholder="my-finance-app" style="font-size: 12px;" />
-                </div>
+              <div class="form-group" style="margin-bottom: 10px;">
+                <label class="form-label">Project ID</label>
+                <input type="text" id="firebase-project-id" class="form-input" value="sbafa-ft" placeholder="sbafa-ft" style="font-size: 12px;" />
               </div>
 
               <div class="form-group" style="margin-bottom: 16px;">
                 <label class="form-label">Auth Domain</label>
-                <input type="text" id="firebase-auth-domain" class="form-input" placeholder="my-finance-app.firebaseapp.com" style="font-size: 12px;" />
+                <input type="text" id="firebase-auth-domain" class="form-input" value="sbafa-ft.firebaseapp.com" placeholder="sbafa-ft.firebaseapp.com" style="font-size: 12px;" />
               </div>
 
               <div style="display: flex; flex-direction: column; gap: 8px;">
                 <button type="submit" class="btn btn-primary btn-block">
-                  Save & Connect with Google →
+                  Save & Sign In with Google →
                 </button>
                 <button type="button" id="firebase-demo-fallback-btn" class="btn btn-secondary btn-block" style="font-size: 12px;">
                   ⚡ Quick Test with Local Google Profile
@@ -288,6 +350,7 @@ export class FirebaseAuthService {
       const backdrop = document.getElementById('firebase-config-backdrop');
       const form = document.getElementById('firebase-config-form');
       const demoBtn = document.getElementById('firebase-demo-fallback-btn');
+      const modalErr = document.getElementById('firebase-config-error');
 
       cancelBtn.onclick = () => { cleanup(); resolve(null); };
       backdrop.onclick = (e) => {
@@ -310,15 +373,16 @@ export class FirebaseAuthService {
 
       form.onsubmit = (e) => {
         e.preventDefault();
-        const rawJson = document.getElementById('firebase-raw-json').value.trim();
+        if (modalErr) modalErr.style.display = 'none';
+        const inputVal = document.getElementById('firebase-api-key').value.trim();
+        const projectIdInput = document.getElementById('firebase-project-id').value.trim() || 'sbafa-ft';
+        const authDomainInput = document.getElementById('firebase-auth-domain').value.trim() || `${projectIdInput}.firebaseapp.com`;
         let config = null;
 
-        if (rawJson) {
+        if (inputVal.includes('{')) {
           try {
-            // Attempt to parse JSON or extract key-values from JS object snippet
-            const jsonMatch = rawJson.match(/\{[\s\S]*\}/);
+            const jsonMatch = inputVal.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
-              // Convert unquoted keys to quoted keys for standard JSON parsing
               const normalized = jsonMatch[0]
                 .replace(/([a-zA-Z0-9_]+)\s*:/g, '"$1":')
                 .replace(/'/g, '"')
@@ -326,21 +390,35 @@ export class FirebaseAuthService {
               config = JSON.parse(normalized);
             }
           } catch (err) {
-            console.warn('Direct JSON parse failed, trying field extractions:', err);
+            console.warn('Snippet parse failed, trying regex extraction:', err);
+          }
+          if (!config || !config.apiKey) {
+            const keyMatch = inputVal.match(/apiKey\s*[:=]\s*["']([^"']+)["']/);
+            if (keyMatch) {
+              config = {
+                apiKey: keyMatch[1],
+                projectId: projectIdInput,
+                authDomain: authDomainInput
+              };
+            }
           }
         }
 
         if (!config || !config.apiKey) {
-          const apiKey = document.getElementById('firebase-api-key').value.trim();
-          const projectId = document.getElementById('firebase-project-id').value.trim();
-          const authDomain = document.getElementById('firebase-auth-domain').value.trim() || `${projectId}.firebaseapp.com`;
-          if (apiKey && projectId) {
-            config = { apiKey, projectId, authDomain };
+          if (inputVal) {
+            config = {
+              apiKey: inputVal,
+              projectId: projectIdInput,
+              authDomain: authDomainInput
+            };
           }
         }
 
         if (!config || !config.apiKey) {
-          alert('Please enter at least your Firebase API Key and Project ID.');
+          if (modalErr) {
+            modalErr.innerText = 'Please enter your Web API Key from Firebase Console (Project Settings > General).';
+            modalErr.style.display = 'block';
+          }
           return;
         }
 

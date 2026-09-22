@@ -20,11 +20,24 @@ export async function renderTransactions(container) {
 
   const allTxns = userId ? await getUserTransactions(userId) : [];
 
+  // Check URL query params for initial category filter e.g. #/transactions?category=Dining
+  const hash = window.location.hash;
+  if (hash.includes('?')) {
+    const params = new URLSearchParams(hash.split('?')[1]);
+    const catParam = params.get('category');
+    if (catParam) {
+      currentFilter = `cat:${catParam}`;
+    }
+  }
+
   // Filter & Search logic
   let filtered = allTxns.filter(t => {
     if (currentFilter === 'expense' && t.type !== 'expense') return false;
     if (currentFilter === 'income' && t.type !== 'income') return false;
-    if (currentFilter !== 'all' && currentFilter !== 'expense' && currentFilter !== 'income' && currentFilter !== 'offline') {
+    if (currentFilter.startsWith('cat:')) {
+      const targetCat = currentFilter.replace('cat:', '');
+      if (t.category !== targetCat) return false;
+    } else if (currentFilter !== 'all' && currentFilter !== 'expense' && currentFilter !== 'income' && currentFilter !== 'offline') {
       if (t.account_id !== currentFilter) return false;
     }
 
@@ -39,6 +52,9 @@ export async function renderTransactions(container) {
 
     return true;
   });
+
+  // Extract distinct categories present in allTxns for quick filter chips
+  const distinctCategories = [...new Set(allTxns.map(t => t.category).filter(Boolean))];
 
   // Sort descending by date
   filtered.sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at));
@@ -69,12 +85,14 @@ export async function renderTransactions(container) {
       <input type="text" id="txns-search-input" class="txns-search-input" placeholder="Search merchants, categories, or ₹..." value="${escapeHtml(currentSearch)}" />
     </div>
 
-    <!-- Filter Chips Scroll (Dynamically driven by connected user accounts) -->
+    <!-- Filter Chips Scroll -->
     <div class="filter-chips-scroll">
       <button class="filter-chip ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">All (${allTxns.length})</button>
       <button class="filter-chip ${currentFilter === 'expense' ? 'active' : ''}" data-filter="expense">Expenses</button>
       <button class="filter-chip ${currentFilter === 'income' ? 'active' : ''}" data-filter="income">Income</button>
-      <button class="filter-chip ${currentFilter === 'offline' ? 'active' : ''}" data-filter="offline">Offline Pending</button>
+      ${distinctCategories.map(cat => `
+        <button class="filter-chip ${currentFilter === `cat:${cat}` ? 'active' : ''}" data-filter="cat:${escapeHtml(cat)}">${escapeHtml(cat)}</button>
+      `).join('')}
       ${accounts.map(a => `
         <button class="filter-chip ${currentFilter === a.id ? 'active' : ''}" data-filter="${escapeHtml(a.id)}">${escapeHtml(a.bankName)}</button>
       `).join('')}
@@ -257,7 +275,14 @@ function showTransactionDetailModal(txn, accountMap) {
 
 function exportTransactionsCSV(transactions, accountMap = {}) {
   if (transactions.length === 0) {
-    alert('No transactions to export.');
+    const toastBox = document.getElementById('toast-container');
+    if (toastBox) {
+      const toast = document.createElement('div');
+      toast.className = 'toast toast-info';
+      toast.innerHTML = `<span style="color: var(--accent-blue); font-weight: 800;">ℹ</span> <span>No transactions to export.</span>`;
+      toastBox.appendChild(toast);
+      setTimeout(() => toast.remove(), 2800);
+    }
     return;
   }
 

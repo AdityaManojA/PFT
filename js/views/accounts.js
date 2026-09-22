@@ -1,14 +1,14 @@
 /**
- * Accounts & Bank Synchronization View
- * Handles connected Indian banks (Edit/Remove accounts), Setu AA Sandbox consent,
- * CSV statement uploads, and Password-Protected PDF statement decryption / Passkey management.
+ * Accounts View - SBAFA Financial Enclave
+ * Handles connected Indian banks (Edit/Remove accounts), PDF statement imports,
+ * and automated weekly Gmail statement sync with zero third-party telemetry.
  */
 
 import { db, formatINR, getCurrentUser, getUserAccounts } from '../db.js';
 import { BiometricAuthService } from '../auth.js';
 import { BankStatementParser } from '../parsers/bank-parser.js';
 import { BankPDFParser } from '../parsers/pdf-parser.js';
-import { SetuAccountAggregatorService } from '../services/setu-aa.js';
+import { GmailStatementSyncService } from '../services/gmail-sync.js';
 
 export async function renderAccounts(container, showToastCallback) {
   const isPrivacy = await BiometricAuthService.getPrivacyMode();
@@ -16,8 +16,9 @@ export async function renderAccounts(container, showToastCallback) {
   const userId = user ? user.id : null;
   const accounts = userId ? await getUserAccounts(userId) : [];
   const isAutofill = userId ? await BankPDFParser.isAutofillEnabled(userId) : false;
-  const userBank = userId ? await BankPDFParser.getPrimaryBank(userId) : 'HDFC';
+  const userBank = userId ? await BankPDFParser.getPrimaryBank(userId) : 'Federal';
   const savedPasskey = userId ? await BankPDFParser.getSavedPasswordRaw(userBank, userId) : '';
+  const isWeeklyDue = GmailStatementSyncService.isWeeklySyncDue();
 
   let bankCardsHtml = '';
   if (accounts.length === 0) {
@@ -40,22 +41,30 @@ export async function renderAccounts(container, showToastCallback) {
   }
 
   container.innerHTML = `
-    <!-- Account Aggregator Banner / Action Card -->
+    <!-- Gmail Weekly Statement Auto-Pull Card (Direct Email Sync) -->
     <div class="glass-card glass-card-glow-blue" style="margin-bottom: 20px;">
       <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px;">
         <div>
-          <span class="badge badge-blue" style="margin-bottom: 6px;">RBI Compliant</span>
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+            <span class="badge badge-blue">Direct Email Sync</span>
+            <span class="badge ${isWeeklyDue ? 'badge-amber' : 'badge-emerald'}" style="font-size: 10px;">
+              ${isWeeklyDue ? '📅 Weekly Check Due' : '✓ Up to Date'}
+            </span>
+          </div>
           <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text-primary);">
-            Account Aggregator (AA) Live Sync
+            Fetch Bank Statements from Gmail
           </h3>
           <p style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
-            Connect your Indian bank accounts securely via Setu AA Sandbox for automated, end-to-end encrypted transaction syncing. Eliminates protected PDFs entirely!
+            Automatically scans your inbox weekly for e-statements from <strong>${escapeHtml(userBank)}</strong> with keyword <code>STATEMENT</code>, decrypts the PDF locally with your saved passkey, and imports your transactions.
           </p>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+            Last checked: <strong>${GmailStatementSyncService.getLastSyncLabel()}</strong> • Zero external server sharing
+          </div>
         </div>
       </div>
-      <button id="start-aa-sync-btn" class="btn btn-accent-blue btn-block">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-        Sync via Setu AA Sandbox
+      <button id="start-gmail-sync-btn" class="btn btn-accent-blue btn-block">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span>Fetch Latest Statement from Gmail</span>
       </button>
     </div>
 
@@ -152,13 +161,13 @@ export async function renderAccounts(container, showToastCallback) {
       </div>
     </div>
 
-    <!-- Bank Statement Upload Section (PDF & CSV) -->
+    <!-- Bank Statement PDF Upload Section -->
     <div class="card" style="margin-bottom: 24px;">
       <div class="section-header">
         <div>
-          <h3 class="section-title">Upload Statement (PDF / CSV)</h3>
+          <h3 class="section-title">Upload Bank Statement PDF</h3>
           <p style="font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px;">
-            Supports password-protected PDFs &amp; CSV exports from HDFC, Federal, ICICI, SBI, Axis, Kotak.
+            Supports official password-protected e-Statement PDFs from HDFC, Federal, ICICI, SBI, Axis, Kotak.
           </p>
         </div>
       </div>
@@ -169,17 +178,17 @@ export async function renderAccounts(container, showToastCallback) {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
         </div>
         <div style="font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
-          Choose Protected Bank PDF or CSV Statement
+          Choose Protected Bank PDF Statement
         </div>
         <div style="font-size: var(--text-xs); color: var(--text-muted);">
-          Decrypted and parsed 100% locally on your device
+          Auto-decrypted using your saved statement passkey. 100% private on your device.
         </div>
-        <input type="file" id="statement-file-input" accept=".csv,text/csv,application/pdf,.pdf" style="display: none;" />
+        <input type="file" id="statement-file-input" accept="application/pdf,.pdf,.csv,text/csv" style="display: none;" />
       </div>
     </div>
   `;
 
-  // --- Passkey Reveal / Hide Toggle ---
+  // --- Passkey Reveal / Hide Toggle (PIN-Gated) ---
   let passkeyVisible = false;
   const revealPasskeyBtn = container.querySelector('#toggle-passkey-reveal-btn');
   const passkeyDisplay = container.querySelector('#passkey-masked-display');
@@ -187,22 +196,26 @@ export async function renderAccounts(container, showToastCallback) {
   const revealText = container.querySelector('#passkey-reveal-text');
   if (revealPasskeyBtn && passkeyDisplay) {
     revealPasskeyBtn.onclick = () => {
-      passkeyVisible = !passkeyVisible;
       if (passkeyVisible) {
-        passkeyDisplay.textContent = savedPasskey;
-        passkeyDisplay.style.letterSpacing = 'normal';
-        if (eyeIcon) eyeIcon.textContent = '🙈';
-        if (revealText) revealText.textContent = 'Hide';
-      } else {
+        passkeyVisible = false;
         passkeyDisplay.textContent = '••••••••';
         passkeyDisplay.style.letterSpacing = '2px';
         if (eyeIcon) eyeIcon.textContent = '👁️';
         if (revealText) revealText.textContent = 'Show';
+      } else {
+        // Enforce PIN gating every time
+        promptPinAuthModal(user, 'view your statement passkey', () => {
+          passkeyVisible = true;
+          passkeyDisplay.textContent = savedPasskey;
+          passkeyDisplay.style.letterSpacing = 'normal';
+          if (eyeIcon) eyeIcon.textContent = '🙈';
+          if (revealText) revealText.textContent = 'Hide';
+        });
       }
     };
   }
 
-  // --- Edit Passkey modal trigger ---
+  // --- Edit Passkey modal trigger (PIN-Gated) ---
   const editPasskeyBtn = container.querySelector('#edit-passkey-btn');
   if (editPasskeyBtn) {
     editPasskeyBtn.onclick = () => {
@@ -210,11 +223,13 @@ export async function renderAccounts(container, showToastCallback) {
         window.location.hash = '#/login';
         return;
       }
-      openEditPasskeyModal(userId, userBank, savedPasskey, isAutofill, showToastCallback, () => renderAccounts(container, showToastCallback));
+      promptPinAuthModal(user, 'edit your statement passkey', () => {
+        openEditPasskeyModal(userId, userBank, savedPasskey, isAutofill, showToastCallback, () => renderAccounts(container, showToastCallback));
+      });
     };
   }
 
-  // --- Add Passkey modal trigger (when none saved) ---
+  // --- Add Passkey modal trigger (when none saved - PIN Gated) ---
   const addPasskeyBtn = container.querySelector('#add-passkey-btn');
   if (addPasskeyBtn) {
     addPasskeyBtn.onclick = () => {
@@ -222,11 +237,13 @@ export async function renderAccounts(container, showToastCallback) {
         window.location.hash = '#/login';
         return;
       }
-      openEditPasskeyModal(userId, userBank, '', true, showToastCallback, () => renderAccounts(container, showToastCallback));
+      promptPinAuthModal(user, 'configure a statement passkey', () => {
+        openEditPasskeyModal(userId, userBank, '', true, showToastCallback, () => renderAccounts(container, showToastCallback));
+      });
     };
   }
 
-  // --- Remove Passkey Completely trigger ---
+  // --- Remove Passkey Completely trigger (PIN-Gated) ---
   const removePasskeyBtn = container.querySelector('#remove-passkey-btn');
   if (removePasskeyBtn) {
     removePasskeyBtn.onclick = () => {
@@ -234,7 +251,9 @@ export async function renderAccounts(container, showToastCallback) {
         window.location.hash = '#/login';
         return;
       }
-      confirmRemovePasskeyModal(userId, userBank, showToastCallback, () => renderAccounts(container, showToastCallback));
+      promptPinAuthModal(user, 'remove your statement passkey', () => {
+        confirmRemovePasskeyModal(userId, userBank, showToastCallback, () => renderAccounts(container, showToastCallback));
+      });
     };
   }
 
@@ -302,16 +321,16 @@ export async function renderAccounts(container, showToastCallback) {
     };
   }
 
-  // --- Setu AA Sync trigger ---
-  const aaSyncBtn = container.querySelector('#start-aa-sync-btn');
-  if (aaSyncBtn) {
-    aaSyncBtn.onclick = () => {
+  // --- Gmail Statement Sync trigger ---
+  const gmailSyncBtn = container.querySelector('#start-gmail-sync-btn');
+  if (gmailSyncBtn) {
+    gmailSyncBtn.onclick = () => {
       if (!user) {
-        showToastCallback('Please sign in to sync accounts via Setu AA.', 'warning');
+        showToastCallback('Please sign in to sync statements from Gmail.', 'warning');
         window.location.hash = '#/login';
         return;
       }
-      openSetuAAModal(showToastCallback, () => renderAccounts(container, showToastCallback));
+      openGmailSyncModal(userId, userBank, savedPasskey, showToastCallback, () => renderAccounts(container, showToastCallback));
     };
   }
 
@@ -336,7 +355,9 @@ export async function renderAccounts(container, showToastCallback) {
 
   fileInput.onchange = (e) => {
     if (e.target.files.length > 0) {
-      handleUploadedFile(e.target.files[0], showToastCallback, () => renderAccounts(container, showToastCallback));
+      const selected = e.target.files[0];
+      e.target.value = '';
+      handleUploadedFile(selected, showToastCallback, () => renderAccounts(container, showToastCallback));
     }
   };
 }
@@ -397,42 +418,55 @@ async function handleUploadedFile(file, showToast, refreshCallback) {
  * Handle Bank Statement PDF with automatic password decryption
  */
 async function handlePdfFile(file, showToast, refreshCallback) {
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const arrayBuffer = e.target.result;
-    const curUser = await getCurrentUser();
-    const userId = curUser ? curUser.id : null;
-    const isAutofill = await BankPDFParser.isAutofillEnabled(userId);
+  try {
+    const reader = new FileReader();
+    reader.onerror = (e) => {
+      showToast('Could not read statement PDF file: ' + (e.target?.error?.message || 'File read error'), 'warning');
+    };
+    reader.onload = async (e) => {
+      try {
+        const arrayBuffer = e.target.result;
+        const curUser = await getCurrentUser();
+        const userId = curUser ? curUser.id : null;
+        const isAutofill = await BankPDFParser.isAutofillEnabled(userId);
 
-    let decryptedText = null;
+        let decryptedText = null;
 
-    // Check if autofill is enabled and try candidate passwords
-    if (isAutofill) {
-      const primaryBank = await BankPDFParser.getPrimaryBank(userId);
-      const savedPrimary = await BankPDFParser.getSavedPassword(primaryBank, userId);
-      const savedHdfcPwd = await BankPDFParser.getSavedPassword('HDFC', userId);
-      const savedFedPwd = await BankPDFParser.getSavedPassword('FEDERAL', userId);
-      const candidates = [savedPrimary, savedHdfcPwd, savedFedPwd, ''].filter(Boolean);
+        // Check if autofill is enabled and try candidate passwords
+        if (isAutofill) {
+          const primaryBank = await BankPDFParser.getPrimaryBank(userId);
+          const savedPrimary = await BankPDFParser.getSavedPassword(primaryBank, userId);
+          const savedHdfcPwd = await BankPDFParser.getSavedPassword('HDFC', userId);
+          const savedFedPwd = await BankPDFParser.getSavedPassword('FEDERAL', userId);
+          const candidates = [savedPrimary, savedHdfcPwd, savedFedPwd, ''].filter(Boolean);
 
-      for (const pwd of candidates) {
-        try {
-          decryptedText = await BankPDFParser.extractPdfText(arrayBuffer, pwd);
-          if (decryptedText) break;
-        } catch (err) {
-          // Continue to next password
+          for (const pwd of candidates) {
+            try {
+              decryptedText = await BankPDFParser.extractPdfText(arrayBuffer, pwd);
+              if (decryptedText) break;
+            } catch (err) {
+              // Continue to next password
+            }
+          }
         }
-      }
-    }
 
-    if (decryptedText) {
-      // Successfully decrypted with saved password
-      parseAndIngestPdfText(decryptedText, showToast, refreshCallback);
-    } else {
-      // Prompt user for password
-      promptPdfPasswordModal(arrayBuffer, file.name, showToast, refreshCallback);
-    }
-  };
-  reader.readAsArrayBuffer(file);
+        if (decryptedText) {
+          // Successfully decrypted with saved password
+          await parseAndIngestPdfText(decryptedText, showToast, refreshCallback);
+        } else {
+          // Prompt user for password
+          promptPdfPasswordModal(arrayBuffer, file.name, showToast, refreshCallback);
+        }
+      } catch (err) {
+        console.error('PDF file handling error:', err);
+        showToast('Error processing statement PDF: ' + (err.message || 'Unknown error'), 'warning');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  } catch (err) {
+    console.error('File read error:', err);
+    showToast('Failed to open PDF statement: ' + (err.message || 'Unknown error'), 'warning');
+  }
 }
 
 function promptPdfPasswordModal(arrayBuffer, fileName, showToast, refreshCallback) {
@@ -451,6 +485,9 @@ function promptPdfPasswordModal(arrayBuffer, fileName, showToast, refreshCallbac
           File: <strong>${escapeHtml(fileName)}</strong> is encrypted by your bank.
         </p>
 
+        <!-- Custom In-App Error Banner -->
+        <div id="pdf-modal-error" style="display: none; color: var(--signal-expense); font-size: 11.5px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 12px; text-align: center;"></div>
+
         <!-- Bank Password Guide -->
         <div style="background: var(--bg-deep); border-radius: var(--radius-md); padding: 12px; margin-bottom: 16px; font-size: 11px; color: var(--text-secondary); line-height: 1.5;">
           Please enter the bank-provided password required to view and decrypt your protected bank statement PDF.
@@ -458,7 +495,7 @@ function promptPdfPasswordModal(arrayBuffer, fileName, showToast, refreshCallbac
 
         <div class="form-group">
           <label class="form-label">Enter PDF Password</label>
-          <input type="password" id="pdf-pwd-input" class="form-input" placeholder="Enter bank-provided statement password" autofocus />
+          <input type="password" id="pdf-pwd-input" class="form-input" placeholder="Password for viewing your protected Pdfs and access the statements (read only)" />
         </div>
 
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 18px;">
@@ -479,17 +516,23 @@ function promptPdfPasswordModal(arrayBuffer, fileName, showToast, refreshCallbac
   const input = document.getElementById('pdf-pwd-input');
   const cancelBtn = document.getElementById('pdf-pwd-cancel-btn');
   const submitBtn = document.getElementById('pdf-pwd-submit-btn');
+  const errDiv = document.getElementById('pdf-modal-error');
 
   cancelBtn.onclick = () => { modalContainer.innerHTML = ''; };
 
   submitBtn.onclick = async () => {
     const pwd = input.value.trim();
     if (!pwd) {
+      if (errDiv) {
+        errDiv.innerText = 'Please enter the statement password';
+        errDiv.style.display = 'block';
+      }
       showToast('Please enter the statement password', 'info');
       input.focus();
       return;
     }
 
+    if (errDiv) errDiv.style.display = 'none';
     submitBtn.disabled = true;
     submitBtn.innerText = 'Decrypting...';
 
@@ -510,10 +553,14 @@ function promptPdfPasswordModal(arrayBuffer, fileName, showToast, refreshCallbac
       }
 
       modalContainer.innerHTML = '';
-      parseAndIngestPdfText(text, showToast, refreshCallback);
+      await parseAndIngestPdfText(text, showToast, refreshCallback);
     } catch (err) {
       submitBtn.disabled = false;
       submitBtn.innerText = 'Decrypt & Import →';
+      if (errDiv) {
+        errDiv.innerText = 'Incorrect password or unreadable PDF. Please try again.';
+        errDiv.style.display = 'block';
+      }
       showToast('Incorrect password or unreadable PDF. Please try again.', 'info');
       input.focus();
     }
@@ -555,13 +602,16 @@ async function parseAndIngestPdfText(pdfText, showToast, refreshCallback) {
         bankName: result.detectedBank || 'Bank Account',
         accountNumberMask: '•••• ' + Math.floor(1000 + Math.random() * 9000),
         accountType: 'Savings Account',
-        balance: Math.max(0, netChange),
+        balance: result.availableBalance != null ? result.availableBalance : Math.max(0, netChange),
         bankCode: result.bankCode || 'OTHER',
         lastSynced: 'Just now'
       };
       await db.accounts.add(matchedAccount);
     } else {
-      const updatedBalance = Math.max(0, (matchedAccount.balance || 0) + netChange);
+      const updatedBalance = result.availableBalance != null
+        ? result.availableBalance
+        : Math.max(0, (matchedAccount.balance || 0) + netChange);
+
       await db.accounts.update(matchedAccount.id, {
         balance: updatedBalance,
         lastSynced: 'Just now'
@@ -574,8 +624,9 @@ async function parseAndIngestPdfText(pdfText, showToast, refreshCallback) {
       userId
     }));
     await db.transactions.bulkAdd(tagged);
+    const balMsg = result.availableBalance != null ? ` • Balance: ₹${result.availableBalance.toFixed(2)}` : '';
     showToast(
-      `Successfully ingested ${result.totalParsed} transactions (${result.formatDetected}) into ${matchedAccount.bankName}!`,
+      `Successfully ingested ${result.totalParsed} transactions (${result.formatDetected}) into ${matchedAccount.bankName}${balMsg}!`,
       'success'
     );
 
@@ -660,100 +711,212 @@ async function processCsvText(csvText, targetAccId, showToast, refreshCallback) 
 }
 
 /**
- * Interactive RBI Setu Account Aggregator Modal Flow
+ * Custom In-App 6-Digit PIN Security Verification Modal
+ * Uses design system tokens and inline custom error display (no native browser alert).
  */
-function openSetuAAModal(showToast, refreshCallback) {
+function promptPinAuthModal(user, actionTitle, onSuccess) {
   const modalContainer = document.getElementById('global-modal-container');
   if (!modalContainer) return;
 
+  if (!user || !user.pin) {
+    if (onSuccess) onSuccess();
+    return;
+  }
+
   modalContainer.innerHTML = `
-    <div class="modal-backdrop active" id="aa-modal-backdrop">
-      <div class="modal-sheet">
+    <div class="modal-backdrop active" id="pin-auth-backdrop">
+      <div class="modal-sheet" style="max-width: 390px; text-align: center;">
         <div class="sheet-handle"></div>
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-          <div style="width: 28px; height: 28px; border-radius: 6px; background: #2563EB; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: white;">SETU</div>
-          <span style="font-size: var(--text-base); font-weight: 700;">Setu AA Sandbox Gateway</span>
-        </div>
-        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 16px;">
-          Secure RBI Account Aggregator Framework. 256-bit encrypted data pipeline.
+        <div style="font-size: 2rem; margin-bottom: 8px;">🔐</div>
+        <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text-primary);">Security Verification</h3>
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-top: 4px; margin-bottom: 16px;">
+          Enter your 6-digit PIN to ${actionTitle}.
         </p>
 
-        <!-- Step 1: Mobile & Bank Selection -->
-        <div id="aa-step-1">
-          <div class="form-group">
-            <label class="form-label">Linked Mobile Number</label>
-            <input type="tel" id="aa-mobile-input" class="form-input" placeholder="Enter 10-digit mobile number" />
-          </div>
-          <div style="background: var(--bg-deep); border-radius: var(--radius-md); padding: 12px; margin-bottom: 16px; font-size: var(--text-xs); color: var(--text-secondary);">
-            <div style="font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">Eligible AA FIP Financial Institutions:</div>
-            <div>• HDFC Bank Ltd (NetBanking / UPI)</div>
-            <div>• Federal Bank (FedNet / UPI)</div>
-            <div>• ICICI Bank (iMobile / Salary)</div>
-            <div>• State Bank of India (YONO / Retail)</div>
-          </div>
-          <button id="aa-proceed-btn" class="btn btn-accent-blue btn-block">
-            Request AA Consent OTP →
-          </button>
+        <!-- Custom In-App Error Banner -->
+        <div id="pin-modal-error" style="display: none; color: var(--signal-expense); font-size: 11.5px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 14px; text-align: center;">
         </div>
 
-        <!-- Step 2: OTP Verification -->
-        <div id="aa-step-2" style="display: none;">
-          <div class="form-group">
-            <label class="form-label">Enter 6-digit Consent OTP</label>
-            <input type="text" id="aa-otp-input" class="form-input" placeholder="123456" maxlength="6" style="letter-spacing: 6px; font-size: 1.3rem; text-align: center;" />
-            <span style="font-size: 11px; color: var(--accent-emerald); display: block; margin-top: 4px;">Sandbox testing OTP: 123456</span>
+        <form id="pin-auth-form">
+          <div class="form-group" style="margin-bottom: 18px;">
+            <input type="password" id="pin-auth-input" class="form-input" maxlength="6" placeholder="••••••" style="letter-spacing: 8px; font-size: 1.4rem; text-align: center; font-weight: 700;" required autofocus />
           </div>
-          <button id="aa-verify-btn" class="btn btn-primary btn-block">
-            Authorize Consent &amp; Sync Live Data
-          </button>
-        </div>
 
-        <!-- Step 3: Loading -->
-        <div id="aa-step-3" style="display: none; text-align: center; padding: 30px 0;">
-          <div style="font-size: 2rem; margin-bottom: 12px; animation: spin 1s infinite linear;">🔄</div>
-          <div style="font-weight: 700; font-size: var(--text-base);">Fetching Live Bank Data...</div>
-          <div style="font-size: var(--text-xs); color: var(--text-muted); margin-top: 4px;">Contacting RBI Financial Information Provider (FIP) endpoints...</div>
-        </div>
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
+            <button type="button" id="pin-auth-cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" id="pin-auth-submit-btn" class="btn btn-primary">Verify PIN →</button>
+          </div>
+        </form>
       </div>
     </div>
   `;
 
-  const backdrop = document.getElementById('aa-modal-backdrop');
-  backdrop.onclick = (e) => {
-    if (e.target.id === 'aa-modal-backdrop') modalContainer.innerHTML = '';
+  const input = document.getElementById('pin-auth-input');
+  const errorDiv = document.getElementById('pin-modal-error');
+  const cancelBtn = document.getElementById('pin-auth-cancel-btn');
+  const form = document.getElementById('pin-auth-form');
+
+  cancelBtn.onclick = () => {
+    modalContainer.innerHTML = '';
   };
 
-  const proceedBtn = document.getElementById('aa-proceed-btn');
-  const step1 = document.getElementById('aa-step-1');
-  const step2 = document.getElementById('aa-step-2');
-  const step3 = document.getElementById('aa-step-3');
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const entered = input.value.trim();
 
-  proceedBtn.onclick = async () => {
-    const mobile = document.getElementById('aa-mobile-input').value;
-    proceedBtn.disabled = true;
-    proceedBtn.innerText = 'Requesting Consent...';
-    await SetuAccountAggregatorService.createConsentRequest(mobile);
-    step1.style.display = 'none';
-    step2.style.display = 'block';
+    if (String(user.pin).trim() === entered) {
+      modalContainer.innerHTML = '';
+      if (onSuccess) onSuccess();
+    } else {
+      // In-app error display matching design (no browser alert)
+      errorDiv.innerText = 'Incorrect 6-digit security PIN. Please try again.';
+      errorDiv.style.display = 'block';
+      input.value = '';
+      input.focus();
+    }
+  };
+}
+
+/**
+ * Interactive Gmail Statement Auto-Pull & Sync Modal Flow
+ */
+function openGmailSyncModal(userId, userBank, savedPasskey, showToast, refreshCallback) {
+  const modalContainer = document.getElementById('global-modal-container');
+  if (!modalContainer) return;
+
+  const bankName = userBank || 'Federal Bank';
+
+  modalContainer.innerHTML = `
+    <div class="modal-backdrop active" id="gmail-modal-backdrop">
+      <div class="modal-sheet">
+        <div class="sheet-handle"></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #EA4335, #C5221F); display: flex; align-items: center; justify-content: center; font-size: 16px; color: white;">
+              📬
+            </div>
+            <div>
+              <span style="font-size: var(--text-base); font-weight: 700;">Gmail Statement Auto-Pull</span>
+              <div style="font-size: 11px; color: var(--text-muted);">Direct personal email sync • Zero AA regulations</div>
+            </div>
+          </div>
+          <button id="gmail-close-btn" class="btn-icon btn-ghost btn-sm">✕</button>
+        </div>
+
+        <p style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: 6px; margin-bottom: 14px; line-height: 1.4;">
+          SBAFA will search your inbox for weekly statements sent from <strong>${escapeHtml(bankName)}</strong> with keyword <code>STATEMENT</code> and extract new transactions.
+        </p>
+
+        <!-- Custom In-App Error / Status Banner -->
+        <div id="gmail-modal-error" style="display: none; color: var(--signal-expense); font-size: 11.5px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 14px;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Bank</label>
+          <input type="text" id="gmail-bank-input" class="form-input" value="${escapeHtml(bankName)}" readonly style="opacity: 0.85; background: var(--bg-deep);" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">PDF Passkey for Decryption</label>
+          <input type="password" id="gmail-pwd-input" class="form-input" value="${escapeHtml(savedPasskey || '')}" placeholder="Password for viewing your protected Pdfs and access the statements (read only)" />
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+            ${savedPasskey ? '✓ Pre-filled from your saved statement passkey' : 'Enter the password to decrypt the statement PDF'}
+          </div>
+        </div>
+
+        <div id="gmail-progress-box" style="display: none; background: var(--bg-deep); border-radius: var(--radius-md); padding: 12px; margin-bottom: 16px; text-align: center;">
+          <div style="font-size: 1.4rem; margin-bottom: 6px; animation: spin 1s infinite linear;">🔄</div>
+          <div id="gmail-progress-text" style="font-size: var(--text-xs); font-weight: 600; color: var(--accent-blue);">Connecting to Gmail...</div>
+        </div>
+
+        <button id="gmail-sync-start-btn" class="btn btn-accent-blue btn-block" style="padding: 12px;">
+          Fetch &amp; Sync Statement →
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('gmail-close-btn').onclick = () => { modalContainer.innerHTML = ''; };
+  document.getElementById('gmail-modal-backdrop').onclick = (e) => {
+    if (e.target.id === 'gmail-modal-backdrop') modalContainer.innerHTML = '';
   };
 
-  const verifyBtn = document.getElementById('aa-verify-btn');
-  verifyBtn.onclick = async () => {
-    const otp = document.getElementById('aa-otp-input').value;
-    step2.style.display = 'none';
-    step3.style.display = 'block';
+  const syncBtn = document.getElementById('gmail-sync-start-btn');
+  const errorDiv = document.getElementById('gmail-modal-error');
+  const progressBox = document.getElementById('gmail-progress-box');
+  const progressText = document.getElementById('gmail-progress-text');
+  const pwdInput = document.getElementById('gmail-pwd-input');
+
+  syncBtn.onclick = async () => {
+    errorDiv.style.display = 'none';
+    syncBtn.disabled = true;
+    progressBox.style.display = 'block';
+
+    const passkey = pwdInput.value.trim();
 
     try {
-      const authResult = await SetuAccountAggregatorService.verifyConsentOtp('mock-handle', otp);
-      const syncResult = await SetuAccountAggregatorService.syncLiveFinancialData(authResult.consentId);
+      const result = await GmailStatementSyncService.syncStatementsFromGmail(
+        bankName,
+        passkey,
+        showToast,
+        (status) => {
+          if (progressText) progressText.innerText = status;
+        }
+      );
+
+      if (result.count === 0) {
+        progressBox.style.display = 'none';
+        syncBtn.disabled = false;
+        errorDiv.innerText = result.message;
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      // Ingest the fetched transactions
+      const userAccounts = await db.accounts.where('userId').equals(userId).toArray();
+      let matchedAccount = userAccounts.find(a => 
+        (a.bankCode && result.bankCode && a.bankCode.toLowerCase() === result.bankCode.toLowerCase()) ||
+        (a.bankName && result.detectedBank && a.bankName.toLowerCase().includes(result.detectedBank.toLowerCase()))
+      );
+
+      if (!matchedAccount) {
+        const newAccId = `acc-${userId}-${Date.now().toString(36)}`;
+        matchedAccount = {
+          id: newAccId,
+          userId,
+          bankName: result.detectedBank || bankName,
+          accountNumberMask: '•••• ' + Math.floor(1000 + Math.random() * 9000),
+          accountType: 'Savings Account',
+          balance: result.availableBalance != null ? result.availableBalance : 0,
+          bankCode: result.bankCode || 'FEDERAL',
+          lastSynced: 'Just now (Gmail)'
+        };
+        await db.accounts.add(matchedAccount);
+      } else {
+        const updatedBal = result.availableBalance != null ? result.availableBalance : matchedAccount.balance;
+        await db.accounts.update(matchedAccount.id, {
+          balance: updatedBal,
+          lastSynced: 'Just now (Gmail)'
+        });
+      }
+
+      const tagged = result.transactions.map(t => ({
+        ...t,
+        account_id: matchedAccount.id,
+        userId,
+        source: 'GMAIL_AUTO_PULL'
+      }));
+      await db.transactions.bulkAdd(tagged);
 
       modalContainer.innerHTML = '';
-      showToast(`Setu AA Sync Successful! Ingested ${syncResult.syncedCount} real-time transactions.`, 'success');
+      const balMsg = result.availableBalance != null ? ` • Balance: ₹${result.availableBalance.toFixed(2)}` : '';
+      showToast(`Ingested ${result.count} transactions from ${matchedAccount.bankName} statement email${balMsg}!`, 'success');
       if (refreshCallback) refreshCallback();
     } catch (err) {
-      step3.style.display = 'none';
-      step2.style.display = 'block';
-      showToast(err.message, 'info');
+      progressBox.style.display = 'none';
+      syncBtn.disabled = false;
+      errorDiv.innerText = err.message || 'Failed to sync from Gmail.';
+      errorDiv.style.display = 'block';
     }
   };
 }

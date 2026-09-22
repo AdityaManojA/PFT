@@ -4,7 +4,7 @@
  * transactions, budgets, and settings.
  */
 
-const DexieClass = window.Dexie;
+const DexieClass = (typeof window !== 'undefined' && window.Dexie) ? window.Dexie : class { version() { return { stores() {} }; } };
 
 // Clean up stale v1 database if it exists to resolve primary key conflict
 if (typeof window !== 'undefined' && window.indexedDB) {
@@ -62,6 +62,7 @@ export async function loginUser(nameOrEmail, pin, extraSettings = {}) {
   const users = await db.users.toArray();
   const matched = users.find(u => 
     (u.email && u.email.toLowerCase() === search) || 
+    (u.googleEmail && u.googleEmail.toLowerCase() === search) ||
     (u.name && u.name.toLowerCase() === search)
   );
 
@@ -106,7 +107,11 @@ export async function findUserByEmail(email) {
   if (!email) return null;
   const clean = String(email).trim().toLowerCase();
   const users = await db.users.toArray();
-  return users.find(u => u.email && u.email.toLowerCase() === clean) || null;
+  return users.find(u => 
+    (u.email && u.email.toLowerCase() === clean) ||
+    (u.googleEmail && u.googleEmail.toLowerCase() === clean) ||
+    (u.name && u.name.toLowerCase() === clean)
+  ) || null;
 }
 
 export async function registerUser(name, email, pin, bankSettings = {}) {
@@ -122,7 +127,7 @@ export async function registerUser(name, email, pin, bankSettings = {}) {
     throw new Error('Please set a 6-digit security PIN (numbers only).');
   }
 
-  const existing = await db.users.where('email').equals(cleanEmail).first();
+  const existing = await findUserByEmail(cleanEmail);
   if (existing) {
     throw new Error('A user with this email or username already exists.');
   }
@@ -133,6 +138,7 @@ export async function registerUser(name, email, pin, bankSettings = {}) {
   const autofillEnabled = bankSettings.autofillEnabled !== false;
   const authProvider = bankSettings.authProvider || 'local';
   const picture = bankSettings.picture || '';
+  const googleEmail = bankSettings.googleEmail || '';
 
   const newUser = {
     id,
@@ -144,6 +150,7 @@ export async function registerUser(name, email, pin, bankSettings = {}) {
     autofillEnabled,
     authProvider,
     picture,
+    googleEmail,
     createdAt: new Date().toISOString()
   };
 
@@ -181,25 +188,43 @@ export async function registerUser(name, email, pin, bankSettings = {}) {
   return newUser;
 }
 
-// Production Database Initialization (Zero mock data, clean slate)
-export async function seedInitialDataIfNeeded() {
-  // Purge any development mock/dummy data if present on client
+// Purge all test data and placeholder accounts from database
+export async function purgeAllTestData() {
   try {
-    const legacyAditya = await db.users.get('user-aditya');
-    if (legacyAditya) {
-      await db.users.delete('user-aditya');
-      await db.accounts.where('userId').equals('user-aditya').delete();
-      await db.transactions.where('userId').equals('user-aditya').delete();
-      await db.budgets.where('userId').equals('user-aditya').delete();
-      if (localStorage.getItem('pft_active_user_id') === 'user-aditya') {
-        localStorage.removeItem('pft_active_user_id');
-      }
-      console.log('Legacy development mock data cleared.');
+    // Clear all test accounts and transactions
+    const testAccountIds = ['acc-hdfc', 'acc-federal', 'acc-icici', 'acc-sbi', 'acc-1', 'acc-2'];
+    for (const id of testAccountIds) {
+      await db.accounts.delete(id);
     }
+
+    // Clean up mock users and orphaned accounts
+    const allAccounts = await db.accounts.toArray();
+    for (const acc of allAccounts) {
+      if (!acc.userId || acc.userId.includes('mock') || acc.userId.includes('demo') || acc.userId === 'user-aditya') {
+        await db.accounts.delete(acc.id);
+      }
+    }
+
+    const allTxns = await db.transactions.toArray();
+    for (const t of allTxns) {
+      if (!t.userId || t.userId.includes('mock') || t.userId.includes('demo') || t.userId === 'user-aditya') {
+        await db.transactions.delete(t.id);
+      }
+    }
+
+    if (localStorage.getItem('pft_active_user_id') === 'user-aditya') {
+      localStorage.removeItem('pft_active_user_id');
+    }
+
+    console.log('All test data and placeholders cleared.');
   } catch (err) {
     console.warn('Initial cleanup check:', err);
   }
+}
 
+// Production Database Initialization (Zero mock data, clean slate)
+export async function seedInitialDataIfNeeded() {
+  await purgeAllTestData();
   console.log('SBAFA production database ready (clean zero state).');
 }
 

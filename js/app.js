@@ -404,6 +404,12 @@ class AppCoordinator {
 
   showToast(message, type = 'success') {
     if (!this.toastContainer) return;
+
+    // Enforce maximum 3 notifications visible simultaneously
+    while (this.toastContainer.children.length >= 3) {
+      this.toastContainer.removeChild(this.toastContainer.firstElementChild);
+    }
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     const icon = type === 'success' ? '✓' : 'ℹ';
@@ -415,7 +421,7 @@ class AppCoordinator {
       toast.style.transform = 'translateY(-10px)';
       toast.style.transition = 'all 0.25s ease';
       setTimeout(() => toast.remove(), 250);
-    }, 3500);
+    }, 2800);
   }
 
   /**

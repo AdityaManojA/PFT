@@ -152,16 +152,18 @@ function createParticleMesh(canvas) {
           const cursorDist = Math.sqrt(cdx * cdx + cdy * cdy);
           const glowBoost = Math.max(0, 1 - cursorDist / (MOUSE_RADIUS * 1.5));
 
-          const baseAlpha = t * 0.12 * Math.min(a.depth, b.depth);
-          const alpha = Math.min(0.55, baseAlpha + glowBoost * 0.28);
           const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-          const rgb = isLight ? '15,23,42' : '255,255,255';
+          const edgeRgb = isLight ? '51, 65, 85' : '255, 255, 255';
+          const baseAlpha = isLight
+            ? (t * 0.22 * Math.min(a.depth, b.depth) + 0.08)
+            : (t * 0.12 * Math.min(a.depth, b.depth));
+          const alpha = Math.min(0.65, baseAlpha + glowBoost * 0.35);
 
           ctx.beginPath();
           ctx.moveTo(ax, ay);
           ctx.lineTo(bx, by);
-          ctx.strokeStyle = `rgba(${rgb},${alpha.toFixed(3)})`;
-          ctx.lineWidth = 0.6 + glowBoost * 0.6;
+          ctx.strokeStyle = `rgba(${edgeRgb},${alpha.toFixed(3)})`;
+          ctx.lineWidth = isLight ? (0.8 + glowBoost * 0.8) : (0.6 + glowBoost * 0.6);
           ctx.stroke();
         }
       }
@@ -177,16 +179,20 @@ function createParticleMesh(canvas) {
       const dy = py - cursorY;
       const dist = Math.sqrt(dx * dx + dy * dy);
       const glowBoost = Math.max(0, 1 - dist / MOUSE_RADIUS);
-      const alpha = Math.min(0.95, p.alpha + glowBoost * 0.5);
-      const radius = p.r + glowBoost * 1.8;
+
       const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-      const rgb = isLight ? '15,23,42' : '255,255,255';
+      const nodeRgb = isLight ? '15, 23, 42' : '255, 255, 255';
+      const haloRgb = isLight ? '37, 99, 235' : '255, 255, 255';
+      const alpha = isLight
+        ? Math.min(0.95, p.alpha + 0.25 + glowBoost * 0.5)
+        : Math.min(0.95, p.alpha + glowBoost * 0.5);
+      const radius = p.r + (isLight ? 0.3 : 0) + glowBoost * 1.8;
 
       // Glow halo near cursor
       if (glowBoost > 0.1) {
         const grad = ctx.createRadialGradient(px, py, 0, px, py, radius * 4);
-        grad.addColorStop(0, `rgba(${rgb},${(glowBoost * 0.12).toFixed(3)})`);
-        grad.addColorStop(1, `rgba(${rgb},0)`);
+        grad.addColorStop(0, `rgba(${haloRgb},${(glowBoost * (isLight ? 0.22 : 0.12)).toFixed(3)})`);
+        grad.addColorStop(1, `rgba(${haloRgb},0)`);
         ctx.beginPath();
         ctx.arc(px, py, radius * 4, 0, Math.PI * 2);
         ctx.fillStyle = grad;
@@ -196,7 +202,7 @@ function createParticleMesh(canvas) {
       // Node dot
       ctx.beginPath();
       ctx.arc(px, py, radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${rgb},${alpha.toFixed(3)})`;
+      ctx.fillStyle = `rgba(${nodeRgb},${alpha.toFixed(3)})`;
       ctx.fill();
     });
 
@@ -261,7 +267,7 @@ export async function renderLanding(container) {
           </h1>
 
           <p class="landing-hero-subtitle">
-            Local-first personal finance engineered for India. Direct Setu RBI Account Aggregator integration, in-browser e-statement parsing, and 256-bit WebCrypto hardware-isolated memory.
+            Local-first personal finance engineered for India. Direct client-side PDF bank statement parsing, automated weekly Gmail sync, and 256-bit WebCrypto hardware-isolated memory.
           </p>
 
           <div class="landing-cta-group">
@@ -280,7 +286,7 @@ export async function renderLanding(container) {
             </div>
             <div class="trust-item">
               <span class="trust-check">✓</span>
-              <span>RBI AA Consent</span>
+              <span>Direct Statements</span>
             </div>
             <div class="trust-item">
               <span class="trust-check">✓</span>
@@ -313,13 +319,13 @@ export async function renderLanding(container) {
 
           <div class="feature-card-minimal">
             <div>
-              <div class="feature-card-icon">🏛️</div>
-              <h3 class="feature-card-title">RBI Account Aggregator (Setu)</h3>
+              <div class="feature-card-icon">📬</div>
+              <h3 class="feature-card-title">Gmail Statement Auto-Pull</h3>
               <p class="feature-card-text">
-                Connect HDFC, ICICI, SBI, and Federal Bank through RBI's Sahamati consent framework. Clean, verified e-statement telemetry without password scraping.
+                Secure, direct email statement fetch via Google OAuth. Automatic weekly sync searches for e-statements with zero regulatory AA middlemen and zero server telemetry.
               </p>
             </div>
-            <div class="feature-card-tag">FRAMEWORK: SETU SANDBOX FIP/FIU</div>
+            <div class="feature-card-tag">PROTOCOL: GMAIL REST / CLIENT OAUTH</div>
           </div>
 
           <div class="feature-card-minimal">

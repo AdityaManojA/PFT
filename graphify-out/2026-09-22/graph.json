@@ -30,17 +30,30 @@
       "source_location": "L10"
     },
     {
-      "id": "js_services_gmail_sync_gmailstatementsyncservice",
-      "label": "GmailStatementSyncService",
+      "id": "js_services_setu_aa_setuaccountaggregatorservice",
+      "label": "SetuAccountAggregatorService",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "accounts.js",
       "file_type": "code",
-      "norm_label": "gmailstatementsyncservice",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L11"
+      "norm_label": "setuaccountaggregatorservice",
+      "source_file": "js/services/setu-aa.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "js_auth_biometricauthservice",
+      "label": "BiometricAuthService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": "biometricauthservice",
+      "source_file": "js/auth.js",
+      "source_location": "L9"
     },
     {
       "id": "js_app_appcoordinator",
@@ -49,24 +62,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": "appcoordinator",
       "source_file": "js/app.js",
       "source_location": "L20"
-    },
-    {
-      "id": "js_auth_biometricauthservice",
-      "label": "BiometricAuthService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "dashboard.js",
-      "file_type": "code",
-      "norm_label": "biometricauthservice",
-      "source_file": "js/auth.js",
-      "source_location": "L9"
     },
     {
       "id": "js_parsers_bank_parser_bankstatementparser",
@@ -75,24 +75,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": "bankstatementparser",
       "source_file": "js/parsers/bank-parser.js",
       "source_location": "L8"
-    },
-    {
-      "id": "js_services_setu_aa_setuaccountaggregatorservice",
-      "label": "SetuAccountAggregatorService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "db",
-      "file_type": "code",
-      "norm_label": "setuaccountaggregatorservice",
-      "source_file": "js/services/setu-aa.js",
-      "source_location": "L9"
     },
     {
       "id": "js_auth_firebaseauthservice",
@@ -101,7 +88,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": "firebaseauthservice",
       "source_file": "js/auth.js",
@@ -118,18 +105,6 @@
       "norm_label": "escapehtml()",
       "source_file": "js/app.js",
       "source_location": "L487"
-    },
-    {
-      "id": "js_db_addtransaction",
-      "label": "addTransaction()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "addtransaction()",
-      "source_file": "js/db.js",
-      "source_location": "L248"
     },
     {
       "id": "js_db_appdatabase_constructor",
@@ -190,18 +165,6 @@
       "norm_label": "getpendingcount()",
       "source_file": "js/db.js",
       "source_location": "L296"
-    },
-    {
-      "id": "js_db_getuseraccounts",
-      "label": "getUserAccounts()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "getuseraccounts()",
-      "source_file": "js/db.js",
-      "source_location": "L232"
     },
     {
       "id": "js_db_loginuser",
@@ -312,30 +275,6 @@
       "source_location": "L75"
     },
     {
-      "id": "js_views_add_expense_escapehtml",
-      "label": "escapeHtml()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "escapehtml()",
-      "source_file": "js/views/add-expense.js",
-      "source_location": "L166"
-    },
-    {
-      "id": "js_views_add_expense_renderaddexpense",
-      "label": "renderAddExpense()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "renderaddexpense()",
-      "source_file": "js/views/add-expense.js",
-      "source_location": "L12"
-    },
-    {
       "id": "js_views_login_escapehtml",
       "label": "escapeHtml()",
       "_callable": true,
@@ -345,7 +284,7 @@
       "file_type": "code",
       "norm_label": "escapehtml()",
       "source_file": "js/views/login.js",
-      "source_location": "L511"
+      "source_location": "L483"
     },
     {
       "id": "js_views_login_promptregistrationgooglestep",
@@ -357,7 +296,7 @@
       "file_type": "code",
       "norm_label": "promptregistrationgooglestep()",
       "source_file": "js/views/login.js",
-      "source_location": "L412"
+      "source_location": "L391"
     },
     {
       "id": "js_views_login_renderlogin",
@@ -372,6 +311,18 @@
       "source_location": "L12"
     },
     {
+      "id": "js_db_getcurrentuser",
+      "label": "getCurrentUser()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "accounts.js",
+      "file_type": "code",
+      "norm_label": "getcurrentuser()",
+      "source_file": "js/db.js",
+      "source_location": "L41"
+    },
+    {
       "id": "js_parsers_pdf_parser_bankpdfparser_deletepassword",
       "label": ".deletePassword()",
       "_callable": true,
@@ -381,19 +332,7 @@
       "file_type": "code",
       "norm_label": ".deletepassword()",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L359"
-    },
-    {
-      "id": "js_parsers_pdf_parser_bankpdfparser_deletesavedpassword",
-      "label": ".deleteSavedPassword()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "accounts.js",
-      "file_type": "code",
-      "norm_label": ".deletesavedpassword()",
-      "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L338"
+      "source_location": "L340"
     },
     {
       "id": "js_parsers_pdf_parser_bankpdfparser_extractpdftext",
@@ -405,7 +344,7 @@
       "file_type": "code",
       "norm_label": ".extractpdftext()",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L17"
+      "source_location": "L16"
     },
     {
       "id": "js_parsers_pdf_parser_bankpdfparser_getprimarybank",
@@ -417,7 +356,19 @@
       "file_type": "code",
       "norm_label": ".getprimarybank()",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L275"
+      "source_location": "L237"
+    },
+    {
+      "id": "js_parsers_pdf_parser_bankpdfparser_getsavedpassword",
+      "label": ".getSavedPassword()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "accounts.js",
+      "file_type": "code",
+      "norm_label": ".getsavedpassword()",
+      "source_file": "js/parsers/pdf-parser.js",
+      "source_location": "L251"
     },
     {
       "id": "js_parsers_pdf_parser_bankpdfparser_getsavedpasswordraw",
@@ -429,7 +380,7 @@
       "file_type": "code",
       "norm_label": ".getsavedpasswordraw()",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L305"
+      "source_location": "L306"
     },
     {
       "id": "js_parsers_pdf_parser_bankpdfparser_isautofillenabled",
@@ -441,7 +392,7 @@
       "file_type": "code",
       "norm_label": ".isautofillenabled()",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L240"
+      "source_location": "L202"
     },
     {
       "id": "js_parsers_pdf_parser_bankpdfparser_normalizedate",
@@ -453,7 +404,7 @@
       "file_type": "code",
       "norm_label": ".normalizedate()",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L211"
+      "source_location": "L173"
     },
     {
       "id": "js_parsers_pdf_parser_bankpdfparser_parsetexttotransactions",
@@ -465,7 +416,7 @@
       "file_type": "code",
       "norm_label": ".parsetexttotransactions()",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L80"
+      "source_location": "L74"
     },
     {
       "id": "js_parsers_pdf_parser_bankpdfparser_savepassword",
@@ -477,19 +428,7 @@
       "file_type": "code",
       "norm_label": ".savepassword()",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L352"
-    },
-    {
-      "id": "js_parsers_pdf_parser_bankpdfparser_savepasswordforbank",
-      "label": ".savePasswordForBank()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "accounts.js",
-      "file_type": "code",
-      "norm_label": ".savepasswordforbank()",
-      "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L321"
+      "source_location": "L282"
     },
     {
       "id": "js_parsers_pdf_parser_bankpdfparser_setautofillenabled",
@@ -501,79 +440,43 @@
       "file_type": "code",
       "norm_label": ".setautofillenabled()",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L258"
+      "source_location": "L220"
     },
     {
-      "id": "js_parsers_pdf_parser_bankpdfparser_setprimarybank",
-      "label": ".setPrimaryBank()",
+      "id": "js_services_setu_aa_setuaccountaggregatorservice_createconsentrequest",
+      "label": ".createConsentRequest()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "accounts.js",
       "file_type": "code",
-      "norm_label": ".setprimarybank()",
-      "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L289"
+      "norm_label": ".createconsentrequest()",
+      "source_file": "js/services/setu-aa.js",
+      "source_location": "L14"
     },
     {
-      "id": "js_services_gmail_sync_gmailstatementsyncservice_findpdfpart",
-      "label": ".findPdfPart()",
+      "id": "js_services_setu_aa_setuaccountaggregatorservice_synclivefinancialdata",
+      "label": ".syncLiveFinancialData()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "accounts.js",
       "file_type": "code",
-      "norm_label": ".findpdfpart()",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L137"
+      "norm_label": ".synclivefinancialdata()",
+      "source_file": "js/services/setu-aa.js",
+      "source_location": "L58"
     },
     {
-      "id": "js_services_gmail_sync_gmailstatementsyncservice_getlastsynclabel",
-      "label": ".getLastSyncLabel()",
+      "id": "js_services_setu_aa_setuaccountaggregatorservice_verifyconsentotp",
+      "label": ".verifyConsentOtp()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "accounts.js",
       "file_type": "code",
-      "norm_label": ".getlastsynclabel()",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L25"
-    },
-    {
-      "id": "js_services_gmail_sync_gmailstatementsyncservice_isweeklysyncdue",
-      "label": ".isWeeklySyncDue()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "accounts.js",
-      "file_type": "code",
-      "norm_label": ".isweeklysyncdue()",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L15"
-    },
-    {
-      "id": "js_services_gmail_sync_gmailstatementsyncservice_requestgoogleaccesstoken",
-      "label": ".requestGoogleAccessToken()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "accounts.js",
-      "file_type": "code",
-      "norm_label": ".requestgoogleaccesstoken()",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L157"
-    },
-    {
-      "id": "js_services_gmail_sync_gmailstatementsyncservice_syncstatementsfromgmail",
-      "label": ".syncStatementsFromGmail()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "accounts.js",
-      "file_type": "code",
-      "norm_label": ".syncstatementsfromgmail()",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L39"
+      "norm_label": ".verifyconsentotp()",
+      "source_file": "js/services/setu-aa.js",
+      "source_location": "L37"
     },
     {
       "id": "js_views_accounts_confirmdeleteaccountmodal",
@@ -585,7 +488,7 @@
       "file_type": "code",
       "norm_label": "confirmdeleteaccountmodal()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1124"
+      "source_location": "L989"
     },
     {
       "id": "js_views_accounts_confirmremovepasskeymodal",
@@ -597,7 +500,7 @@
       "file_type": "code",
       "norm_label": "confirmremovepasskeymodal()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1312"
+      "source_location": "L1177"
     },
     {
       "id": "js_views_accounts_escapehtml",
@@ -609,7 +512,7 @@
       "file_type": "code",
       "norm_label": "escapehtml()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1358"
+      "source_location": "L1223"
     },
     {
       "id": "js_views_accounts_handlepdffile",
@@ -621,7 +524,7 @@
       "file_type": "code",
       "norm_label": "handlepdffile()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L418"
+      "source_location": "L399"
     },
     {
       "id": "js_views_accounts_handleuploadedfile",
@@ -633,7 +536,7 @@
       "file_type": "code",
       "norm_label": "handleuploadedfile()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L399"
+      "source_location": "L380"
     },
     {
       "id": "js_views_accounts_openaddaccountmodal",
@@ -645,7 +548,7 @@
       "file_type": "code",
       "norm_label": "openaddaccountmodal()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L899"
+      "source_location": "L764"
     },
     {
       "id": "js_views_accounts_openeditaccountmodal",
@@ -657,7 +560,7 @@
       "file_type": "code",
       "norm_label": "openeditaccountmodal()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1010"
+      "source_location": "L875"
     },
     {
       "id": "js_views_accounts_openeditpasskeymodal",
@@ -669,19 +572,19 @@
       "file_type": "code",
       "norm_label": "openeditpasskeymodal()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1203"
+      "source_location": "L1068"
     },
     {
-      "id": "js_views_accounts_opengmailsyncmodal",
-      "label": "openGmailSyncModal()",
+      "id": "js_views_accounts_opensetuaamodal",
+      "label": "openSetuAAModal()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "accounts.js",
       "file_type": "code",
-      "norm_label": "opengmailsyncmodal()",
+      "norm_label": "opensetuaamodal()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L755"
+      "source_location": "L665"
     },
     {
       "id": "js_views_accounts_parseandingestpdftext",
@@ -693,7 +596,7 @@
       "file_type": "code",
       "norm_label": "parseandingestpdftext()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L542"
+      "source_location": "L523"
     },
     {
       "id": "js_views_accounts_processcsvtext",
@@ -705,7 +608,7 @@
       "file_type": "code",
       "norm_label": "processcsvtext()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L611"
+      "source_location": "L588"
     },
     {
       "id": "js_views_accounts_promptpdfpasswordmodal",
@@ -717,19 +620,7 @@
       "file_type": "code",
       "norm_label": "promptpdfpasswordmodal()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L457"
-    },
-    {
-      "id": "js_views_accounts_promptpinauthmodal",
-      "label": "promptPinAuthModal()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "accounts.js",
-      "file_type": "code",
-      "norm_label": "promptpinauthmodal()",
-      "source_file": "js/views/accounts.js",
-      "source_location": "L689"
+      "source_location": "L438"
     },
     {
       "id": "js_views_accounts_renderaccounts",
@@ -753,7 +644,175 @@
       "file_type": "code",
       "norm_label": "renderbankcardhtml()",
       "source_file": "js/views/accounts.js",
-      "source_location": "L363"
+      "source_location": "L344"
+    },
+    {
+      "id": "js_auth_biometricauthservice_authenticatebiometrics",
+      "label": ".authenticateBiometrics()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": ".authenticatebiometrics()",
+      "source_file": "js/auth.js",
+      "source_location": "L24"
+    },
+    {
+      "id": "js_auth_biometricauthservice_isbiometricavailable",
+      "label": ".isBiometricAvailable()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": ".isbiometricavailable()",
+      "source_file": "js/auth.js",
+      "source_location": "L13"
+    },
+    {
+      "id": "js_auth_biometricauthservice_isbiometriclockenabled",
+      "label": ".isBiometricLockEnabled()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": ".isbiometriclockenabled()",
+      "source_file": "js/auth.js",
+      "source_location": "L83"
+    },
+    {
+      "id": "js_auth_biometricauthservice_setbiometriclockenabled",
+      "label": ".setBiometricLockEnabled()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": ".setbiometriclockenabled()",
+      "source_file": "js/auth.js",
+      "source_location": "L88"
+    },
+    {
+      "id": "js_auth_biometricauthservice_verifypin",
+      "label": ".verifyPin()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": ".verifypin()",
+      "source_file": "js/auth.js",
+      "source_location": "L53"
+    },
+    {
+      "id": "js_firebase_config_loadfirebaseconfig",
+      "label": "loadFirebaseConfig()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": "loadfirebaseconfig()",
+      "source_file": "js/firebase-config.js",
+      "source_location": "L18"
+    },
+    {
+      "id": "js_views_landing_createparticlemesh",
+      "label": "createParticleMesh()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "createParticleMesh",
+      "file_type": "code",
+      "norm_label": "createparticlemesh()",
+      "source_file": "js/views/landing.js",
+      "source_location": "L12"
+    },
+    {
+      "id": "js_views_landing_createparticlemesh_draw",
+      "label": "draw()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "createParticleMesh",
+      "file_type": "code",
+      "norm_label": "draw()",
+      "source_file": "js/views/landing.js",
+      "source_location": "L93"
+    },
+    {
+      "id": "js_views_landing_createparticlemesh_makeparticle",
+      "label": "makeParticle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "createParticleMesh",
+      "file_type": "code",
+      "norm_label": "makeparticle()",
+      "source_file": "js/views/landing.js",
+      "source_location": "L37"
+    },
+    {
+      "id": "js_views_landing_createparticlemesh_onmousemove",
+      "label": "onMouseMove()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "createParticleMesh",
+      "file_type": "code",
+      "norm_label": "onmousemove()",
+      "source_file": "js/views/landing.js",
+      "source_location": "L66"
+    },
+    {
+      "id": "js_views_landing_createparticlemesh_onscroll",
+      "label": "onScroll()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "createParticleMesh",
+      "file_type": "code",
+      "norm_label": "onscroll()",
+      "source_file": "js/views/landing.js",
+      "source_location": "L81"
+    },
+    {
+      "id": "js_views_landing_createparticlemesh_ontouchmove",
+      "label": "onTouchMove()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "createParticleMesh",
+      "file_type": "code",
+      "norm_label": "ontouchmove()",
+      "source_file": "js/views/landing.js",
+      "source_location": "L73"
+    },
+    {
+      "id": "js_views_landing_createparticlemesh_resize",
+      "label": "resize()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "createParticleMesh",
+      "file_type": "code",
+      "norm_label": "resize()",
+      "source_file": "js/views/landing.js",
+      "source_location": "L54"
+    },
+    {
+      "id": "js_views_landing_renderlanding",
+      "label": "renderLanding()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "createParticleMesh",
+      "file_type": "code",
+      "norm_label": "renderlanding()",
+      "source_file": "js/views/landing.js",
+      "source_location": "L234"
     },
     {
       "id": "js_app_appcoordinator_applytheme",
@@ -761,7 +820,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".applytheme()",
       "source_file": "js/app.js",
@@ -773,7 +832,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "js/app.js",
@@ -785,7 +844,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".handleloginsuccess()",
       "source_file": "js/app.js",
@@ -797,7 +856,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".handlenetworkchange()",
       "source_file": "js/app.js",
@@ -809,7 +868,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".init()",
       "source_file": "js/app.js",
@@ -821,7 +880,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".inittheme()",
       "source_file": "js/app.js",
@@ -833,7 +892,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".navigate()",
       "source_file": "js/app.js",
@@ -845,7 +904,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".refreshcurrentview()",
       "source_file": "js/app.js",
@@ -857,7 +916,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".setupglobalcontrols()",
       "source_file": "js/app.js",
@@ -869,7 +928,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".setuprouting()",
       "source_file": "js/app.js",
@@ -881,7 +940,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".showbiometriclockscreen()",
       "source_file": "js/app.js",
@@ -893,7 +952,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".showtoast()",
       "source_file": "js/app.js",
@@ -905,7 +964,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".showuserprofilesheet()",
       "source_file": "js/app.js",
@@ -917,131 +976,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "AppCoordinator",
       "file_type": "code",
       "norm_label": ".updateheaderuserprofile()",
       "source_file": "js/app.js",
       "source_location": "L116"
-    },
-    {
-      "id": "js_db_getcurrentuser",
-      "label": "getCurrentUser()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "getcurrentuser()",
-      "source_file": "js/db.js",
-      "source_location": "L41"
-    },
-    {
-      "id": "js_views_landing_createparticlemesh",
-      "label": "createParticleMesh()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "createparticlemesh()",
-      "source_file": "js/views/landing.js",
-      "source_location": "L12"
-    },
-    {
-      "id": "js_views_landing_createparticlemesh_draw",
-      "label": "draw()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "draw()",
-      "source_file": "js/views/landing.js",
-      "source_location": "L93"
-    },
-    {
-      "id": "js_views_landing_createparticlemesh_makeparticle",
-      "label": "makeParticle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "makeparticle()",
-      "source_file": "js/views/landing.js",
-      "source_location": "L37"
-    },
-    {
-      "id": "js_views_landing_createparticlemesh_onmousemove",
-      "label": "onMouseMove()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "onmousemove()",
-      "source_file": "js/views/landing.js",
-      "source_location": "L66"
-    },
-    {
-      "id": "js_views_landing_createparticlemesh_onscroll",
-      "label": "onScroll()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "onscroll()",
-      "source_file": "js/views/landing.js",
-      "source_location": "L81"
-    },
-    {
-      "id": "js_views_landing_createparticlemesh_ontouchmove",
-      "label": "onTouchMove()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "ontouchmove()",
-      "source_file": "js/views/landing.js",
-      "source_location": "L73"
-    },
-    {
-      "id": "js_views_landing_createparticlemesh_resize",
-      "label": "resize()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "resize()",
-      "source_file": "js/views/landing.js",
-      "source_location": "L54"
-    },
-    {
-      "id": "js_views_landing_renderlanding",
-      "label": "renderLanding()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "renderlanding()",
-      "source_file": "js/views/landing.js",
-      "source_location": "L234"
-    },
-    {
-      "id": "js_auth_biometricauthservice_authenticatebiometrics",
-      "label": ".authenticateBiometrics()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "dashboard.js",
-      "file_type": "code",
-      "norm_label": ".authenticatebiometrics()",
-      "source_file": "js/auth.js",
-      "source_location": "L24"
     },
     {
       "id": "js_auth_biometricauthservice_getprivacymode",
@@ -1056,42 +995,6 @@
       "source_location": "L78"
     },
     {
-      "id": "js_auth_biometricauthservice_isbiometricavailable",
-      "label": ".isBiometricAvailable()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "dashboard.js",
-      "file_type": "code",
-      "norm_label": ".isbiometricavailable()",
-      "source_file": "js/auth.js",
-      "source_location": "L13"
-    },
-    {
-      "id": "js_auth_biometricauthservice_isbiometriclockenabled",
-      "label": ".isBiometricLockEnabled()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "dashboard.js",
-      "file_type": "code",
-      "norm_label": ".isbiometriclockenabled()",
-      "source_file": "js/auth.js",
-      "source_location": "L83"
-    },
-    {
-      "id": "js_auth_biometricauthservice_setbiometriclockenabled",
-      "label": ".setBiometricLockEnabled()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "dashboard.js",
-      "file_type": "code",
-      "norm_label": ".setbiometriclockenabled()",
-      "source_file": "js/auth.js",
-      "source_location": "L88"
-    },
-    {
       "id": "js_auth_biometricauthservice_toggleprivacymode",
       "label": ".togglePrivacyMode()",
       "_callable": true,
@@ -1102,18 +1005,6 @@
       "norm_label": ".toggleprivacymode()",
       "source_file": "js/auth.js",
       "source_location": "L71"
-    },
-    {
-      "id": "js_auth_biometricauthservice_verifypin",
-      "label": ".verifyPin()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "dashboard.js",
-      "file_type": "code",
-      "norm_label": ".verifypin()",
-      "source_file": "js/auth.js",
-      "source_location": "L53"
     },
     {
       "id": "js_db_formatinr",
@@ -1308,12 +1199,36 @@
       "source_location": "L191"
     },
     {
+      "id": "js_db_addtransaction",
+      "label": "addTransaction()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "categorizeTransaction",
+      "file_type": "code",
+      "norm_label": "addtransaction()",
+      "source_file": "js/db.js",
+      "source_location": "L248"
+    },
+    {
+      "id": "js_db_getuseraccounts",
+      "label": "getUserAccounts()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "categorizeTransaction",
+      "file_type": "code",
+      "norm_label": "getuseraccounts()",
+      "source_file": "js/db.js",
+      "source_location": "L232"
+    },
+    {
       "id": "js_parsers_bank_parser_bankstatementparser_normalizedate",
       "label": ".normalizeDate()",
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": ".normalizedate()",
       "source_file": "js/parsers/bank-parser.js",
@@ -1325,7 +1240,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": ".parse()",
       "source_file": "js/parsers/bank-parser.js",
@@ -1337,7 +1252,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": ".parsefederal()",
       "source_file": "js/parsers/bank-parser.js",
@@ -1349,7 +1264,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": ".parsegeneric()",
       "source_file": "js/parsers/bank-parser.js",
@@ -1361,7 +1276,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": ".parsehdfc()",
       "source_file": "js/parsers/bank-parser.js",
@@ -1373,11 +1288,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": "categorizetransaction()",
       "source_file": "js/parsers/categorizer.js",
-      "source_location": "L93"
+      "source_location": "L54"
     },
     {
       "id": "js_parsers_categorizer_extractcleanmerchant",
@@ -1385,11 +1300,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": "extractcleanmerchant()",
       "source_file": "js/parsers/categorizer.js",
-      "source_location": "L132"
+      "source_location": "L90"
     },
     {
       "id": "js_parsers_categorizer_formattitlecase",
@@ -1397,47 +1312,35 @@
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": "formattitlecase()",
       "source_file": "js/parsers/categorizer.js",
-      "source_location": "L179"
+      "source_location": "L122"
     },
     {
-      "id": "js_services_setu_aa_setuaccountaggregatorservice_createconsentrequest",
-      "label": ".createConsentRequest()",
+      "id": "js_views_add_expense_escapehtml",
+      "label": "escapeHtml()",
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
-      "norm_label": ".createconsentrequest()",
-      "source_file": "js/services/setu-aa.js",
-      "source_location": "L14"
+      "norm_label": "escapehtml()",
+      "source_file": "js/views/add-expense.js",
+      "source_location": "L166"
     },
     {
-      "id": "js_services_setu_aa_setuaccountaggregatorservice_synclivefinancialdata",
-      "label": ".syncLiveFinancialData()",
+      "id": "js_views_add_expense_renderaddexpense",
+      "label": "renderAddExpense()",
       "_callable": true,
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
-      "norm_label": ".synclivefinancialdata()",
-      "source_file": "js/services/setu-aa.js",
-      "source_location": "L58"
-    },
-    {
-      "id": "js_services_setu_aa_setuaccountaggregatorservice_verifyconsentotp",
-      "label": ".verifyConsentOtp()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "db",
-      "file_type": "code",
-      "norm_label": ".verifyconsentotp()",
-      "source_file": "js/services/setu-aa.js",
-      "source_location": "L37"
+      "norm_label": "renderaddexpense()",
+      "source_file": "js/views/add-expense.js",
+      "source_location": "L12"
     },
     {
       "id": "scripts_email_pdf_streamline_batch_decrypt_directory",
@@ -1469,7 +1372,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".detecthostingconfig()",
       "source_file": "js/auth.js",
@@ -1481,7 +1384,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".getauth()",
       "source_file": "js/auth.js",
@@ -1493,7 +1396,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".getfirebaseconfig()",
       "source_file": "js/auth.js",
@@ -1505,7 +1408,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".isconfigured()",
       "source_file": "js/auth.js",
@@ -1517,7 +1420,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".loadfirebasesdk()",
       "source_file": "js/auth.js",
@@ -1529,7 +1432,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".promptfirebaseconfigmodal()",
       "source_file": "js/auth.js",
@@ -1541,7 +1444,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".setfirebaseconfig()",
       "source_file": "js/auth.js",
@@ -1553,23 +1456,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".signinwithgoogle()",
       "source_file": "js/auth.js",
       "source_location": "L206"
-    },
-    {
-      "id": "js_firebase_config_loadfirebaseconfig",
-      "label": "loadFirebaseConfig()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "loadfirebaseconfig()",
-      "source_file": "js/firebase-config.js",
-      "source_location": "L18"
     },
     {
       "id": "js_app",
@@ -1594,17 +1485,6 @@
       "source_location": "L1"
     },
     {
-      "id": "js_parsers_categorizer_all_categories",
-      "label": "ALL_CATEGORIES",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "all_categories",
-      "source_file": "js/parsers/categorizer.js",
-      "source_location": "L187"
-    },
-    {
       "id": "js_pwa",
       "label": "pwa.js",
       "_origin": "ast",
@@ -1613,17 +1493,6 @@
       "file_type": "code",
       "norm_label": "pwa.js",
       "source_file": "js/pwa.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "js_views_add_expense",
-      "label": "add-expense.js",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "add-expense.js",
-      "source_file": "js/views/add-expense.js",
       "source_location": "L1"
     },
     {
@@ -2166,6 +2035,83 @@
       "source_location": "L3"
     },
     {
+      "id": "firebase_app_js",
+      "label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "confidence": "EXTRACTED",
+      "file_type": "code",
+      "norm_label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+      "source_file": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
+    },
+    {
+      "id": "firebase_auth_js",
+      "label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "confidence": "EXTRACTED",
+      "file_type": "code",
+      "norm_label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+      "source_file": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
+    },
+    {
+      "id": "js_auth",
+      "label": "auth.js",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": "auth.js",
+      "source_file": "js/auth.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "js_auth_googleauthservice",
+      "label": "GoogleAuthService",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": "googleauthservice",
+      "source_file": "js/auth.js",
+      "source_location": "L399"
+    },
+    {
+      "id": "js_firebase_config",
+      "label": "firebase-config.js",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": "firebase-config.js",
+      "source_file": "js/firebase-config.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "js_firebase_config_firebaseconfig",
+      "label": "firebaseConfig",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "auth.js",
+      "file_type": "code",
+      "norm_label": "firebaseconfig",
+      "source_file": "js/firebase-config.js",
+      "source_location": "L6"
+    },
+    {
+      "id": "js_views_landing",
+      "label": "landing.js",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "createParticleMesh",
+      "file_type": "code",
+      "norm_label": "landing.js",
+      "source_file": "js/views/landing.js",
+      "source_location": "L1"
+    },
+    {
       "id": "graphify_workflow",
       "label": "GRAPHIFY_WORKFLOW.md",
       "_origin": "ast",
@@ -2199,17 +2145,6 @@
       "node_kind": "heading",
       "norm_label": "graphify + antigravity project workflow & setup guide",
       "source_file": "GRAPHIFY_WORKFLOW.md",
-      "source_location": "L1"
-    },
-    {
-      "id": "js_views_landing",
-      "label": "landing.js",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "landing.js",
-      "source_file": "js/views/landing.js",
       "source_location": "L1"
     },
     {
@@ -2250,7 +2185,7 @@
       "label": "db",
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": "db",
       "source_file": "js/db.js",
@@ -2261,7 +2196,7 @@
       "label": "bank-parser.js",
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": "bank-parser.js",
       "source_file": "js/parsers/bank-parser.js",
@@ -2272,43 +2207,43 @@
       "label": "categorizer.js",
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": "categorizer.js",
       "source_file": "js/parsers/categorizer.js",
       "source_location": "L1"
     },
     {
+      "id": "js_parsers_categorizer_all_categories",
+      "label": "ALL_CATEGORIES",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "categorizeTransaction",
+      "file_type": "code",
+      "norm_label": "all_categories",
+      "source_file": "js/parsers/categorizer.js",
+      "source_location": "L130"
+    },
+    {
       "id": "js_parsers_categorizer_category_rules",
       "label": "CATEGORY_RULES",
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": "category_rules",
       "source_file": "js/parsers/categorizer.js",
-      "source_location": "L7"
+      "source_location": "L6"
     },
     {
       "id": "js_parsers_pdf_parser",
       "label": "pdf-parser.js",
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": "pdf-parser.js",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "js_services_gmail_sync",
-      "label": "gmail-sync.js",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "db",
-      "file_type": "code",
-      "norm_label": "gmail-sync.js",
-      "source_file": "js/services/gmail-sync.js",
       "source_location": "L1"
     },
     {
@@ -2316,10 +2251,21 @@
       "label": "setu-aa.js",
       "_origin": "ast",
       "community": 4,
-      "community_name": "db",
+      "community_name": "categorizeTransaction",
       "file_type": "code",
       "norm_label": "setu-aa.js",
       "source_file": "js/services/setu-aa.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "js_views_add_expense",
+      "label": "add-expense.js",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "categorizeTransaction",
+      "file_type": "code",
+      "norm_label": "add-expense.js",
+      "source_file": "js/views/add-expense.js",
       "source_location": "L1"
     },
     {
@@ -2675,72 +2621,6 @@
       "source_location": "L60"
     },
     {
-      "id": "firebase_app_js",
-      "label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-      "source_file": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
-    },
-    {
-      "id": "firebase_auth_js",
-      "label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
-      "source_file": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
-    },
-    {
-      "id": "js_auth",
-      "label": "auth.js",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "auth.js",
-      "source_file": "js/auth.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "js_auth_googleauthservice",
-      "label": "GoogleAuthService",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "googleauthservice",
-      "source_file": "js/auth.js",
-      "source_location": "L399"
-    },
-    {
-      "id": "js_firebase_config",
-      "label": "firebase-config.js",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "firebase-config.js",
-      "source_file": "js/firebase-config.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "js_firebase_config_firebaseconfig",
-      "label": "firebaseConfig",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "firebaseconfig",
-      "source_file": "js/firebase-config.js",
-      "source_location": "L6"
-    },
-    {
       "id": "agents_rules_graphify",
       "label": "rules/graphify.md",
       "_origin": "ast",
@@ -2821,7 +2701,7 @@
       "label": "ref_https",
       "_origin": "semantic",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_https",
@@ -3739,7 +3619,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/parsers/categorizer.js",
-      "source_location": "L99",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
@@ -3751,19 +3631,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/parsers/categorizer.js",
-      "source_location": "L149",
-      "weight": 1.0
-    },
-    {
-      "source": "js_parsers_pdf_parser_bankpdfparser_deletepassword",
-      "target": "js_parsers_pdf_parser_bankpdfparser_deletesavedpassword",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L360",
+      "source_location": "L107",
       "weight": 1.0
     },
     {
@@ -3775,7 +3643,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L361",
+      "source_location": "L365",
+      "weight": 1.0
+    },
+    {
+      "source": "js_parsers_pdf_parser_bankpdfparser_getsavedpassword",
+      "target": "js_parsers_pdf_parser_bankpdfparser_isautofillenabled",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "js/parsers/pdf-parser.js",
+      "source_location": "L259",
       "weight": 1.0
     },
     {
@@ -3787,7 +3667,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L151",
+      "source_location": "L124",
       "weight": 1.0
     },
     {
@@ -3799,19 +3679,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L184",
-      "weight": 1.0
-    },
-    {
-      "source": "js_parsers_pdf_parser_bankpdfparser_savepassword",
-      "target": "js_parsers_pdf_parser_bankpdfparser_savepasswordforbank",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L353",
+      "source_location": "L147",
       "weight": 1.0
     },
     {
@@ -3823,7 +3691,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L355",
+      "source_location": "L291",
       "weight": 1.0
     },
     {
@@ -3848,66 +3716,6 @@
       "context": "call",
       "source_file": "js/pwa.js",
       "source_location": "L69",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync_gmailstatementsyncservice_findpdfpart",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_findpdfpart",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L147",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync_gmailstatementsyncservice_syncstatementsfromgmail",
-      "target": "js_parsers_pdf_parser_bankpdfparser_extractpdftext",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L118",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync_gmailstatementsyncservice_syncstatementsfromgmail",
-      "target": "js_parsers_pdf_parser_bankpdfparser_parsetexttotransactions",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L119",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync_gmailstatementsyncservice_syncstatementsfromgmail",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_requestgoogleaccesstoken",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L47",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync_gmailstatementsyncservice_syncstatementsfromgmail",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_findpdfpart",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L92",
       "weight": 1.0
     },
     {
@@ -3943,7 +3751,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1137",
+      "source_location": "L1002",
       "weight": 1.0
     },
     {
@@ -3955,7 +3763,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1348",
+      "source_location": "L1213",
       "weight": 1.0
     },
     {
@@ -3967,7 +3775,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L422",
+      "source_location": "L403",
       "weight": 1.0
     },
     {
@@ -3979,7 +3787,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L424",
+      "source_location": "L405",
       "weight": 1.0
     },
     {
@@ -3991,7 +3799,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L430",
+      "source_location": "L411",
+      "weight": 1.0
+    },
+    {
+      "source": "js_views_accounts_handlepdffile",
+      "target": "js_parsers_pdf_parser_bankpdfparser_getsavedpassword",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "js/views/accounts.js",
+      "source_location": "L412",
       "weight": 1.0
     },
     {
@@ -4003,7 +3823,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L438",
+      "source_location": "L419",
       "weight": 1.0
     },
     {
@@ -4015,7 +3835,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L448",
+      "source_location": "L429",
       "weight": 1.0
     },
     {
@@ -4027,7 +3847,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L451",
+      "source_location": "L432",
       "weight": 1.0
     },
     {
@@ -4039,7 +3859,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L403",
+      "source_location": "L384",
       "weight": 1.0
     },
     {
@@ -4051,7 +3871,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L409",
+      "source_location": "L390",
       "weight": 1.0
     },
     {
@@ -4063,7 +3883,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1048",
+      "source_location": "L913",
       "weight": 1.0
     },
     {
@@ -4075,7 +3895,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1095",
+      "source_location": "L960",
       "weight": 1.0
     },
     {
@@ -4087,7 +3907,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1241",
+      "source_location": "L1106",
       "weight": 1.0
     },
     {
@@ -4099,7 +3919,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1286",
+      "source_location": "L1151",
       "weight": 1.0
     },
     {
@@ -4111,31 +3931,43 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L1302",
+      "source_location": "L1167",
       "weight": 1.0
     },
     {
-      "source": "js_views_accounts_opengmailsyncmodal",
-      "target": "js_views_accounts_escapehtml",
+      "source": "js_views_accounts_opensetuaamodal",
+      "target": "js_services_setu_aa_setuaccountaggregatorservice_createconsentrequest",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L779",
+      "source_location": "L735",
       "weight": 1.0
     },
     {
-      "source": "js_views_accounts_opengmailsyncmodal",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_syncstatementsfromgmail",
+      "source": "js_views_accounts_opensetuaamodal",
+      "target": "js_services_setu_aa_setuaccountaggregatorservice_verifyconsentotp",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L830",
+      "source_location": "L747",
+      "weight": 1.0
+    },
+    {
+      "source": "js_views_accounts_opensetuaamodal",
+      "target": "js_services_setu_aa_setuaccountaggregatorservice_synclivefinancialdata",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "js/views/accounts.js",
+      "source_location": "L748",
       "weight": 1.0
     },
     {
@@ -4147,7 +3979,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L544",
+      "source_location": "L525",
       "weight": 1.0
     },
     {
@@ -4159,7 +3991,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L551",
+      "source_location": "L532",
       "weight": 1.0
     },
     {
@@ -4171,7 +4003,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L613",
+      "source_location": "L590",
       "weight": 1.0
     },
     {
@@ -4183,7 +4015,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L620",
+      "source_location": "L597",
       "weight": 1.0
     },
     {
@@ -4195,7 +4027,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L470",
+      "source_location": "L451",
       "weight": 1.0
     },
     {
@@ -4207,7 +4039,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L516",
+      "source_location": "L497",
       "weight": 1.0
     },
     {
@@ -4219,7 +4051,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L520",
+      "source_location": "L501",
       "weight": 1.0
     },
     {
@@ -4231,7 +4063,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L523",
+      "source_location": "L504",
       "weight": 1.0
     },
     {
@@ -4243,7 +4075,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L524",
+      "source_location": "L505",
       "weight": 1.0
     },
     {
@@ -4255,7 +4087,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L528",
+      "source_location": "L509",
       "weight": 1.0
     },
     {
@@ -4267,7 +4099,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L532",
+      "source_location": "L513",
+      "weight": 1.0
+    },
+    {
+      "source": "js_views_accounts_renderaccounts",
+      "target": "js_views_accounts_escapehtml",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "js/views/accounts.js",
+      "source_location": "L101",
       "weight": 1.0
     },
     {
@@ -4344,30 +4188,6 @@
     },
     {
       "source": "js_views_accounts_renderaccounts",
-      "target": "js_views_accounts_promptpinauthmodal",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/views/accounts.js",
-      "source_location": "L207",
-      "weight": 1.0
-    },
-    {
-      "source": "js_views_accounts_renderaccounts",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_isweeklysyncdue",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/views/accounts.js",
-      "source_location": "L21",
-      "weight": 1.0
-    },
-    {
-      "source": "js_views_accounts_renderaccounts",
       "target": "js_views_accounts_openeditpasskeymodal",
       "relation": "calls",
       "_origin": "ast",
@@ -4375,7 +4195,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L227",
+      "source_location": "L213",
       "weight": 1.0
     },
     {
@@ -4387,7 +4207,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L227",
+      "source_location": "L213",
       "weight": 1.0
     },
     {
@@ -4399,7 +4219,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L255",
+      "source_location": "L237",
       "weight": 1.0
     },
     {
@@ -4411,7 +4231,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L269",
+      "source_location": "L250",
       "weight": 1.0
     },
     {
@@ -4423,7 +4243,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L285",
+      "source_location": "L266",
       "weight": 1.0
     },
     {
@@ -4435,7 +4255,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L296",
+      "source_location": "L277",
       "weight": 1.0
     },
     {
@@ -4447,19 +4267,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L309",
+      "source_location": "L290",
       "weight": 1.0
     },
     {
       "source": "js_views_accounts_renderaccounts",
-      "target": "js_views_accounts_opengmailsyncmodal",
+      "target": "js_views_accounts_opensetuaamodal",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L333",
+      "source_location": "L314",
       "weight": 1.0
     },
     {
@@ -4471,7 +4291,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L352",
+      "source_location": "L333",
       "weight": 1.0
     },
     {
@@ -4483,31 +4303,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L40",
-      "weight": 1.0
-    },
-    {
-      "source": "js_views_accounts_renderaccounts",
-      "target": "js_views_accounts_escapehtml",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/views/accounts.js",
-      "source_location": "L58",
-      "weight": 1.0
-    },
-    {
-      "source": "js_views_accounts_renderaccounts",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_getlastsynclabel",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "js/views/accounts.js",
-      "source_location": "L61",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -4519,7 +4315,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L366",
+      "source_location": "L347",
       "weight": 1.0
     },
     {
@@ -4531,7 +4327,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/accounts.js",
-      "source_location": "L374",
+      "source_location": "L355",
       "weight": 1.0
     },
     {
@@ -4879,7 +4675,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/login.js",
-      "source_location": "L430",
+      "source_location": "L409",
       "weight": 1.0
     },
     {
@@ -4891,7 +4687,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/login.js",
-      "source_location": "L477",
+      "source_location": "L453",
       "weight": 1.0
     },
     {
@@ -4903,7 +4699,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/login.js",
-      "source_location": "L487",
+      "source_location": "L463",
       "weight": 1.0
     },
     {
@@ -4915,7 +4711,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/login.js",
-      "source_location": "L282",
+      "source_location": "L278",
       "weight": 1.0
     },
     {
@@ -4927,7 +4723,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/login.js",
-      "source_location": "L285",
+      "source_location": "L281",
       "weight": 1.0
     },
     {
@@ -4939,7 +4735,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/login.js",
-      "source_location": "L339",
+      "source_location": "L326",
       "weight": 1.0
     },
     {
@@ -4951,7 +4747,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/views/login.js",
-      "source_location": "L398",
+      "source_location": "L377",
       "weight": 1.0
     },
     {
@@ -5460,30 +5256,6 @@
       "weight": 1.0
     },
     {
-      "source": "js_services_gmail_sync",
-      "target": "js_parsers_pdf_parser_bankpdfparser",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync",
-      "target": "js_db_db",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
       "source": "js_services_setu_aa",
       "target": "js_db_db",
       "relation": "imports",
@@ -5533,7 +5305,7 @@
     },
     {
       "source": "js_views_accounts",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice",
+      "target": "js_services_setu_aa_setuaccountaggregatorservice",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -6216,30 +5988,6 @@
       "weight": 1.0
     },
     {
-      "source": "js_services_gmail_sync",
-      "target": "js_parsers_pdf_parser",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync",
-      "target": "js_db",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
       "source": "js_services_setu_aa",
       "target": "js_db",
       "relation": "imports_from",
@@ -6277,7 +6025,7 @@
     },
     {
       "source": "js_views_accounts",
-      "target": "js_services_gmail_sync",
+      "target": "js_services_setu_aa",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -6776,24 +6524,13 @@
     },
     {
       "source": "js_parsers_categorizer",
-      "target": "js_parsers_categorizer_extractcleanmerchant",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/parsers/categorizer.js",
-      "source_location": "L132",
-      "weight": 1.0
-    },
-    {
-      "source": "js_parsers_categorizer",
       "target": "js_parsers_categorizer_formattitlecase",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/categorizer.js",
-      "source_location": "L179",
+      "source_location": "L122",
       "weight": 1.0
     },
     {
@@ -6804,18 +6541,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/categorizer.js",
-      "source_location": "L187",
-      "weight": 1.0
-    },
-    {
-      "source": "js_parsers_categorizer",
-      "target": "js_parsers_categorizer_category_rules",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/parsers/categorizer.js",
-      "source_location": "L7",
+      "source_location": "L130",
       "weight": 1.0
     },
     {
@@ -6826,7 +6552,29 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/categorizer.js",
-      "source_location": "L93",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "js_parsers_categorizer",
+      "target": "js_parsers_categorizer_category_rules",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "js/parsers/categorizer.js",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "js_parsers_categorizer",
+      "target": "js_parsers_categorizer_extractcleanmerchant",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "js/parsers/categorizer.js",
+      "source_location": "L90",
       "weight": 1.0
     },
     {
@@ -6885,17 +6633,6 @@
       "weight": 1.0
     },
     {
-      "source": "js_services_gmail_sync",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
       "source": "js_services_setu_aa",
       "target": "js_services_setu_aa_setuaccountaggregatorservice",
       "relation": "contains",
@@ -6908,35 +6645,35 @@
     },
     {
       "source": "js_views_accounts",
-      "target": "js_views_accounts_openeditaccountmodal",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/views/accounts.js",
-      "source_location": "L1010",
-      "weight": 1.0
-    },
-    {
-      "source": "js_views_accounts",
-      "target": "js_views_accounts_confirmdeleteaccountmodal",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/views/accounts.js",
-      "source_location": "L1124",
-      "weight": 1.0
-    },
-    {
-      "source": "js_views_accounts",
       "target": "js_views_accounts_openeditpasskeymodal",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/accounts.js",
-      "source_location": "L1203",
+      "source_location": "L1068",
+      "weight": 1.0
+    },
+    {
+      "source": "js_views_accounts",
+      "target": "js_views_accounts_confirmremovepasskeymodal",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "js/views/accounts.js",
+      "source_location": "L1177",
+      "weight": 1.0
+    },
+    {
+      "source": "js_views_accounts",
+      "target": "js_views_accounts_escapehtml",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "js/views/accounts.js",
+      "source_location": "L1223",
       "weight": 1.0
     },
     {
@@ -6952,35 +6689,13 @@
     },
     {
       "source": "js_views_accounts",
-      "target": "js_views_accounts_confirmremovepasskeymodal",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/views/accounts.js",
-      "source_location": "L1312",
-      "weight": 1.0
-    },
-    {
-      "source": "js_views_accounts",
-      "target": "js_views_accounts_escapehtml",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/views/accounts.js",
-      "source_location": "L1358",
-      "weight": 1.0
-    },
-    {
-      "source": "js_views_accounts",
       "target": "js_views_accounts_renderbankcardhtml",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/accounts.js",
-      "source_location": "L363",
+      "source_location": "L344",
       "weight": 1.0
     },
     {
@@ -6991,7 +6706,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/accounts.js",
-      "source_location": "L399",
+      "source_location": "L380",
       "weight": 1.0
     },
     {
@@ -7002,7 +6717,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/accounts.js",
-      "source_location": "L418",
+      "source_location": "L399",
       "weight": 1.0
     },
     {
@@ -7013,7 +6728,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/accounts.js",
-      "source_location": "L457",
+      "source_location": "L438",
       "weight": 1.0
     },
     {
@@ -7024,7 +6739,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/accounts.js",
-      "source_location": "L542",
+      "source_location": "L523",
       "weight": 1.0
     },
     {
@@ -7035,29 +6750,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/accounts.js",
-      "source_location": "L611",
+      "source_location": "L588",
       "weight": 1.0
     },
     {
       "source": "js_views_accounts",
-      "target": "js_views_accounts_promptpinauthmodal",
+      "target": "js_views_accounts_opensetuaamodal",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/accounts.js",
-      "source_location": "L689",
-      "weight": 1.0
-    },
-    {
-      "source": "js_views_accounts",
-      "target": "js_views_accounts_opengmailsyncmodal",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/views/accounts.js",
-      "source_location": "L755",
+      "source_location": "L665",
       "weight": 1.0
     },
     {
@@ -7068,7 +6772,29 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/accounts.js",
-      "source_location": "L899",
+      "source_location": "L764",
+      "weight": 1.0
+    },
+    {
+      "source": "js_views_accounts",
+      "target": "js_views_accounts_openeditaccountmodal",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "js/views/accounts.js",
+      "source_location": "L875",
+      "weight": 1.0
+    },
+    {
+      "source": "js_views_accounts",
+      "target": "js_views_accounts_confirmdeleteaccountmodal",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "js/views/accounts.js",
+      "source_location": "L989",
       "weight": 1.0
     },
     {
@@ -7222,7 +6948,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/login.js",
-      "source_location": "L412",
+      "source_location": "L391",
       "weight": 1.0
     },
     {
@@ -7233,7 +6959,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/views/login.js",
-      "source_location": "L511",
+      "source_location": "L483",
       "weight": 1.0
     },
     {
@@ -8384,7 +8110,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L17",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -8395,7 +8121,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L211",
+      "source_location": "L173",
       "weight": 1.0
     },
     {
@@ -8406,7 +8132,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L240",
+      "source_location": "L202",
       "weight": 1.0
     },
     {
@@ -8417,7 +8143,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L258",
+      "source_location": "L220",
       "weight": 1.0
     },
     {
@@ -8428,51 +8154,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L275",
+      "source_location": "L237",
       "weight": 1.0
     },
     {
       "source": "js_parsers_pdf_parser_bankpdfparser",
-      "target": "js_parsers_pdf_parser_bankpdfparser_setprimarybank",
+      "target": "js_parsers_pdf_parser_bankpdfparser_getsavedpassword",
       "relation": "method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L289",
-      "weight": 1.0
-    },
-    {
-      "source": "js_parsers_pdf_parser_bankpdfparser",
-      "target": "js_parsers_pdf_parser_bankpdfparser_getsavedpasswordraw",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L305",
-      "weight": 1.0
-    },
-    {
-      "source": "js_parsers_pdf_parser_bankpdfparser",
-      "target": "js_parsers_pdf_parser_bankpdfparser_savepasswordforbank",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L321",
-      "weight": 1.0
-    },
-    {
-      "source": "js_parsers_pdf_parser_bankpdfparser",
-      "target": "js_parsers_pdf_parser_bankpdfparser_deletesavedpassword",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L338",
+      "source_location": "L251",
       "weight": 1.0
     },
     {
@@ -8483,7 +8176,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L352",
+      "source_location": "L282",
+      "weight": 1.0
+    },
+    {
+      "source": "js_parsers_pdf_parser_bankpdfparser",
+      "target": "js_parsers_pdf_parser_bankpdfparser_getsavedpasswordraw",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "js/parsers/pdf-parser.js",
+      "source_location": "L306",
       "weight": 1.0
     },
     {
@@ -8494,7 +8198,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L359",
+      "source_location": "L340",
       "weight": 1.0
     },
     {
@@ -8505,62 +8209,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L80",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync_gmailstatementsyncservice",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_findpdfpart",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L137",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync_gmailstatementsyncservice",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_isweeklysyncdue",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync_gmailstatementsyncservice",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_requestgoogleaccesstoken",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L157",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync_gmailstatementsyncservice",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_getlastsynclabel",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L25",
-      "weight": 1.0
-    },
-    {
-      "source": "js_services_gmail_sync_gmailstatementsyncservice",
-      "target": "js_services_gmail_sync_gmailstatementsyncservice_syncstatementsfromgmail",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L39",
+      "source_location": "L74",
       "weight": 1.0
     },
     {

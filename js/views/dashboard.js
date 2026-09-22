@@ -1,12 +1,15 @@
 /**
- * Dashboard View
- * Total net worth, monthly cashflow, spending breakdown chart, and recent activity.
+ * Dashboard View - SBAFA Financial Enclave
+ * Total net worth, period cashflow, intelligent spending sectionization,
+ * interactive category breakdown bars, and recent activity.
  */
 
 import { db, formatINR, getCurrentUser, getUserAccounts, getUserTransactions } from '../db.js';
 import { BiometricAuthService } from '../auth.js';
+import { getCategoryMeta } from '../parsers/categorizer.js';
 
 let chartInstance = null;
+let currentPeriodFilter = 'auto'; // 'auto' | 'month' | 'all'
 
 export async function renderDashboard(container) {
   const isPrivacy = await BiometricAuthService.getPrivacyMode();
@@ -17,26 +20,77 @@ export async function renderDashboard(container) {
   const accounts = userId ? await getUserAccounts(userId) : [];
   const totalBalance = accounts.reduce((acc, a) => acc + (a.balance || 0), 0);
 
-  // Fetch this month's transactions for this user (empty if logged out)
+  // Fetch all transactions for this user
+  const allTxns = userId ? await getUserTransactions(userId) : [];
   const now = new Date();
   const currentMonthPrefix = now.toISOString().slice(0, 7); // YYYY-MM
-  const allTxns = userId ? await getUserTransactions(userId) : [];
   const monthTxns = allTxns.filter(t => t.date && t.date.startsWith(currentMonthPrefix));
 
-  let monthIncome = 0;
-  let monthExpense = 0;
-  const categoryTotals = {};
+  // Determine active transactions based on period filter
+  let activeTxns = [];
+  let periodLabel = 'This Month';
 
-  for (const t of monthTxns) {
-    if (t.type === 'income') {
-      monthIncome += Number(t.amount) || 0;
+  if (currentPeriodFilter === 'month') {
+    activeTxns = monthTxns;
+    periodLabel = 'This Month (' + now.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) + ')';
+  } else if (currentPeriodFilter === 'all') {
+    activeTxns = allTxns;
+    periodLabel = 'All Time (' + allTxns.length + ' entries)';
+  } else {
+    // 'auto' mode: If current month has records, use current month.
+    // If current month is empty but statements/past transactions exist, auto-select all records
+    if (monthTxns.length > 0) {
+      activeTxns = monthTxns;
+      periodLabel = 'This Month (' + now.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) + ')';
+    } else if (allTxns.length > 0) {
+      activeTxns = allTxns;
+      // Identify latest transaction date for label
+      const sortedDates = [...allTxns].filter(t => t.date).sort((a, b) => b.date.localeCompare(a.date));
+      const latestDate = sortedDates[0]?.date ? new Date(sortedDates[0].date) : now;
+      const latestMonthStr = latestDate.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+      periodLabel = `Statement Activity (${latestMonthStr} / All)`;
     } else {
-      const amt = Number(t.amount) || 0;
-      monthExpense += amt;
-      const cat = t.category || 'Other';
-      categoryTotals[cat] = (categoryTotals[cat] || 0) + amt;
+      activeTxns = [];
+      periodLabel = 'This Month';
     }
   }
+
+  // Calculate Cashflow & Category Breakdown for active period
+  let periodIncome = 0;
+  let periodExpense = 0;
+  const categoryMap = {};
+
+  for (const t of activeTxns) {
+    const amt = Number(t.amount) || 0;
+    if (t.type === 'income') {
+      periodIncome += amt;
+    } else {
+      periodExpense += amt;
+      const catName = t.category || 'Other';
+      if (!categoryMap[catName]) {
+        categoryMap[catName] = {
+          category: catName,
+          amount: 0,
+          count: 0
+        };
+      }
+      categoryMap[catName].amount += amt;
+      categoryMap[catName].count += 1;
+    }
+  }
+
+  // Build sorted sectionized category list
+  const categorySections = Object.values(categoryMap)
+    .map(c => {
+      const meta = getCategoryMeta(c.category);
+      const percent = periodExpense > 0 ? (c.amount / periodExpense) * 100 : 0;
+      return {
+        ...c,
+        meta,
+        percent: Math.round(percent * 10) / 10
+      };
+    })
+    .sort((a, b) => b.amount - a.amount);
 
   // Recent 5 transactions
   const recentTxns = allTxns
@@ -44,8 +98,8 @@ export async function renderDashboard(container) {
     .slice(0, 5);
 
   const displayBalance = isPrivacy ? '••••••••' : formatINR(totalBalance);
-  const displayIncome = isPrivacy ? '••••••' : formatINR(monthIncome);
-  const displayExpense = isPrivacy ? '••••••' : formatINR(monthExpense);
+  const displayIncome = isPrivacy ? '••••••' : formatINR(periodIncome);
+  const displayExpense = isPrivacy ? '••••••' : formatINR(periodExpense);
 
   container.innerHTML = `
     ${!user ? `
@@ -75,14 +129,14 @@ export async function renderDashboard(container) {
         <div class="cashflow-item">
           <span class="cashflow-label">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-            This Month Income
+            Period Inflow
           </span>
           <span class="cashflow-value cashflow-income">${displayIncome}</span>
         </div>
         <div class="cashflow-item">
           <span class="cashflow-label">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
-            This Month Spent
+            Period Outflow
           </span>
           <span class="cashflow-value cashflow-expense">${displayExpense}</span>
         </div>
@@ -97,18 +151,21 @@ export async function renderDashboard(container) {
         </div>
         <span class="quick-action-label">Log Spend</span>
       </button>
-      <button class="quick-action-btn" data-action="aa-sync">
+
+      <button class="quick-action-btn" data-action="statements">
         <div class="quick-action-icon" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
         </div>
-        <span class="quick-action-label">AA Sync</span>
+        <span class="quick-action-label">Statements</span>
       </button>
-      <button class="quick-action-btn" data-action="upload-csv">
-        <div class="quick-action-icon" style="background: rgba(139, 92, 246, 0.15); color: #8B5CF6;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+
+      <button class="quick-action-btn" data-action="gmail-sync">
+        <div class="quick-action-icon" style="background: rgba(234, 67, 53, 0.15); color: #EA4335;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
-        <span class="quick-action-label">Upload CSV</span>
+        <span class="quick-action-label">Gmail Sync</span>
       </button>
+
       <button class="quick-action-btn" data-action="budgets">
         <div class="quick-action-icon" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -117,14 +174,62 @@ export async function renderDashboard(container) {
       </button>
     </div>
 
-    <!-- Monthly Spending Breakdown Chart -->
+    <!-- Spending Sectionization & Category Breakdown Card -->
     <div class="card chart-card">
-      <div class="section-header">
-        <h3 class="section-title">Spending by Category</h3>
-        <span class="badge badge-emerald">This Month</span>
+      <div class="spending-period-bar">
+        <div>
+          <h3 class="section-title">Spending Breakdown</h3>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+            ${escapeHtml(periodLabel)}
+          </div>
+        </div>
+
+        <div class="spending-period-tabs">
+          <button type="button" class="spending-period-btn ${currentPeriodFilter === 'auto' ? 'active' : ''}" data-period="auto">
+            Auto
+          </button>
+          <button type="button" class="spending-period-btn ${currentPeriodFilter === 'month' ? 'active' : ''}" data-period="month">
+            This Month
+          </button>
+          <button type="button" class="spending-period-btn ${currentPeriodFilter === 'all' ? 'active' : ''}" data-period="all">
+            All Time
+          </button>
+        </div>
       </div>
+
+      <!-- Donut Visual Chart -->
       <div class="chart-container">
         <canvas id="categoryChart" width="340" height="190"></canvas>
+      </div>
+
+      <!-- Sectionized Category Progress List (Modern Fintech View) -->
+      <div class="spending-breakdown-list">
+        ${categorySections.length === 0 ? `
+          <div style="text-align: center; color: var(--text-muted); font-size: var(--text-xs); padding: 16px;">
+            No spending recorded for this period.
+          </div>
+        ` : categorySections.map(c => `
+          <div class="spending-cat-row" data-category="${escapeHtml(c.category)}" title="Filter ledger by ${escapeHtml(c.category)}">
+            <div class="spending-cat-header">
+              <div class="spending-cat-identity">
+                <div class="spending-cat-icon" style="background: ${c.meta.bg}; color: ${c.meta.color};">
+                  ${c.meta.icon}
+                </div>
+                <div>
+                  <div class="spending-cat-title">${escapeHtml(c.category)}</div>
+                  <div class="spending-cat-count">${c.count} ${c.count === 1 ? 'transaction' : 'transactions'}</div>
+                </div>
+              </div>
+              <div class="spending-cat-figures">
+                <div class="spending-cat-amount">${isPrivacy ? '••••' : formatINR(c.amount)}</div>
+                <div class="spending-cat-percent">${c.percent}%</div>
+              </div>
+            </div>
+            <div class="spending-progress-track">
+              <div class="spending-progress-fill" style="width: ${Math.min(100, Math.max(4, c.percent))}%; background: ${c.meta.color};"></div>
+            </div>
+          </div>
+        `).join('')}
       </div>
     </div>
 
@@ -158,8 +263,26 @@ export async function renderDashboard(container) {
     btn.onclick = () => {
       const action = btn.dataset.action;
       if (action === 'add') window.location.hash = '#/add';
-      else if (action === 'aa-sync' || action === 'upload-csv') window.location.hash = '#/accounts';
+      else if (action === 'statements' || action === 'gmail-sync') window.location.hash = '#/accounts';
       else if (action === 'budgets') window.location.hash = '#/budgets';
+    };
+  });
+
+  // Period filter tabs
+  container.querySelectorAll('.spending-period-btn').forEach(btn => {
+    btn.onclick = () => {
+      currentPeriodFilter = btn.dataset.period;
+      renderDashboard(container);
+    };
+  });
+
+  // Clicking category row filters ledger to that category
+  container.querySelectorAll('.spending-cat-row').forEach(row => {
+    row.onclick = () => {
+      const cat = row.dataset.category;
+      if (cat) {
+        window.location.hash = `#/transactions?category=${encodeURIComponent(cat)}`;
+      }
     };
   });
 
@@ -169,28 +292,17 @@ export async function renderDashboard(container) {
   }
 
   // Initialize Category Breakdown Chart
-  initSpendingChart(categoryTotals);
+  initSpendingChart(categorySections);
 }
 
 function renderTxnItemHtml(t, isPrivacy) {
   const isExp = t.type === 'expense';
   const displayAmt = isPrivacy ? '••••' : (isExp ? '-' : '+') + formatINR(t.amount);
-  const iconMap = {
-    Dining: '🍔',
-    Groceries: '🛒',
-    Shopping: '🛍️',
-    Investments: '📈',
-    Transport: '🚗',
-    Utilities: '⚡',
-    Entertainment: '🍿',
-    Salary: '💼',
-    Health: '💊'
-  };
-  const icon = iconMap[t.category] || '💳';
+  const meta = getCategoryMeta(t.category);
 
   return `
     <div class="txn-item">
-      <div class="txn-icon">${icon}</div>
+      <div class="txn-icon" style="background: ${meta.bg}; color: ${meta.color};">${meta.icon}</div>
       <div class="txn-details">
         <div class="txn-merchant">${escapeHtml(t.merchant || t.category || 'Transaction')}</div>
         <div class="txn-meta">
@@ -210,22 +322,20 @@ function renderTxnItemHtml(t, isPrivacy) {
   `;
 }
 
-function initSpendingChart(categoryTotals) {
+function initSpendingChart(categorySections) {
   const canvas = document.getElementById('categoryChart');
   if (!canvas) return;
 
-  const labels = Object.keys(categoryTotals);
-  const data = Object.values(categoryTotals);
+  const labels = categorySections.map(c => c.category);
+  const data = categorySections.map(c => c.amount);
+  const colors = categorySections.map(c => c.meta.color);
 
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
   const isEmpty = labels.length === 0 || data.every(v => v === 0);
   const chartLabels = isEmpty ? ['No Expenses (₹0)'] : labels;
   const chartData = isEmpty ? [1] : data;
-  const chartColors = isEmpty ? [isLight ? '#E2E8F0' : '#1E293B'] : [
-    '#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#F43F5E', '#06B6D4', '#EC4899'
-  ];
+  const chartColors = isEmpty ? [isLight ? '#E2E8F0' : '#1E293B'] : colors;
 
-  // Check if Chart.js is loaded
   if (window.Chart) {
     if (chartInstance) chartInstance.destroy();
 
@@ -265,74 +375,49 @@ function initSpendingChart(categoryTotals) {
       }
     });
   } else {
-    // Fallback Canvas Donut renderer if Chart.js CDN is unavailable
     renderCanvasDonutFallback(canvas, chartLabels, chartData, isEmpty);
   }
 }
 
-function renderCanvasDonutFallback(canvas, labels, data, isEmpty = false) {
+function renderCanvasDonutFallback(canvas, labels, data, isEmpty) {
   const ctx = canvas.getContext('2d');
-  const width = canvas.width;
-  const height = canvas.height;
-  const centerX = width * 0.35;
-  const centerY = height * 0.5;
-  const radius = Math.min(width, height) * 0.4;
-  const innerRadius = radius * 0.65;
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
 
-  ctx.clearRect(0, 0, width, height);
+  const cx = w / 2;
+  const cy = h / 2;
+  const radius = Math.min(cx, cy) - 20;
+  const innerRadius = radius * 0.7;
 
   if (isEmpty) {
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-    ctx.arc(centerX, centerY, innerRadius, 2 * Math.PI, 0, true);
-    ctx.closePath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.arc(cx, cy, innerRadius, Math.PI * 2, 0, true);
     ctx.fillStyle = '#1E293B';
     ctx.fill();
-
-    ctx.font = 'bold 12px sans-serif';
-    ctx.fillStyle = '#64748B';
-    ctx.textAlign = 'center';
-    ctx.fillText('₹0', centerX, centerY + 4);
-
-    ctx.font = '11px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#1E293B';
-    ctx.fillRect(width * 0.68, 80, 8, 8);
-    ctx.fillStyle = '#94A3B8';
-    ctx.fillText('No Expenses (₹0)', width * 0.68 + 14, 88);
     return;
   }
 
-  const total = data.reduce((a, b) => a + b, 0) || 1;
-  const colors = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#F43F5E', '#06B6D4', '#EC4899'];
+  const total = data.reduce((a, b) => a + b, 0);
   let startAngle = -Math.PI / 2;
+  const colors = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#F43F5E', '#06B6D4', '#EC4899'];
 
   data.forEach((val, i) => {
-    const sliceAngle = (val / total) * 2 * Math.PI;
+    const sliceAngle = (val / total) * Math.PI * 2;
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
-    ctx.arc(centerX, centerY, innerRadius, startAngle + sliceAngle, startAngle, true);
-    ctx.closePath();
+    ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+    ctx.arc(cx, cy, innerRadius, startAngle + sliceAngle, startAngle, true);
     ctx.fillStyle = colors[i % colors.length];
     ctx.fill();
     startAngle += sliceAngle;
   });
-
-  // Render text legend on the right
-  ctx.font = '11px sans-serif';
-  ctx.textAlign = 'left';
-  labels.slice(0, 5).forEach((label, i) => {
-    const y = 30 + i * 26;
-    ctx.fillStyle = colors[i % colors.length];
-    ctx.fillRect(width * 0.68, y - 9, 8, 8);
-    ctx.fillStyle = '#94A3B8';
-    ctx.fillText(`${label} (${formatINR(data[i], true)})`, width * 0.68 + 14, y);
-  });
 }
 
 function escapeHtml(str) {
-  return String(str)
+  return String(str || '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }

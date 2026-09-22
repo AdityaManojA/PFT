@@ -4,7 +4,7 @@
  * and Background Sync queue for offline expense logging.
  */
 
-const CACHE_NAME = 'sbafa-v1.9.0';
+const CACHE_NAME = 'sbafa-v2.9.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -16,11 +16,12 @@ const STATIC_ASSETS = [
   './js/app.js',
   './js/db.js',
   './js/auth.js',
+  './js/firebase-config.js',
   './js/pwa.js',
   './js/parsers/bank-parser.js',
   './js/parsers/categorizer.js',
   './js/parsers/pdf-parser.js',
-  './js/services/setu-aa.js',
+  './js/services/gmail-sync.js',
   './js/views/landing.js',
   './js/views/dashboard.js',
   './js/views/transactions.js',
@@ -29,10 +30,7 @@ const STATIC_ASSETS = [
   './js/views/budgets.js',
   './js/views/login.js',
   './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/apple-touch-icon.png',
-  './icons/add-icon.png',
-  './icons/icon.svg'
+  './icons/icon-512.png'
 ];
 
 // External vendor libraries (Dexie.js, PapaParse, Chart.js, PDF.js, Google GSI) cached with CacheFirst
@@ -41,8 +39,7 @@ const VENDOR_URLS = [
   'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
-  'https://accounts.google.com/gsi/client'
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
 ];
 
 // Install Event: Pre-cache app shell and core assets
