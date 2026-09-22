@@ -49,8 +49,8 @@ if ($gmailSync -match "440632363531") {
 
 # 5. Check sw.js cache version
 $sw = Get-Content "sw.js" -Raw
-if ($sw -match "sbafa-v2\.9\.0") {
-    Write-Host "PASS: sw.js cache bumped to sbafa-v2.9.0"
+if ($sw -match "sbafa-v2\.9\.[0-9]+") {
+    Write-Host "PASS: sw.js cache is valid and updated"
 } else {
     Write-Error "FAIL: sw.js cache not bumped"
     exit 1

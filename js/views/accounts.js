@@ -4,11 +4,12 @@
  * and automated weekly Gmail statement sync with zero third-party telemetry.
  */
 
-import { db, formatINR, getCurrentUser, getUserAccounts } from '../db.js';
+import { db, formatINR, getCurrentUser, getUserAccounts, purgeAllTestData, resetUserData, addNotification } from '../db.js';
 import { BiometricAuthService } from '../auth.js';
 import { BankStatementParser } from '../parsers/bank-parser.js';
 import { BankPDFParser } from '../parsers/pdf-parser.js';
 import { GmailStatementSyncService } from '../services/gmail-sync.js';
+import { checkSpendingCaps } from '../services/notification-center.js';
 
 export async function renderAccounts(container, showToastCallback) {
   const isPrivacy = await BiometricAuthService.getPrivacyMode();
@@ -32,7 +33,7 @@ export async function renderAccounts(container, showToastCallback) {
           ${!user ? 'Sign in to access your connected banks and balances.' : 'Add your primary savings, current, or cash wallet using the button below.'}
         </p>
         <button id="empty-add-account-btn" class="btn btn-primary btn-sm">
-          ${!user ? 'Sign In' : '+ Add Bank Account'}
+          ${!user ? 'Sign In' : 'Add Bank Account'}
         </button>
       </div>
     `;
@@ -184,6 +185,27 @@ export async function renderAccounts(container, showToastCallback) {
           Auto-decrypted using your saved statement passkey. 100% private on your device.
         </div>
         <input type="file" id="statement-file-input" accept="application/pdf,.pdf,.csv,text/csv" style="display: none;" />
+      </div>
+    </div>
+
+    <!-- Reset Full Account (Fresh Statement Ready) -->
+    <div class="card" style="margin-bottom: 24px; border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(135deg, rgba(239, 68, 68, 0.06) 0%, rgba(239, 68, 68, 0.02) 100%);">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+        <div style="max-width: 500px;">
+          <div style="font-size: var(--text-sm); font-weight: 700; color: var(--signal-expense); display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.15rem;">⚠️</span> Reset Full Account (Fresh Statement Ready)
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">
+            Permanently wipes all bank accounts, transactions, balances, and budgets so you can upload a fresh statement from scratch. Your login profile, statement passkey, and 6-digit PIN remain securely saved.
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          ${user ? `
+            <button id="reset-vault-data-btn" class="btn btn-danger btn-sm" style="font-size: 12px; padding: 9px 18px; font-weight: 700; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(239, 68, 68, 0.35);">
+              <span>💥</span> Reset Full Account
+            </button>
+          ` : ''}
+        </div>
       </div>
     </div>
   `;
@@ -360,6 +382,19 @@ export async function renderAccounts(container, showToastCallback) {
       handleUploadedFile(selected, showToastCallback, () => renderAccounts(container, showToastCallback));
     }
   };
+
+  // --- Reset All Vault Data Button Handler (PIN-Gated) ---
+  const resetBtn = container.querySelector('#reset-vault-data-btn');
+  if (resetBtn && user) {
+    resetBtn.onclick = () => {
+      promptPinAuthModal(user, 'permanently reset your full account and purge all data for a fresh start', async () => {
+        await resetUserData(userId);
+        localStorage.removeItem('sbafa_last_gmail_sync');
+        showToastCallback('Full account reset complete. All data cleared — ready for a fresh statement!', 'success');
+        renderAccounts(container, showToastCallback);
+      });
+    };
+  }
 }
 
 function renderBankCardHtml(acc, isPrivacy) {
@@ -625,6 +660,17 @@ async function parseAndIngestPdfText(pdfText, showToast, refreshCallback) {
     }));
     await db.transactions.bulkAdd(tagged);
     const balMsg = result.availableBalance != null ? ` • Balance: ₹${result.availableBalance.toFixed(2)}` : '';
+
+    // Create In-App Notification and check spending caps
+    await addNotification(userId, {
+      title: `Statement Ingested: ${matchedAccount.bankName}`,
+      message: `Extracted ${result.totalParsed} transactions from statement.${balMsg}`,
+      type: 'sync',
+      actionUrl: '#/transactions',
+      actionLabel: 'View Ledger'
+    });
+    await checkSpendingCaps(userId);
+
     showToast(
       `Successfully ingested ${result.totalParsed} transactions (${result.formatDetected}) into ${matchedAccount.bankName}${balMsg}!`,
       'success'
@@ -698,6 +744,16 @@ async function processCsvText(csvText, targetAccId, showToast, refreshCallback) 
     }));
     await db.transactions.bulkAdd(tagged);
 
+    // Create In-App Notification and check spending caps
+    await addNotification(userId, {
+      title: `CSV Statement Ingested: ${matchedAccount.bankName}`,
+      message: `Ingested ${parseResult.totalParsed} transactions into ${matchedAccount.bankName}.`,
+      type: 'sync',
+      actionUrl: '#/transactions',
+      actionLabel: 'View Ledger'
+    });
+    await checkSpendingCaps(userId);
+
     showToast(
       `Successfully ingested ${parseResult.totalParsed} transactions (${parseResult.formatDetected}) into ${matchedAccount.bankName}!`,
       'success'
@@ -714,23 +770,25 @@ async function processCsvText(csvText, targetAccId, showToast, refreshCallback) 
  * Custom In-App 6-Digit PIN Security Verification Modal
  * Uses design system tokens and inline custom error display (no native browser alert).
  */
-function promptPinAuthModal(user, actionTitle, onSuccess) {
+export function promptPinAuthModal(user, actionTitle, onSuccess) {
   const modalContainer = document.getElementById('global-modal-container');
   if (!modalContainer) return;
 
-  if (!user || !user.pin) {
-    if (onSuccess) onSuccess();
+  if (!user) {
+    window.location.hash = '#/login';
     return;
   }
+
+  const hasPin = Boolean(user.pin && String(user.pin).trim().length === 6);
 
   modalContainer.innerHTML = `
     <div class="modal-backdrop active" id="pin-auth-backdrop">
       <div class="modal-sheet" style="max-width: 390px; text-align: center;">
         <div class="sheet-handle"></div>
-        <div style="font-size: 2rem; margin-bottom: 8px;">🔐</div>
-        <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text-primary);">Security Verification</h3>
-        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-top: 4px; margin-bottom: 16px;">
-          Enter your 6-digit PIN to ${actionTitle}.
+        <div style="font-size: 2.2rem; margin-bottom: 8px;">🔐</div>
+        <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text-primary);">Security PIN Verification</h3>
+        <p style="font-size: var(--text-xs); color: var(--text-muted); margin-top: 4px; margin-bottom: 16px; line-height: 1.4;">
+          ${hasPin ? `Enter your 6-digit PIN to ${actionTitle}.` : `Set your 6-digit security PIN to authorize this sensitive action.`}
         </p>
 
         <!-- Custom In-App Error Banner -->
@@ -739,12 +797,12 @@ function promptPinAuthModal(user, actionTitle, onSuccess) {
 
         <form id="pin-auth-form">
           <div class="form-group" style="margin-bottom: 18px;">
-            <input type="password" id="pin-auth-input" class="form-input" maxlength="6" placeholder="••••••" style="letter-spacing: 8px; font-size: 1.4rem; text-align: center; font-weight: 700;" required autofocus />
+            <input type="password" id="pin-auth-input" class="form-input" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" placeholder="••••••" style="letter-spacing: 8px; font-size: 1.4rem; text-align: center; font-weight: 700;" required autofocus />
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
             <button type="button" id="pin-auth-cancel-btn" class="btn btn-secondary">Cancel</button>
-            <button type="submit" id="pin-auth-submit-btn" class="btn btn-primary">Verify PIN →</button>
+            <button type="submit" id="pin-auth-submit-btn" class="btn btn-primary">Authorize Action →</button>
           </div>
         </form>
       </div>
@@ -760,9 +818,24 @@ function promptPinAuthModal(user, actionTitle, onSuccess) {
     modalContainer.innerHTML = '';
   };
 
-  form.onsubmit = (e) => {
+  form.onsubmit = async (e) => {
     e.preventDefault();
     const entered = input.value.trim();
+
+    if (!/^\d{6}$/.test(entered)) {
+      errorDiv.innerText = 'PIN must be exactly 6 digits.';
+      errorDiv.style.display = 'block';
+      return;
+    }
+
+    if (!hasPin) {
+      // First time PIN setup on account
+      user.pin = entered;
+      await db.users.update(user.id, { pin: entered });
+      modalContainer.innerHTML = '';
+      if (onSuccess) onSuccess();
+      return;
+    }
 
     if (String(user.pin).trim() === entered) {
       modalContainer.innerHTML = '';
@@ -915,7 +988,27 @@ function openGmailSyncModal(userId, userBank, savedPasskey, showToast, refreshCa
     } catch (err) {
       progressBox.style.display = 'none';
       syncBtn.disabled = false;
-      errorDiv.innerText = err.message || 'Failed to sync from Gmail.';
+      const msg = err.message || 'Failed to sync from Gmail.';
+      if (msg.includes('403') || msg.includes('not enabled') || msg.includes('permission denied')) {
+        errorDiv.innerHTML = `
+          <div style="font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+            <span>⚠️</span> Gmail API Permission / Activation Needed (403)
+          </div>
+          <div style="margin-bottom: 8px; line-height: 1.4; color: var(--text-secondary);">
+            ${escapeHtml(msg)}
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
+            <a href="https://console.cloud.google.com/apis/library/gmail.googleapis.com?project=sbafa-ft" target="_blank" rel="noopener noreferrer" style="color: var(--accent-blue); text-decoration: underline; font-weight: 600;">
+              🔗 Step 1: Enable Gmail API in Google Cloud Console →
+            </a>
+            <a href="https://console.cloud.google.com/apis/credentials/consent?project=sbafa-ft" target="_blank" rel="noopener noreferrer" style="color: var(--accent-blue); text-decoration: underline; font-weight: 600;">
+              🔗 Step 2: Add your email to "Test users" in OAuth Consent Screen →
+            </a>
+          </div>
+        `;
+      } else {
+        errorDiv.innerText = msg;
+      }
       errorDiv.style.display = 'block';
     }
   };
@@ -934,7 +1027,9 @@ function openAddAccountModal(userId, showToast, refreshCallback) {
         <div class="sheet-handle"></div>
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent-emerald), #059669); display: flex; align-items: center; justify-content: center; font-size: 16px; color: white;">+</div>
+            <div style="width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, var(--accent-emerald), #059669); display: flex; align-items: center; justify-content: center; color: white;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 3l9 7H3z"/></svg>
+            </div>
             <span style="font-size: var(--text-base); font-weight: 700;">Add Bank Account</span>
           </div>
           <button id="add-acc-close-btn" class="btn-icon btn-ghost btn-sm" aria-label="Close">✕</button>
@@ -1388,4 +1483,8 @@ function escapeHtml(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+if (typeof window !== 'undefined') {
+  window.promptPinAuthModal = promptPinAuthModal;
 }

@@ -5,6 +5,7 @@
 
 import { db, addTransaction, getCurrentUser, getUserAccounts } from '../db.js';
 import { ALL_CATEGORIES } from '../parsers/categorizer.js';
+import { checkSpendingCaps } from '../services/notification-center.js';
 
 let activeType = 'expense';
 let activeCategory = 'Dining';
@@ -147,6 +148,9 @@ export async function renderAddExpense(container, showToastCallback) {
       date: dateVal,
       account_id: accountId
     });
+
+    // Check spending caps and trigger alert if breached
+    await checkSpendingCaps(userId);
 
     const isOnline = navigator.onLine;
     if (showToastCallback) {

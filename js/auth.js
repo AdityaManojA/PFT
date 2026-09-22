@@ -333,9 +333,6 @@ export class FirebaseAuthService {
                 <button type="submit" class="btn btn-primary btn-block">
                   Save & Sign In with Google →
                 </button>
-                <button type="button" id="firebase-demo-fallback-btn" class="btn btn-secondary btn-block" style="font-size: 12px;">
-                  ⚡ Quick Test with Local Google Profile
-                </button>
                 <button type="button" id="firebase-cancel-btn" class="btn btn-outline btn-block" style="font-size: 12px;">
                   Cancel
                 </button>
@@ -349,7 +346,6 @@ export class FirebaseAuthService {
       const cancelBtn = document.getElementById('firebase-cancel-btn');
       const backdrop = document.getElementById('firebase-config-backdrop');
       const form = document.getElementById('firebase-config-form');
-      const demoBtn = document.getElementById('firebase-demo-fallback-btn');
       const modalErr = document.getElementById('firebase-config-error');
 
       cancelBtn.onclick = () => { cleanup(); resolve(null); };
@@ -358,17 +354,6 @@ export class FirebaseAuthService {
           cleanup();
           resolve(null);
         }
-      };
-
-      demoBtn.onclick = () => {
-        cleanup();
-        resolve({
-          name: 'Demo Google User',
-          email: 'demo.user@gmail.com',
-          picture: '',
-          authProvider: 'local-google',
-          uid: 'google-demo-' + Math.random().toString(36).substring(2, 8)
-        });
       };
 
       form.onsubmit = (e) => {

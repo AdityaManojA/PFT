@@ -3,7 +3,7 @@
   "1": "accounts.js",
   "2": "AppCoordinator",
   "3": "dashboard.js",
-  "4": "categorizeTransaction",
+  "4": "categorizer.js",
   "5": "manifest.json",
   "6": "package.json",
   "7": "email_pdf_streamline.py",
@@ -17,6 +17,8 @@
   "15": "Design Scout",
   "16": "pwa_maker_skill_finance_tracker.md",
   "17": "auth.js",
-  "18": "createParticleMesh",
-  "19": "Graphify + Antigravity Project Workflow & Setup Guide"
+  "18": "getCurrentUser",
+  "19": "Graphify + Antigravity Project Workflow & Setup Guide",
+  "20": "security_check.ps1",
+  "21": "verify.ps1"
 }

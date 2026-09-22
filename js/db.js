@@ -21,6 +21,9 @@ class AppDatabase extends DexieClass {
       budgets: 'id, userId, category, monthlyLimit, spent',
       settings: 'key, userId'
     });
+    this.version(2).stores({
+      notifications: '++id, userId, type, date, read, createdAt'
+    });
   }
 }
 
@@ -188,38 +191,104 @@ export async function registerUser(name, email, pin, bankSettings = {}) {
   return newUser;
 }
 
-// Purge all test data and placeholder accounts from database
+// Purge all test data, demo users, and placeholder accounts from database
 export async function purgeAllTestData() {
   try {
-    // Clear all test accounts and transactions
-    const testAccountIds = ['acc-hdfc', 'acc-federal', 'acc-icici', 'acc-sbi', 'acc-1', 'acc-2'];
+    // 1. Purge mock / demo / test users
+    const allUsers = await db.users.toArray();
+    for (const u of allUsers) {
+      const isTestUser = !u.id ||
+        u.id.includes('mock') ||
+        u.id.includes('demo') ||
+        u.id.includes('test') ||
+        u.id === 'user-aditya' ||
+        (u.email && (
+          u.email.includes('demo') ||
+          u.email.includes('test') ||
+          u.email.endsWith('@example.com') ||
+          u.email === 'demo.user@gmail.com'
+        ));
+      if (isTestUser) {
+        await db.users.delete(u.id);
+      }
+    }
+
+    // 2. Clear known test accounts and test account IDs
+    const testAccountIds = ['acc-hdfc', 'acc-federal', 'acc-icici', 'acc-sbi', 'acc-1', 'acc-2', 'acc-test', 'acc-demo'];
     for (const id of testAccountIds) {
       await db.accounts.delete(id);
     }
 
-    // Clean up mock users and orphaned accounts
+    // 3. Clean up mock users, demo accounts, and placeholders
     const allAccounts = await db.accounts.toArray();
     for (const acc of allAccounts) {
-      if (!acc.userId || acc.userId.includes('mock') || acc.userId.includes('demo') || acc.userId === 'user-aditya') {
+      const isTestAcc = !acc.userId ||
+        acc.userId.includes('mock') ||
+        acc.userId.includes('demo') ||
+        acc.userId.includes('test') ||
+        acc.userId === 'user-aditya' ||
+        /test|dummy|placeholder|sample/i.test(acc.bankName || '') ||
+        /1234|0000|DEMO/i.test(acc.accountNumberMask || '');
+      if (isTestAcc) {
         await db.accounts.delete(acc.id);
       }
     }
 
+    // 4. Purge mock, demo, and orphaned test transactions
+    const remainingAccIds = new Set((await db.accounts.toArray()).map(a => a.id));
     const allTxns = await db.transactions.toArray();
     for (const t of allTxns) {
-      if (!t.userId || t.userId.includes('mock') || t.userId.includes('demo') || t.userId === 'user-aditya') {
+      const isTestTxn = !t.userId ||
+        t.userId.includes('mock') ||
+        t.userId.includes('demo') ||
+        t.userId.includes('test') ||
+        t.userId === 'user-aditya' ||
+        t.source === 'TEST' ||
+        t.source === 'MOCK' ||
+        /test\s*transaction|dummy|sample\s*spend/i.test(t.narration || '') ||
+        (t.account_id && !remainingAccIds.has(t.account_id) && t.source !== 'PDF_IMPORT' && t.source !== 'GMAIL_AUTO_PULL');
+      if (isTestTxn) {
         await db.transactions.delete(t.id);
       }
     }
 
-    if (localStorage.getItem('pft_active_user_id') === 'user-aditya') {
-      localStorage.removeItem('pft_active_user_id');
+    // 5. Purge test budgets
+    const allBudgets = await db.budgets.toArray();
+    for (const b of allBudgets) {
+      if (!b.userId || b.userId.includes('mock') || b.userId.includes('demo') || b.userId.includes('test') || b.userId === 'user-aditya') {
+        await db.budgets.delete(b.id);
+      }
     }
 
-    console.log('All test data and placeholders cleared.');
+    // 6. Purge test localStorage keys
+    const activeUser = localStorage.getItem('pft_active_user_id');
+    if (activeUser && (activeUser.includes('demo') || activeUser.includes('test') || activeUser === 'user-aditya')) {
+      localStorage.removeItem('pft_active_user_id');
+    }
+    sessionStorage.removeItem('google_access_token');
+
+    console.log('All test data, mock accounts, and placeholders cleared.');
   } catch (err) {
     console.warn('Initial cleanup check:', err);
   }
+}
+
+// Reset an active user's data back to clean slate (purges accounts, transactions, budgets)
+export async function resetUserData(userId) {
+  if (!userId) return;
+  const accounts = await db.accounts.where('userId').equals(userId).toArray();
+  for (const a of accounts) {
+    await db.accounts.delete(a.id);
+  }
+  const txns = await db.transactions.where('userId').equals(userId).toArray();
+  for (const t of txns) {
+    await db.transactions.delete(t.id);
+  }
+  const budgets = await db.budgets.where('userId').equals(userId).toArray();
+  for (const b of budgets) {
+    await db.budgets.delete(b.id);
+  }
+  console.log(`Vault data for user ${userId} reset to zero state.`);
 }
 
 // Production Database Initialization (Zero mock data, clean slate)
@@ -295,4 +364,89 @@ export async function drainOfflineQueue() {
 
 export async function getPendingCount() {
   return await db.transactions.where('synced').equals(0).count();
+}
+
+// -------------------------------------------------------------
+// Notification Center Helpers
+// -------------------------------------------------------------
+
+export async function getUserNotifications(userId) {
+  if (!userId) return [];
+  return await db.notifications
+    .where('userId')
+    .equals(userId)
+    .reverse()
+    .sortBy('createdAt');
+}
+
+export async function addNotification(userId, notif) {
+  if (!userId) return null;
+  const entry = {
+    userId,
+    title: notif.title || 'Notification',
+    message: notif.message || '',
+    type: notif.type || 'reminder', // 'reminder' | 'cap_breach' | 'cap_warning' | 'sync'
+    read: false,
+    actionUrl: notif.actionUrl || '#/dashboard',
+    actionLabel: notif.actionLabel || 'View Details',
+    createdAt: notif.createdAt || new Date().toISOString()
+  };
+  return await db.notifications.add(entry);
+}
+
+export async function markNotificationAsRead(id) {
+  if (!id) return;
+  return await db.notifications.update(id, { read: true });
+}
+
+export async function markAllNotificationsAsRead(userId) {
+  if (!userId) return;
+  return await db.notifications.where('userId').equals(userId).modify({ read: true });
+}
+
+export async function getUnreadNotificationCount(userId) {
+  if (!userId) return 0;
+  return await db.notifications
+    .where('userId')
+    .equals(userId)
+    .filter(n => !n.read)
+    .count();
+}
+
+export async function deleteNotification(id) {
+  if (!id) return;
+  return await db.notifications.delete(id);
+}
+
+// -------------------------------------------------------------
+// Spending Cap & Billing Limit Settings
+// -------------------------------------------------------------
+
+export async function getUserSpendingCap(userId) {
+  if (!userId) return { monthlyLimit: 0, alertEmail: '', emailAlertsEnabled: true };
+  const setting = await db.settings.get(`spending_cap_${userId}`);
+  if (setting && setting.value) {
+    return setting.value;
+  }
+  // Default: check user record
+  const u = await db.users.get(userId);
+  return {
+    monthlyLimit: (u && u.monthlySpendingCap) || 0,
+    alertEmail: (u && (u.alertEmail || u.googleEmail || u.email)) || '',
+    emailAlertsEnabled: true
+  };
+}
+
+export async function setUserSpendingCap(userId, capData) {
+  if (!userId) return;
+  await db.settings.put({
+    key: `spending_cap_${userId}`,
+    userId,
+    value: {
+      monthlyLimit: Number(capData.monthlyLimit) || 0,
+      alertEmail: String(capData.alertEmail || '').trim(),
+      emailAlertsEnabled: capData.emailAlertsEnabled !== false,
+      updatedAt: new Date().toISOString()
+    }
+  });
 }

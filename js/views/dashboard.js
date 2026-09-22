@@ -9,7 +9,8 @@ import { BiometricAuthService } from '../auth.js';
 import { getCategoryMeta } from '../parsers/categorizer.js';
 
 let chartInstance = null;
-let currentPeriodFilter = 'auto'; // 'auto' | 'month' | 'all'
+let currentPeriodFilter = 'month'; // 'month' | 'all'
+let selectedMonth = null;
 
 export async function renderDashboard(container) {
   const isPrivacy = await BiometricAuthService.getPrivacyMode();
@@ -24,35 +25,33 @@ export async function renderDashboard(container) {
   const allTxns = userId ? await getUserTransactions(userId) : [];
   const now = new Date();
   const currentMonthPrefix = now.toISOString().slice(0, 7); // YYYY-MM
-  const monthTxns = allTxns.filter(t => t.date && t.date.startsWith(currentMonthPrefix));
+  
+  // Discover all months with transactions, latest first
+  const availableMonths = [...new Set(
+    allTxns
+      .filter(t => t.date && /^\d{4}-\d{2}/.test(t.date))
+      .map(t => t.date.slice(0, 7))
+  )].sort().reverse();
+
+  if (!selectedMonth || !availableMonths.includes(selectedMonth)) {
+    // Default to current calendar month if it has data, or the latest statement month
+    selectedMonth = availableMonths.includes(currentMonthPrefix)
+      ? currentMonthPrefix
+      : (availableMonths[0] || currentMonthPrefix);
+  }
 
   // Determine active transactions based on period filter
   let activeTxns = [];
-  let periodLabel = 'This Month';
+  let periodLabel = 'Monthly Breakdown';
 
   if (currentPeriodFilter === 'month') {
-    activeTxns = monthTxns;
-    periodLabel = 'This Month (' + now.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) + ')';
-  } else if (currentPeriodFilter === 'all') {
+    activeTxns = allTxns.filter(t => t.date && t.date.startsWith(selectedMonth));
+    const [y, mon] = selectedMonth.split('-');
+    const mDate = new Date(parseInt(y, 10), parseInt(mon, 10) - 1, 1);
+    periodLabel = mDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+  } else {
     activeTxns = allTxns;
     periodLabel = 'All Time (' + allTxns.length + ' entries)';
-  } else {
-    // 'auto' mode: If current month has records, use current month.
-    // If current month is empty but statements/past transactions exist, auto-select all records
-    if (monthTxns.length > 0) {
-      activeTxns = monthTxns;
-      periodLabel = 'This Month (' + now.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) + ')';
-    } else if (allTxns.length > 0) {
-      activeTxns = allTxns;
-      // Identify latest transaction date for label
-      const sortedDates = [...allTxns].filter(t => t.date).sort((a, b) => b.date.localeCompare(a.date));
-      const latestDate = sortedDates[0]?.date ? new Date(sortedDates[0].date) : now;
-      const latestMonthStr = latestDate.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
-      periodLabel = `Statement Activity (${latestMonthStr} / All)`;
-    } else {
-      activeTxns = [];
-      periodLabel = 'This Month';
-    }
   }
 
   // Calculate Cashflow & Category Breakdown for active period
@@ -79,7 +78,7 @@ export async function renderDashboard(container) {
     }
   }
 
-  // Build sorted sectionized category list
+  // Build sorted sectionized category list (Strict Descending Sort: Highest Spend First)
   const categorySections = Object.values(categoryMap)
     .map(c => {
       const meta = getCategoryMeta(c.category);
@@ -90,12 +89,16 @@ export async function renderDashboard(container) {
         percent: Math.round(percent * 10) / 10
       };
     })
-    .sort((a, b) => b.amount - a.amount);
+    .sort((a, b) => {
+      if (b.amount !== a.amount) return b.amount - a.amount;
+      if (b.count !== a.count) return b.count - a.count;
+      return a.category.localeCompare(b.category);
+    });
 
-  // Recent 5 transactions
-  const recentTxns = allTxns
-    .sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at))
-    .slice(0, 5);
+  // Recent transactions for active period (sorted latest first, highest amount first)
+  const recentTxns = [...activeTxns]
+    .sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.amount - a.amount)
+    .slice(0, 6);
 
   const displayBalance = isPrivacy ? '••••••••' : formatINR(totalBalance);
   const displayIncome = isPrivacy ? '••••••' : formatINR(periodIncome);
@@ -180,20 +183,30 @@ export async function renderDashboard(container) {
         <div>
           <h3 class="section-title">Spending Breakdown</h3>
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
-            ${escapeHtml(periodLabel)}
+            ${escapeHtml(periodLabel)} • ${categorySections.length} ${categorySections.length === 1 ? 'Category' : 'Categories'}
           </div>
         </div>
 
-        <div class="spending-period-tabs">
-          <button type="button" class="spending-period-btn ${currentPeriodFilter === 'auto' ? 'active' : ''}" data-period="auto">
-            Auto
-          </button>
-          <button type="button" class="spending-period-btn ${currentPeriodFilter === 'month' ? 'active' : ''}" data-period="month">
-            This Month
-          </button>
-          <button type="button" class="spending-period-btn ${currentPeriodFilter === 'all' ? 'active' : ''}" data-period="all">
-            All Time
-          </button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          ${currentPeriodFilter === 'month' && availableMonths.length > 0 ? `
+            <select id="spending-month-select" class="form-select" style="padding: 4px 10px; font-size: 11px; height: 30px; border-radius: var(--radius-sm); background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-medium); cursor: pointer; font-weight: 600;">
+              ${availableMonths.map(m => {
+                const [y, mon] = m.split('-');
+                const d = new Date(parseInt(y, 10), parseInt(mon, 10) - 1, 1);
+                const label = d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+                return `<option value="${m}" ${selectedMonth === m ? 'selected' : ''}>${label}</option>`;
+              }).join('')}
+            </select>
+          ` : ''}
+
+          <div class="spending-period-tabs">
+            <button type="button" class="spending-period-btn ${currentPeriodFilter === 'month' ? 'active' : ''}" data-period="month">
+              Monthly
+            </button>
+            <button type="button" class="spending-period-btn ${currentPeriodFilter === 'all' ? 'active' : ''}" data-period="all">
+              All Time
+            </button>
+          </div>
         </div>
       </div>
 
@@ -275,6 +288,14 @@ export async function renderDashboard(container) {
       renderDashboard(container);
     };
   });
+
+  const monthSelect = container.querySelector('#spending-month-select');
+  if (monthSelect) {
+    monthSelect.onchange = (e) => {
+      selectedMonth = e.target.value;
+      renderDashboard(container);
+    };
+  }
 
   // Clicking category row filters ledger to that category
   container.querySelectorAll('.spending-cat-row').forEach(row => {

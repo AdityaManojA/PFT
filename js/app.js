@@ -4,7 +4,7 @@
  * toast notifications, and PWA lifecycle.
  */
 
-import { seedInitialDataIfNeeded, drainOfflineQueue, getCurrentUser, getAllUsers, setCurrentUser } from './db.js';
+import { seedInitialDataIfNeeded, drainOfflineQueue, getCurrentUser, getAllUsers, setCurrentUser, resetUserData } from './db.js';
 import { BiometricAuthService } from './auth.js';
 import { initPWAEngine, promptPWAInstall, dismissIOSInstallBanner } from './pwa.js';
 import { BankPDFParser } from './parsers/pdf-parser.js';
@@ -12,10 +12,11 @@ import { BankPDFParser } from './parsers/pdf-parser.js';
 import { renderDashboard } from './views/dashboard.js';
 import { renderTransactions } from './views/transactions.js';
 import { renderAddExpense } from './views/add-expense.js';
-import { renderAccounts } from './views/accounts.js';
+import { renderAccounts, promptPinAuthModal } from './views/accounts.js';
 import { renderBudgets } from './views/budgets.js';
 import { renderLogin } from './views/login.js';
 import { renderLanding } from './views/landing.js';
+import { initNotificationCenter, openNotificationDrawer, updateNotificationBadge } from './services/notification-center.js';
 
 class AppCoordinator {
   constructor() {
@@ -51,9 +52,12 @@ class AppCoordinator {
     this.setupRouting();
     this.setupGlobalControls();
 
-    // 5. Check active user profile
+    // 5. Check active user profile & initialize Notification Center
     const user = await getCurrentUser();
+    // Update header user profile & notification badge
     this.updateHeaderUserProfile(user);
+    await updateNotificationBadge();
+    await initNotificationCenter();
 
     const currentHash = window.location.hash;
 
@@ -191,8 +195,9 @@ class AppCoordinator {
     }
   }
 
-  handleLoginSuccess(user) {
+  async handleLoginSuccess(user) {
     this.updateHeaderUserProfile(user);
+    await updateNotificationBadge();
     this.showToast(`Logged in as ${user.name}!`, 'success');
     window.location.hash = '#/dashboard';
   }
@@ -226,6 +231,12 @@ class AppCoordinator {
     const userBtn = document.getElementById('header-user-btn');
     if (userBtn) {
       userBtn.onclick = () => this.showUserProfileSheet();
+    }
+
+    // Notification Center Header Button
+    const notifBtn = document.getElementById('header-notif-btn');
+    if (notifBtn) {
+      notifBtn.onclick = () => openNotificationDrawer();
     }
 
     // Install Header button
@@ -354,6 +365,9 @@ class AppCoordinator {
             <button id="sheet-add-bank-btn" class="btn btn-secondary btn-block">
               💳 Manage / Add Bank Accounts
             </button>
+            <button id="sheet-reset-account-btn" class="btn btn-outline btn-block" style="border-color: rgba(239, 68, 68, 0.4); color: var(--signal-expense); font-size: 12px; font-weight: 600;">
+              💥 Reset Full Account (Fresh Statement)
+            </button>
             <button id="logout-btn" class="btn btn-primary btn-block" style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);">
               🚪 Log Out of Vault
             </button>
@@ -385,6 +399,20 @@ class AppCoordinator {
       modalContainer.innerHTML = '';
       window.location.hash = '#/accounts';
     };
+
+    const resetAccountBtn = document.getElementById('sheet-reset-account-btn');
+    if (resetAccountBtn) {
+      resetAccountBtn.onclick = () => {
+        promptPinAuthModal(currentUser, 'permanently reset your full account and purge all data for a fresh start', async () => {
+          await resetUserData(currentUser.id);
+          localStorage.removeItem('sbafa_last_gmail_sync');
+          this.showToast('Full account reset complete. All data cleared — ready for a fresh statement!', 'success');
+          modalContainer.innerHTML = '';
+          window.location.hash = '#/accounts';
+          this.refreshCurrentView();
+        });
+      };
+    }
 
     document.getElementById('logout-btn').onclick = () => {
       setCurrentUser(null);
