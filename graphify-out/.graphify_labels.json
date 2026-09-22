@@ -1,8 +1,8 @@
 {
-  "0": "db.js",
+  "0": "login.js",
   "1": "accounts.js",
-  "2": ".init",
-  "3": "formatINR",
+  "2": "app.js",
+  "3": "dashboard.js",
   "4": "categorizer.js",
   "5": "manifest.json",
   "6": "package.json",
@@ -11,16 +11,15 @@
   "9": "rules/graphify.md",
   "10": "workflows/graphify.md",
   "11": "sw.js",
-  "12": "generate_icons.ps1",
+  "12": "transactions.js",
   "13": "unprotect_pdf.ps1",
   "14": "server.ps1",
   "15": "Design Scout",
   "16": "pwa_maker_skill_finance_tracker.md",
-  "17": "getCurrentUser",
+  "17": "db.js",
   "18": "createParticleMesh",
   "19": "Graphify + Antigravity Project Workflow & Setup Guide",
   "20": "security_check.ps1",
   "21": "verify.ps1",
-  "22": "index.js",
-  "23": "test_verification.mjs"
+  "22": "index.js"
 }

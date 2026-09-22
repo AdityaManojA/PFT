@@ -687,25 +687,37 @@ async function ingestMultipleStatements(statementList, userId, showToast, refres
 
     const userAccounts = await db.accounts.where('userId').equals(userId).toArray();
 
-    // Group statements by bank
+    // Group statements by bank code AND account last 4 digits (so multiple accounts of the same bank stay segregated)
     const bankGroups = {};
     for (const item of statementList) {
       const res = item.result;
       if (!res.transactions || res.transactions.length === 0) continue;
-      const key = (res.bankCode || res.detectedBank || 'OTHER').toUpperCase();
-      if (!bankGroups[key]) bankGroups[key] = [];
-      bankGroups[key].push(item);
+      const bankCode = (res.bankCode || res.detectedBank || 'OTHER').toUpperCase();
+      const last4 = res.accountNumberLast4 || (res.accountNumberMask ? res.accountNumberMask.replace(/\D/g, '').slice(-4) : 'DEFAULT');
+      const groupKey = `${bankCode}_${last4}`;
+      if (!bankGroups[groupKey]) bankGroups[groupKey] = [];
+      bankGroups[groupKey].push(item);
     }
 
     let totalImportedTxns = 0;
     const summaryReports = [];
 
-    for (const [bankKey, items] of Object.entries(bankGroups)) {
-      // Find or create account for this bank
-      let matchedAccount = userAccounts.find(a => 
-        (a.bankCode && a.bankCode.toUpperCase() === bankKey) ||
-        (a.bankName && items[0].result.detectedBank && a.bankName.toLowerCase().includes(items[0].result.detectedBank.toLowerCase()))
-      );
+    for (const [groupKey, items] of Object.entries(bankGroups)) {
+      const firstResult = items[0].result;
+      const bankCode = (firstResult.bankCode || firstResult.detectedBank || 'OTHER').toUpperCase();
+      const targetLast4 = firstResult.accountNumberLast4;
+
+      // Find or create account matching BOTH bank and last 4 digits
+      let matchedAccount = userAccounts.find(a => {
+        const sameBank = (a.bankCode && a.bankCode.toUpperCase() === bankCode) ||
+                         (a.bankName && firstResult.detectedBank && a.bankName.toLowerCase().includes(firstResult.detectedBank.toLowerCase()));
+        if (!sameBank) return false;
+        if (targetLast4) {
+          const accLast4 = a.accountNumberLast4 || (a.accountNumberMask ? a.accountNumberMask.replace(/\D/g, '').slice(-4) : '');
+          return accLast4 === targetLast4;
+        }
+        return true;
+      });
 
       // Sort items by statement date ascending so the last one is the latest
       items.sort((a, b) => {
@@ -719,6 +731,7 @@ async function ingestMultipleStatements(statementList, userId, showToast, refres
       const latestResult = latestStatementItem.result;
       const latestDate = latestResult.statementDate || '';
       const latestBalance = latestResult.availableBalance;
+      const assignedMask = latestResult.accountNumberMask || (targetLast4 ? `•••• ${targetLast4}` : '•••• ' + Math.floor(1000 + Math.random() * 9000));
 
       // Calculate total net change if balance was null
       let netChange = 0;
@@ -736,7 +749,8 @@ async function ingestMultipleStatements(statementList, userId, showToast, refres
           id: newAccId,
           userId,
           bankName: latestResult.detectedBank || 'Bank Account',
-          accountNumberMask: '•••• ' + Math.floor(1000 + Math.random() * 9000),
+          accountNumberMask: assignedMask,
+          accountNumberLast4: targetLast4 || null,
           accountType: 'Savings Account',
           balance: latestBalance != null ? latestBalance : Math.max(0, netChange),
           bankCode: latestResult.bankCode || 'OTHER',
@@ -1118,12 +1132,21 @@ function openGmailSyncModal(userId, userBank, savedPasskey, showToast, refreshCa
         return;
       }
 
-      // Ingest the fetched transactions
+      // Ingest the fetched transactions with account segregation
       const userAccounts = await db.accounts.where('userId').equals(userId).toArray();
-      let matchedAccount = userAccounts.find(a => 
-        (a.bankCode && result.bankCode && a.bankCode.toLowerCase() === result.bankCode.toLowerCase()) ||
-        (a.bankName && result.detectedBank && a.bankName.toLowerCase().includes(result.detectedBank.toLowerCase()))
-      );
+      const targetLast4 = result.accountNumberLast4;
+      let matchedAccount = userAccounts.find(a => {
+        const sameBank = (a.bankCode && result.bankCode && a.bankCode.toLowerCase() === result.bankCode.toLowerCase()) ||
+                         (a.bankName && result.detectedBank && a.bankName.toLowerCase().includes(result.detectedBank.toLowerCase()));
+        if (!sameBank) return false;
+        if (targetLast4) {
+          const accLast4 = a.accountNumberLast4 || (a.accountNumberMask ? a.accountNumberMask.replace(/\D/g, '').slice(-4) : '');
+          return accLast4 === targetLast4;
+        }
+        return true;
+      });
+
+      const assignedMask = result.accountNumberMask || (targetLast4 ? `•••• ${targetLast4}` : '•••• ' + Math.floor(1000 + Math.random() * 9000));
 
       if (!matchedAccount) {
         const newAccId = `acc-${userId}-${Date.now().toString(36)}`;
@@ -1131,7 +1154,8 @@ function openGmailSyncModal(userId, userBank, savedPasskey, showToast, refreshCa
           id: newAccId,
           userId,
           bankName: result.detectedBank || bankName,
-          accountNumberMask: '•••• ' + Math.floor(1000 + Math.random() * 9000),
+          accountNumberMask: assignedMask,
+          accountNumberLast4: targetLast4 || null,
           accountType: 'Savings Account',
           balance: result.availableBalance != null ? result.availableBalance : 0,
           bankCode: result.bankCode || 'FEDERAL',
@@ -1153,6 +1177,19 @@ function openGmailSyncModal(userId, userBank, savedPasskey, showToast, refreshCa
         source: 'GMAIL_AUTO_PULL'
       }));
       await db.transactions.bulkAdd(tagged);
+
+      // Record Gmail fetched statement PDF to statement upload history
+      const emailFileName = result.fileName || `${result.detectedBank || bankName}_eStatement_Email.pdf`;
+      await addStatementUploadHistory(userId, [{
+        id: 'stmt-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6),
+        fileName: emailFileName,
+        date: result.statementDate || new Date().toISOString().slice(0, 10),
+        uploadedAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' (Gmail)',
+        bank: result.detectedBank || bankName,
+        txnCount: result.count || (result.transactions ? result.transactions.length : 0),
+        balance: result.availableBalance != null ? result.availableBalance : null,
+        status: 'Processed'
+      }]);
 
       modalContainer.innerHTML = '';
       const balMsg = result.availableBalance != null ? ` • Balance: ₹${result.availableBalance.toFixed(2)}` : '';

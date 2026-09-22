@@ -5,6 +5,7 @@
 
 import { db, formatINR, getCurrentUser, getUserAccounts, getUserTransactions } from '../db.js';
 import { BiometricAuthService } from '../auth.js';
+import { openEditTransactionModal } from '../components/edit-category-modal.js';
 
 let currentFilter = 'all';
 let currentSearch = '';
@@ -139,12 +140,14 @@ export async function renderTransactions(container) {
     exportBtn.onclick = () => exportTransactionsCSV(filtered, accountMap);
   }
 
-  // Transaction item click for details/delete
+  // Transaction item click for quick-edit popup window
   container.querySelectorAll('.txn-item').forEach(item => {
     item.onclick = async () => {
       const id = Number(item.dataset.id);
       const txn = await db.transactions.get(id);
-      if (txn) showTransactionDetailModal(txn, accountMap);
+      if (txn) {
+        openEditTransactionModal(txn, () => renderTransactions(container));
+      }
     };
   });
 }
@@ -181,10 +184,13 @@ function renderGroupedList(txns, isPrivacy, accountMap) {
       const icon = iconMap[t.category] || '💳';
 
       return `
-        <div class="txn-item" data-id="${t.id}">
+        <div class="txn-item" data-id="${t.id}" style="cursor: pointer;" title="Tap to change category, emoji, or type">
           <div class="txn-icon">${icon}</div>
           <div class="txn-details">
-            <div class="txn-merchant">${escapeHtml(t.merchant || t.category || 'Transaction')}</div>
+            <div class="txn-merchant" style="display: flex; align-items: center; gap: 6px;">
+              <span>${escapeHtml(t.merchant || t.category || 'Transaction')}</span>
+              <span style="font-size: 11px; color: var(--text-muted); opacity: 0.6;">✏️</span>
+            </div>
             <div class="txn-meta">
               <span>${escapeHtml(bankName)}</span>
               <span>•</span>

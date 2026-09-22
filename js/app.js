@@ -105,7 +105,7 @@ class AppCoordinator {
 
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute('content', theme === 'light' ? '#F5F1E8' : '#181915');
+      metaTheme.setAttribute('content', theme === 'light' ? '#F5F1E8' : '#272A32');
     }
 
     const sunIcon = document.querySelector('.theme-icon-sun');
@@ -129,9 +129,37 @@ class AppCoordinator {
         const firstName = user.name.trim().split(/\s+/)[0] || user.name;
         nameEl.innerText = firstName;
         if (userBtn) userBtn.title = `${user.name} • Tap to view profile or switch account`;
+
+        // Profile Picture (pfp) from Google login
+        let pfpImg = userBtn.querySelector('.header-user-pfp');
+        const pfpUrl = user.picture || user.photoURL;
+        if (pfpUrl) {
+          if (!pfpImg) {
+            pfpImg = document.createElement('img');
+            pfpImg.className = 'header-user-pfp';
+            pfpImg.style.width = '18px';
+            pfpImg.style.height = '18px';
+            pfpImg.style.borderRadius = '50%';
+            pfpImg.style.objectFit = 'cover';
+            pfpImg.style.marginRight = '5px';
+            pfpImg.style.border = '1.5px solid var(--accent-primary)';
+            userBtn.insertBefore(pfpImg, nameEl);
+          }
+          pfpImg.src = pfpUrl;
+          const dot = userBtn.querySelector('.user-status-dot');
+          if (dot) dot.style.display = 'none';
+        } else {
+          if (pfpImg) pfpImg.remove();
+          const dot = userBtn.querySelector('.user-status-dot');
+          if (dot) dot.style.display = 'inline-block';
+        }
       } else {
         nameEl.innerText = 'Sign In';
         if (userBtn) userBtn.title = 'Sign In to Vault';
+        const pfpImg = userBtn.querySelector('.header-user-pfp');
+        if (pfpImg) pfpImg.remove();
+        const dot = userBtn.querySelector('.user-status-dot');
+        if (dot) dot.style.display = 'inline-block';
       }
     }
   }
@@ -336,9 +364,16 @@ class AppCoordinator {
           <div class="sheet-handle"></div>
           
           <div style="text-align: center; margin-bottom: 20px;">
-            <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-blue) 100%); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; color: white; margin: 0 auto 10px auto; box-shadow: var(--shadow-glow-emerald);">
-              ${initial}
-            </div>
+            ${(currentUser.picture || currentUser.photoURL) ? `
+              <img src="${escapeHtml(currentUser.picture || currentUser.photoURL)}" alt="${escapeHtml(currentUser.name)}" style="width: 58px; height: 58px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px auto; border: 2px solid var(--accent-primary); box-shadow: var(--shadow-glow-terracotta); display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+              <div style="display: none; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-hover) 100%); align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; color: white; margin: 0 auto 10px auto; box-shadow: var(--shadow-glow-terracotta);">
+                ${initial}
+              </div>
+            ` : `
+              <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-hover) 100%); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; color: white; margin: 0 auto 10px auto; box-shadow: var(--shadow-glow-terracotta);">
+                ${initial}
+              </div>
+            `}
             <h3 class="sheet-title" style="margin-bottom: 2px;">${escapeHtml(currentUser.name)}</h3>
             <p style="font-size: var(--text-xs); color: var(--text-muted);">${escapeHtml(currentUser.email || 'Local User Vault')}</p>
             <span class="badge badge-emerald" style="margin-top: 8px;">🔒 Private Vault Active</span>
@@ -347,7 +382,7 @@ class AppCoordinator {
           <div style="background: var(--bg-deep); border-radius: var(--radius-md); padding: 14px; margin-bottom: 18px; font-size: var(--text-xs); display: flex; flex-direction: column; gap: 10px;">
             <div style="display: flex; justify-content: space-between;">
               <span style="color: var(--text-muted);">Account Status</span>
-              <span style="font-weight: 600; color: var(--accent-emerald);">Isolated & Encrypted</span>
+              <span style="font-weight: 600; color: var(--signal-income);">Isolated &amp; Encrypted</span>
             </div>
             <div style="display: flex; justify-content: space-between;">
               <span style="color: var(--text-muted);">Storage Location</span>
@@ -355,13 +390,13 @@ class AppCoordinator {
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-subtle); padding-top: 8px;">
               <span style="color: var(--text-muted);">Primary Bank</span>
-              <span style="font-weight: 600; color: var(--accent-blue);">${escapeHtml(userBank)}</span>
+              <span style="font-weight: 600; color: var(--accent-primary);">${escapeHtml(userBank)}</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="color: var(--text-muted);">Statement PDF Autofill</span>
               <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                <input type="checkbox" id="profile-autofill-chk" ${isAutofill ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-emerald);" />
-                <span id="profile-autofill-txt" style="font-weight: 600; color: ${isAutofill ? 'var(--accent-emerald)' : 'var(--text-muted)'};">${isAutofill ? 'Enabled' : 'Off'}</span>
+                <input type="checkbox" id="profile-autofill-chk" ${isAutofill ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-primary);" />
+                <span id="profile-autofill-txt" style="font-weight: 600; color: ${isAutofill ? 'var(--signal-income)' : 'var(--text-muted)'};">${isAutofill ? 'Enabled' : 'Off'}</span>
               </label>
             </div>
           </div>
@@ -374,13 +409,13 @@ class AppCoordinator {
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 10px;">
-            <button id="sheet-add-bank-btn" class="btn btn-secondary btn-block">
+            <button id="sheet-add-bank-btn" class="btn btn-secondary btn-block" style="padding: 11px;">
               💳 Manage / Add Bank Accounts
             </button>
-            <button id="sheet-reset-account-btn" class="btn btn-outline btn-block" style="border-color: rgba(239, 68, 68, 0.4); color: var(--signal-expense); font-size: 12px; font-weight: 600;">
+            <button id="sheet-reset-account-btn" class="btn btn-outline btn-block" style="border-color: rgba(232, 96, 52, 0.35); color: var(--accent-primary); font-size: 12px; font-weight: 600; padding: 11px;">
               💥 Reset Full Account (Fresh Statement)
             </button>
-            <button id="logout-btn" class="btn btn-primary btn-block" style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);">
+            <button id="logout-btn" class="btn btn-secondary btn-block" style="border: 1px solid var(--border-hover); background: var(--bg-surface-elevated); color: var(--text-primary); font-weight: 700; padding: 11px;">
               🚪 Log Out of Vault
             </button>
           </div>

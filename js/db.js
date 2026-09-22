@@ -139,8 +139,8 @@ export async function registerUser(name, email, pin, bankSettings = {}) {
   const primaryBank = bankSettings.primaryBank || 'HDFC';
   const pdfPassword = bankSettings.pdfPassword || '';
   const autofillEnabled = bankSettings.autofillEnabled !== false;
-  const authProvider = bankSettings.authProvider || 'local';
-  const picture = bankSettings.picture || '';
+  const picture = bankSettings.picture || bankSettings.photoURL || '';
+  const photoURL = picture;
   const googleEmail = bankSettings.googleEmail || '';
 
   const newUser = {
@@ -153,6 +153,7 @@ export async function registerUser(name, email, pin, bankSettings = {}) {
     autofillEnabled,
     authProvider,
     picture,
+    photoURL,
     googleEmail,
     createdAt: new Date().toISOString()
   };
@@ -307,22 +308,25 @@ export async function getUserTransactions(userId) {
   if (!userId) return [];
   const txns = await db.transactions.where('userId').equals(userId).toArray();
 
-  // Auto-upgrade legacy or misclassified transactions (e.g. Mb Ftb stuck in Other)
+  // Auto-upgrade legacy or misclassified transactions (e.g. UPI expenses previously bundled into Transfers or Other)
   if (typeof window !== 'undefined' && window.__categorizeTransaction) {
     for (const t of txns) {
       const rawText = t.narration || t.merchant || '';
       const isOtherOrGeneral = !t.category || t.category === 'Other' || t.category === 'General';
       const isRawMbFtb = t.merchant === 'Mb Ftb' || /^(MB\s*FTB|FTB)/i.test(rawText);
-      if (isOtherOrGeneral || isRawMbFtb) {
+      const isBundledTransfer = t.type === 'expense' && t.category === 'Transfers' && !/\b(MB\s*FTB|MB:FTB|FTB|0000|6540|transfer to|sent to)\b/i.test(rawText);
+      const hasRawId = /[SC]\d{7,10}/.test(t.merchant || '') || /Q7-/i.test(t.merchant || '');
+
+      if (isOtherOrGeneral || isRawMbFtb || isBundledTransfer || hasRawId) {
         const catRes = window.__categorizeTransaction(rawText, t.type || 'expense');
         if (catRes) {
           let updated = false;
-          if (catRes.category && catRes.category !== 'Other' && catRes.category !== t.category) {
+          if (catRes.category && catRes.category !== t.category) {
             t.category = catRes.category;
             t.icon = catRes.icon;
             updated = true;
           }
-          if (t.merchant === 'Mb Ftb' || !t.merchant || t.merchant === 'Expense' || t.merchant === 'Other') {
+          if (catRes.cleanMerchant && (catRes.cleanMerchant !== t.merchant || hasRawId)) {
             t.merchant = catRes.cleanMerchant;
             updated = true;
           }

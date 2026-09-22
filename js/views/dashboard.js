@@ -7,10 +7,12 @@
 import { db, formatINR, getCurrentUser, getUserAccounts, getUserTransactions } from '../db.js';
 import { BiometricAuthService } from '../auth.js';
 import { getCategoryMeta } from '../parsers/categorizer.js';
+import { openEditTransactionModal } from '../components/edit-category-modal.js';
 
 let chartInstance = null;
 let currentPeriodFilter = 'month'; // 'month' | 'all'
 let selectedMonth = null;
+let currentChartType = 'donut'; // 'donut' | 'bar'
 
 export async function renderDashboard(container) {
   const isPrivacy = await BiometricAuthService.getPrivacyMode();
@@ -99,29 +101,23 @@ export async function renderDashboard(container) {
 
   // Build sorted sectionized category list (Strict Descending Sort: Highest Spend First)
   const categorySections = Object.values(categoryMap)
+    .filter(c => c.amount > 0)
+    .sort((a, b) => b.amount - a.amount)
     .map(c => {
       const meta = getCategoryMeta(c.category);
-      const percent = periodExpense > 0 ? (c.amount / periodExpense) * 100 : 0;
+      const percent = periodExpense > 0 ? Math.round((c.amount / periodExpense) * 100) : 0;
       return {
         ...c,
         meta,
-        percent: Math.round(percent * 10) / 10
+        percent
       };
-    })
-    .sort((a, b) => {
-      if (b.amount !== a.amount) return b.amount - a.amount;
-      if (b.count !== a.count) return b.count - a.count;
-      return a.category.localeCompare(b.category);
     });
 
-  // Recent transactions for active period (sorted latest first, highest amount first)
-  const recentTxns = [...activeTxns]
-    .sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.amount - a.amount)
-    .slice(0, 6);
-
   const displayBalance = isPrivacy ? '••••••••' : formatINR(totalBalance);
-  const displayIncome = isPrivacy ? '••••••' : formatINR(periodIncome);
-  const displayExpense = isPrivacy ? '••••••' : formatINR(periodExpense);
+  const displayIncome = isPrivacy ? '••••' : formatINR(periodIncome);
+  const displayExpense = isPrivacy ? '••••' : formatINR(periodExpense);
+
+  const recentTxns = allTxns.slice(0, 5);
 
   const todayFormatted = new Date().toLocaleDateString('en-IN', {
     weekday: 'short',
@@ -144,18 +140,23 @@ export async function renderDashboard(container) {
         <button id="banner-signin-btn" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 5px 12px;">Sign In</button>
       </div>
     ` : `
-      <!-- Personal Greeting & Status Bar (Meetgen Style) -->
-      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
-        <div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <h2 style="font-family: var(--font-family-display); font-size: var(--text-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
-              Ciao, ${escapeHtml(userName)}!
-            </h2>
-            <span style="font-size: 1.1rem;">✨</span>
+      <!-- Personal Greeting & Status Bar (with Google PFP avatar if present) -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          ${(user && (user.picture || user.photoURL)) ? `
+            <img src="${escapeHtml(user.picture || user.photoURL)}" alt="Profile" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-primary); box-shadow: var(--shadow-glow-terracotta);" />
+          ` : ''}
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h2 style="font-family: var(--font-family-display); font-size: var(--text-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+                Ciao, ${escapeHtml(userName)}!
+              </h2>
+              <span style="font-size: 1.1rem;">✨</span>
+            </div>
+            <p style="font-size: var(--text-xs); color: var(--text-muted); margin: 3px 0 0 0;">
+              Track your income, expenses &amp; statement flow
+            </p>
           </div>
-          <p style="font-size: var(--text-xs); color: var(--text-muted); margin: 3px 0 0 0;">
-            Track your income, expenses & statement flow
-          </p>
         </div>
         <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--bg-surface-elevated); padding: 5px 12px; border-radius: var(--radius-full); border: 1px solid var(--border-medium); white-space: nowrap;">
           ${todayFormatted}
@@ -255,9 +256,19 @@ export async function renderDashboard(container) {
         </div>
       </div>
 
-      <!-- Donut Visual Chart -->
-      <div class="chart-container">
-        <canvas id="categoryChart" width="340" height="190"></canvas>
+      <!-- Interactive Chart with Cute Graph Type Switcher -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; margin-bottom: 8px; padding: 0 4px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
+          Visual Spend Breakdown
+        </span>
+        <button type="button" id="toggle-chart-type-btn" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 10px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 6px; font-weight: 600;" title="Click to change graph type">
+          <span>${currentChartType === 'donut' ? '🍩 Donut' : '📊 Cute Bars'}</span>
+          <span style="font-size: 10px; color: var(--accent-primary);">⇄ Change</span>
+        </button>
+      </div>
+
+      <div class="chart-container" style="min-height: 200px;">
+        <canvas id="categoryChart" width="340" height="200"></canvas>
       </div>
 
       <!-- Sectionized Category Progress List (Modern Fintech View) -->
@@ -316,6 +327,15 @@ export async function renderDashboard(container) {
     };
   }
 
+  // Toggle chart type button (Donut vs Cute Bars)
+  const toggleChartBtn = container.querySelector('#toggle-chart-type-btn');
+  if (toggleChartBtn) {
+    toggleChartBtn.onclick = () => {
+      currentChartType = currentChartType === 'donut' ? 'bar' : 'donut';
+      renderDashboard(container);
+    };
+  }
+
   // Quick actions
   container.querySelectorAll('.quick-action-btn').forEach(btn => {
     btn.onclick = () => {
@@ -357,6 +377,17 @@ export async function renderDashboard(container) {
     viewAllLink.onclick = () => { window.location.hash = '#/transactions'; };
   }
 
+  // Transaction quick-edit modal for Recent Transactions
+  container.querySelectorAll('#dashboard-txns-list .txn-item').forEach(item => {
+    item.onclick = () => {
+      const id = item.dataset.id;
+      const targetTxn = allTxns.find(t => String(t.id) === String(id));
+      if (targetTxn) {
+        openEditTransactionModal(targetTxn, () => renderDashboard(container));
+      }
+    };
+  });
+
   // Initialize Category Breakdown Chart
   initSpendingChart(categorySections);
 }
@@ -367,10 +398,13 @@ function renderTxnItemHtml(t, isPrivacy) {
   const meta = getCategoryMeta(t.category);
 
   return `
-    <div class="txn-item">
+    <div class="txn-item" data-id="${t.id}" style="cursor: pointer;" title="Tap to change category, emoji, or type">
       <div class="txn-icon" style="background: ${meta.bg}; color: ${meta.color};">${meta.icon}</div>
       <div class="txn-details">
-        <div class="txn-merchant">${escapeHtml(t.merchant || t.category || 'Transaction')}</div>
+        <div class="txn-merchant" style="display: flex; align-items: center; gap: 6px;">
+          <span>${escapeHtml(t.merchant || t.category || 'Transaction')}</span>
+          <span style="font-size: 11px; color: var(--text-muted); opacity: 0.6;">✏️</span>
+        </div>
         <div class="txn-meta">
           <span>${t.date || 'Today'}</span>
           <span>•</span>
@@ -400,74 +434,158 @@ function initSpendingChart(categorySections) {
   const isEmpty = labels.length === 0 || data.every(v => v === 0);
   const chartLabels = isEmpty ? ['No Expenses (₹0)'] : labels;
   const chartData = isEmpty ? [1] : data;
-  const chartColors = isEmpty ? [isLight ? '#E2E8F0' : '#1E293B'] : colors;
+  const chartColors = isEmpty ? [isLight ? '#E2E8F0' : '#333742'] : colors;
 
   if (window.Chart) {
     if (chartInstance) chartInstance.destroy();
 
     const ctx = canvas.getContext('2d');
-    chartInstance = new window.Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: chartLabels,
-        datasets: [{
-          data: chartData,
-          backgroundColor: chartColors,
-          borderColor: isLight ? '#FFFFFF' : '#0F172A',
-          borderWidth: 3,
-          hoverOffset: isEmpty ? 0 : 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '70%',
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: {
-              boxWidth: 10,
-              color: isLight ? '#334155' : '#94A3B8',
-              font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
-              padding: 10
+
+    if (currentChartType === 'bar' && !isEmpty) {
+      // Cute Rounded Bar Graph View
+      chartInstance = new window.Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: chartLabels.map(l => {
+            const sec = categorySections.find(s => s.category === l);
+            return (sec && sec.meta ? sec.meta.icon + ' ' : '') + l;
+          }),
+          datasets: [{
+            data: chartData,
+            backgroundColor: chartColors,
+            borderRadius: 8,
+            borderSkipped: false,
+            barThickness: Math.min(26, Math.max(14, Math.floor(220 / (chartLabels.length || 1)))),
+            maxBarThickness: 32
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 650,
+            easing: 'easeOutQuart'
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (context) => ` ${formatINR(context.raw)}`
+              }
             }
           },
-          tooltip: {
-            callbacks: {
-              label: (context) => isEmpty ? ' No expenses recorded (₹0.00)' : ` ${context.label}: ${formatINR(context.raw)}`
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: isLight ? '#475569' : '#CBD5E1',
+                font: { family: 'Plus Jakarta Sans', size: 10.5, weight: '600' },
+                maxRotation: 32,
+                minRotation: 0
+              }
+            },
+            y: {
+              grid: {
+                color: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'
+              },
+              ticks: {
+                color: isLight ? '#64748B' : '#94A3B8',
+                font: { family: 'Plus Jakarta Sans', size: 10 },
+                callback: (v) => '₹' + v
+              }
             }
           }
         }
-      }
-    });
+      });
+    } else {
+      // Donut view without thick border lines (Clean & Seamless)
+      chartInstance = new window.Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: chartLabels,
+          datasets: [{
+            data: chartData,
+            backgroundColor: chartColors,
+            borderColor: 'transparent',
+            borderWidth: 0,
+            hoverOffset: isEmpty ? 0 : 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          animation: {
+            duration: 650,
+            easing: 'easeOutQuart'
+          },
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                boxWidth: 10,
+                color: isLight ? '#334155' : '#CBD5E1',
+                font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
+                padding: 10
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => isEmpty ? ' No expenses recorded (₹0.00)' : ` ${context.label}: ${formatINR(context.raw)}`
+              }
+            }
+          }
+        }
+      });
+    }
   } else {
-    renderCanvasDonutFallback(canvas, chartLabels, chartData, isEmpty);
+    renderCanvasChartFallback(canvas, chartLabels, chartData, chartColors, isEmpty, currentChartType);
   }
 }
 
-function renderCanvasDonutFallback(canvas, labels, data, isEmpty) {
+function renderCanvasChartFallback(canvas, labels, data, colors, isEmpty, chartType) {
   const ctx = canvas.getContext('2d');
   const w = canvas.width;
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
 
+  if (chartType === 'bar' && !isEmpty) {
+    // Cute Canvas Bar Fallback
+    const maxVal = Math.max(...data, 1);
+    const barWidth = Math.min(24, (w - 40) / labels.length - 8);
+    const startX = 20;
+    const baseLine = h - 25;
+
+    data.forEach((val, i) => {
+      const x = startX + i * (barWidth + 8);
+      const barH = (val / maxVal) * (h - 50);
+      const y = baseLine - barH;
+
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(x, y, barWidth, barH, [6, 6, 0, 0]) : ctx.rect(x, y, barWidth, barH);
+      ctx.fill();
+    });
+    return;
+  }
+
+  // Donut fallback without thick stroke lines
   const cx = w / 2;
   const cy = h / 2;
   const radius = Math.min(cx, cy) - 20;
-  const innerRadius = radius * 0.7;
+  const innerRadius = radius * 0.72;
 
   if (isEmpty) {
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.arc(cx, cy, innerRadius, Math.PI * 2, 0, true);
-    ctx.fillStyle = '#1E293B';
+    ctx.fillStyle = '#323742';
     ctx.fill();
     return;
   }
 
   const total = data.reduce((a, b) => a + b, 0);
   let startAngle = -Math.PI / 2;
-  const colors = ['#E86034', '#3D6B52', '#D9822B', '#2E7D5B', '#C2542E', '#7A8C53', '#B86B1C'];
 
   data.forEach((val, i) => {
     const sliceAngle = (val / total) * Math.PI * 2;

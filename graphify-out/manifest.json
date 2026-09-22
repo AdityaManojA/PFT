@@ -5,16 +5,10 @@
     "ast_hash": "8a380d8096dae422c75d1ae2c3c1c9c8",
     "semantic_hash": ""
   },
-  "generate_icons.ps1": {
-    "mtime": 1790066072.5639708,
-    "seen": 1790078987.6687117,
-    "ast_hash": "838b0dd97463150c6f5dbb4b8c94721c",
-    "semantic_hash": "838b0dd97463150c6f5dbb4b8c94721c"
-  },
   "js/app.js": {
-    "mtime": 1790095035.3348765,
-    "seen": 1790095219.732454,
-    "ast_hash": "0201c99af8bf5bac5b1f17df63fd87a1",
+    "mtime": 1790100187.169193,
+    "seen": 1790100857.8151426,
+    "ast_hash": "595bdd9f8bf44de9b0875e59a406fa18",
     "semantic_hash": ""
   },
   "js/auth.js": {
@@ -24,9 +18,9 @@
     "semantic_hash": ""
   },
   "js/db.js": {
-    "mtime": 1790094882.6199937,
-    "seen": 1790095219.732454,
-    "ast_hash": "69b99317e322ab46f2457f5fa73a5191",
+    "mtime": 1790100209.104764,
+    "seen": 1790100857.8151426,
+    "ast_hash": "8915b88eb01fc137b70fb655335be8c9",
     "semantic_hash": ""
   },
   "js/parsers/bank-parser.js": {
@@ -36,15 +30,15 @@
     "semantic_hash": "0a51fbf50ec9804ee5c8dbfba4708485"
   },
   "js/parsers/categorizer.js": {
-    "mtime": 1790092460.398581,
-    "seen": 1790092514.5620651,
-    "ast_hash": "12209a0976b329fbd7bc5edcb22d10cb",
+    "mtime": 1790100173.2735424,
+    "seen": 1790100857.8151426,
+    "ast_hash": "93b0fa8c269362b989e24266d956cca8",
     "semantic_hash": ""
   },
   "js/parsers/pdf-parser.js": {
-    "mtime": 1790087050.6026306,
-    "seen": 1790092514.5620651,
-    "ast_hash": "3313531790e31ee445a116623f393ae5",
+    "mtime": 1790096602.6767297,
+    "seen": 1790100857.8151426,
+    "ast_hash": "f4598986a0f278715b8cebe918c150f0",
     "semantic_hash": ""
   },
   "js/pwa.js": {
@@ -54,9 +48,9 @@
     "semantic_hash": "702128dc01bc9eb943f11d946b26edc1"
   },
   "js/views/accounts.js": {
-    "mtime": 1790095189.607917,
-    "seen": 1790095219.732454,
-    "ast_hash": "6f41a519bb5fbdca7de7fdccc0a5e45d",
+    "mtime": 1790100387.8471339,
+    "seen": 1790100857.8151426,
+    "ast_hash": "f0c1bb44c2718fbf640760d0198b9ff8",
     "semantic_hash": ""
   },
   "js/views/add-expense.js": {
@@ -72,21 +66,21 @@
     "semantic_hash": ""
   },
   "js/views/dashboard.js": {
-    "mtime": 1790094645.7844486,
-    "seen": 1790094781.0259168,
-    "ast_hash": "53631cfaa8df08e42e497915d154dbca",
+    "mtime": 1790100254.0387404,
+    "seen": 1790100857.8151426,
+    "ast_hash": "08bfc752649d7170fb09d8389112fb1e",
     "semantic_hash": ""
   },
   "js/views/landing.js": {
-    "mtime": 1790091913.1254032,
-    "seen": 1790092514.5620651,
-    "ast_hash": "f5cd344f0d14a71d67536561a96ab872",
+    "mtime": 1790099688.597301,
+    "seen": 1790100857.8151426,
+    "ast_hash": "28ece8ffb2df174ba2fee70649d3c755",
     "semantic_hash": ""
   },
   "js/views/login.js": {
-    "mtime": 1790087272.1959262,
-    "seen": 1790092514.5620651,
-    "ast_hash": "1b2b5801b65617216d24a7765bf619b7",
+    "mtime": 1790096548.8429224,
+    "seen": 1790100857.8151426,
+    "ast_hash": "94d7bbcff9dc662d2506269b6ddd7339",
     "semantic_hash": ""
   },
   "js/views/transactions.js": {
@@ -96,10 +90,10 @@
     "semantic_hash": ""
   },
   "manifest.json": {
-    "mtime": 1790070864.703719,
-    "seen": 1790078987.6687117,
-    "ast_hash": "33a820c4d05a63c3f1d574f11cb04323",
-    "semantic_hash": "33a820c4d05a63c3f1d574f11cb04323"
+    "mtime": 1790099706.7428138,
+    "seen": 1790100857.8151426,
+    "ast_hash": "8dae0c3164cfd29ccb24378dda56676f",
+    "semantic_hash": ""
   },
   "package.json": {
     "mtime": 1790095285.0470076,
@@ -126,9 +120,9 @@
     "semantic_hash": "ee4b85b73cbba1067f5fb73593b10b82"
   },
   "sw.js": {
-    "mtime": 1790095223.8195622,
-    "seen": 1790095301.705473,
-    "ast_hash": "7cab3fe8ddb2704f9c1e7db66ccc4585",
+    "mtime": 1790099723.6061935,
+    "seen": 1790100857.8151426,
+    "ast_hash": "c05c29a23c8ea5abfdddae63ebf0eb98",
     "semantic_hash": ""
   },
   "js/firebase-config.js": {
@@ -168,9 +162,9 @@
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1790094951.5593832,
-    "seen": 1790095219.732454,
-    "ast_hash": "008ab0bee7fa59575ed3ce8d9ba7e1f0",
+    "mtime": 1790096493.3827543,
+    "seen": 1790100857.8151426,
+    "ast_hash": "3d7b969d4e5c1ddac49ef0d22d486ffb",
     "semantic_hash": ""
   },
   "public/index.html": {
@@ -204,9 +198,9 @@
     "semantic_hash": ""
   },
   "icons/icon.svg": {
-    "mtime": 1790066083.289747,
-    "seen": 1790079017.5818367,
-    "ast_hash": "6006e68a9813215a05d5291dfe417bb5",
+    "mtime": 1790096474.2417436,
+    "seen": 1790100857.8151426,
+    "ast_hash": "3f6d339b56f111c6b1c662a1abe484e2",
     "semantic_hash": ""
   },
   "js/services/gmail-sync.js": {
@@ -267,6 +261,12 @@
     "mtime": 1790095265.7503953,
     "seen": 1790095301.705473,
     "ast_hash": "856cd2f4659474fe712ca8e81752ab90",
+    "semantic_hash": ""
+  },
+  "icons/SBAFA_Logo.svg": {
+    "mtime": 1790095707.2755885,
+    "seen": 1790100857.8151426,
+    "ast_hash": "3f6d339b56f111c6b1c662a1abe484e2",
     "semantic_hash": ""
   }
 }

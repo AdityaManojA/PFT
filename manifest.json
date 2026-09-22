@@ -41,7 +41,7 @@
   ],
   "id": "./?source=pwa",
   "start_url": "./?source=pwa",
-  "background_color": "#181915",
+  "background_color": "#272A32",
   "theme_color": "#E86034",
   "display": "standalone",
   "display_override": [

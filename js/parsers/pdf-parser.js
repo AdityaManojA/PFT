@@ -134,6 +134,26 @@ export class BankPDFParser {
       }
     }
 
+    // Extract Account Number / Last 4 Digits from statement header
+    let accountNumberMask = '•••• ' + Math.floor(1000 + Math.random() * 9000);
+    let accountNumberLast4 = null;
+    const accMatch = fullText.match(/(?:Account\s*(?:Number|No\.?)|A\/c\s*(?:No\.?|Number)|SB\s*A\/c)\s*:?\s*([A-Za-z0-9\*\-]{4,25})/i);
+    if (accMatch) {
+      const digitsOnly = accMatch[1].replace(/\D/g, '');
+      if (digitsOnly.length >= 4) {
+        accountNumberLast4 = digitsOnly.slice(-4);
+        accountNumberMask = '•••• ' + accountNumberLast4;
+      }
+    }
+    // Fallback: check Customer ID or Branch IFSC if explicit A/c No is omitted
+    if (!accountNumberLast4) {
+      const custMatch = fullText.match(/(?:Customer\s*ID|Cust\s*ID)\s*:?\s*(\d{4,12})/i);
+      if (custMatch) {
+        accountNumberLast4 = custMatch[1].slice(-4);
+        accountNumberMask = '•••• ' + accountNumberLast4;
+      }
+    }
+
     // Regular expressions for Indian bank dates: DD/MM/YYYY or DD-MM-YYYY or DD-Mon-YYYY
     const numericDateRegex = /\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b/;
     const alphaDateRegex = /\b(\d{1,2}[\s\-](?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s\-]\d{2,4})\b/i;
@@ -186,11 +206,12 @@ export class BankPDFParser {
       const parsedAmt = parseFloat(amounts[0].replace(/,/g, ''));
       if (isNaN(parsedAmt) || parsedAmt <= 0 || parsedAmt > 50000000) continue;
 
-      // Clean narration: remove dates, amounts, and trailing balance flags
+      // Clean narration: remove dates, amounts, Tran Type flags (TRF/TFR/CLG/CHQ), and Tran IDs (S47985925)
       let narration = rawLine
         .replace(new RegExp(dateMatch[0], 'g'), '')
         .replace(amountRegex, '')
-        .replace(/\b(Cr|Dr|CR|DR|TFR)\b/g, '')
+        .replace(/\b(Cr|Dr|CR|DR|TFR|TRF|CLG|CHQ|CHEQUE)\b/gi, '')
+        .replace(/\b[SC]\d{7,10}\b/g, '')
         .replace(/\s+/g, ' ')
         .trim();
 
@@ -230,6 +251,8 @@ export class BankPDFParser {
       bankCode,
       availableBalance,
       statementDate,
+      accountNumberMask,
+      accountNumberLast4,
       totalParsed: transactions.length,
       transactions
     };

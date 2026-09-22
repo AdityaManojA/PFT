@@ -285,16 +285,26 @@ export async function renderLogin(container, onLoginSuccess) {
 
         const existing = await findUserByEmail(googleProfile.email);
         if (existing) {
+          // If Google provides an image, save it immediately so it's always up to date
+          if (googleProfile.picture && (existing.picture !== googleProfile.picture || existing.photoURL !== googleProfile.picture)) {
+            await db.users.update(existing.id, {
+              picture: googleProfile.picture,
+              photoURL: googleProfile.picture
+            });
+            existing.picture = googleProfile.picture;
+            existing.photoURL = googleProfile.picture;
+          }
           // Direct login for existing users via Google
           setCurrentUser(existing);
           if (onLoginSuccess) onLoginSuccess(existing);
         } else {
-          // If no account exists yet, direct to registration tab
+          // If no account exists yet, direct to registration tab and pre-fill Google PFP
           tabSignup.click();
           const signupName = container.querySelector('#signup-name');
           const signupEmail = container.querySelector('#signup-email');
           if (signupName && !signupName.value) signupName.value = googleProfile.name || '';
           if (signupEmail && !signupEmail.value) signupEmail.value = googleProfile.email || '';
+          window.__pendingGooglePicture = googleProfile.picture || '';
           showSignupErr(`No vault found for ${googleProfile.email}. Please set your 6-digit PIN below to finalize your vault.`);
         }
       } catch (err) {
@@ -482,7 +492,8 @@ function promptRegistrationGoogleStep(pendingData, onLoginSuccess) {
         autofillEnabled: pendingData.autofillEnabled,
         authProvider: 'google',
         googleEmail: gProfile.email,
-        picture: gProfile.picture || ''
+        picture: gProfile.picture || window.__pendingGooglePicture || '',
+        photoURL: gProfile.picture || window.__pendingGooglePicture || ''
       });
 
       modalContainer.innerHTML = '';

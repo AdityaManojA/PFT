@@ -14,41 +14,47 @@
 
   /* Secondary Accents */
   --accent-sage: #3D6B52;
-  --accent-sage-subtle: rgba(61, 107, 82, 0.12);
+  --accent-sage-subtle: rgba(61, 107, 82, 0.14);
   --accent-ochre: #D9822B;
-  --accent-ochre-subtle: rgba(217, 130, 43, 0.12);
+  --accent-ochre-subtle: rgba(217, 130, 43, 0.14);
+
+  /* Semantic Theme Fallbacks (sticking to theme) */
+  --accent-emerald: #2E7D5B;
+  --accent-emerald-subtle: rgba(46, 125, 91, 0.14);
+  --accent-blue: #E86034; /* Aliased to theme brand terracotta */
+  --accent-blue-subtle: rgba(232, 96, 52, 0.14);
 
   /* Functional Financial Signals */
   --signal-income: #2E7D5B;
-  --signal-income-subtle: rgba(46, 125, 91, 0.12);
+  --signal-income-subtle: rgba(46, 125, 91, 0.14);
   --signal-expense: #E86034;
-  --signal-expense-subtle: rgba(232, 96, 52, 0.12);
+  --signal-expense-subtle: rgba(232, 96, 52, 0.14);
   --signal-warning: #D9822B;
-  --signal-warning-subtle: rgba(217, 130, 43, 0.12);
+  --signal-warning-subtle: rgba(217, 130, 43, 0.14);
 
-  /* Dark Mode Hierarchy (Warm Espresso Obsidian & Wheat Tones) */
-  --bg-deep: #121310;
-  --bg-main: #181915;
-  --bg-surface: #20221C;
-  --bg-surface-elevated: #282A24;
-  --bg-surface-subtle: rgba(32, 34, 28, 0.85);
-  --bg-glass: rgba(24, 25, 21, 0.88);
-  --bg-glass-card: rgba(32, 34, 28, 0.75);
-  --bg-glass-card-hover: rgba(40, 42, 36, 0.9);
+  /* Clean Architectural Lighter Gray Theme (Noticeably Lighter & Cleaner) */
+  --bg-deep: #1E2126;
+  --bg-main: #272A32;
+  --bg-surface: #323742;
+  --bg-surface-elevated: #3E4452;
+  --bg-surface-subtle: rgba(50, 55, 66, 0.85);
+  --bg-glass: rgba(39, 42, 50, 0.90);
+  --bg-glass-card: rgba(50, 55, 66, 0.75);
+  --bg-glass-card-hover: rgba(62, 68, 82, 0.92);
 
-  /* Warm Borders & Dividers */
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-medium: rgba(255, 255, 255, 0.13);
-  --border-hover: rgba(255, 255, 255, 0.22);
-  --border-focus: rgba(232, 96, 52, 0.55);
-  --border-accent: rgba(232, 96, 52, 0.35);
+  /* Clean Crisp Borders & Dividers */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --border-hover: rgba(255, 255, 255, 0.25);
+  --border-focus: rgba(232, 96, 52, 0.65);
+  --border-accent: rgba(232, 96, 52, 0.40);
 
-  /* High Legibility Warm Editorial Typography */
-  --text-primary: #F7F5EE;
-  --text-secondary: #B0AEA5;
-  --text-muted: #7E7C74;
-  --text-dim: #55544E;
-  --text-inverse: #181915;
+  /* High Legibility Clean Typography */
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+  --text-inverse: #1E2126;
 
   /* Typography Families */
   --font-family-base: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
