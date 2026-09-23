@@ -6,9 +6,9 @@
     "semantic_hash": ""
   },
   "js/app.js": {
-    "mtime": 1790105877.4160545,
-    "seen": 1790105980.3060193,
-    "ast_hash": "8ef19a9697e094d04d03d913bc129d55",
+    "mtime": 1790107636.597246,
+    "seen": 1790107688.0509987,
+    "ast_hash": "a741e05e63ab57384b66d855a688dfc7",
     "semantic_hash": ""
   },
   "js/auth.js": {
@@ -42,9 +42,9 @@
     "semantic_hash": ""
   },
   "js/pwa.js": {
-    "mtime": 1790104797.3923259,
-    "seen": 1790104974.4108846,
-    "ast_hash": "f3830258ec6056f2431601fd152e63d9",
+    "mtime": 1790107614.8696804,
+    "seen": 1790107688.0509987,
+    "ast_hash": "224daae0fb7663368030e9f7a74fbc89",
     "semantic_hash": ""
   },
   "js/views/accounts.js": {
@@ -78,9 +78,9 @@
     "semantic_hash": ""
   },
   "js/views/login.js": {
-    "mtime": 1790102262.2777412,
-    "seen": 1790102388.9265308,
-    "ast_hash": "08228c17035fa767bff81b9dca4c7d01",
+    "mtime": 1790108312.7880495,
+    "seen": 1790108360.9867816,
+    "ast_hash": "184852d83145feff097f24cd414c339f",
     "semantic_hash": ""
   },
   "js/views/transactions.js": {
@@ -90,9 +90,9 @@
     "semantic_hash": ""
   },
   "manifest.json": {
-    "mtime": 1790101911.0692205,
-    "seen": 1790102388.9265308,
-    "ast_hash": "56af639b320c899d65be16f0529d66a4",
+    "mtime": 1790107562.9430385,
+    "seen": 1790107688.0509987,
+    "ast_hash": "55b15f176d707c764245d9f3ae2c99b8",
     "semantic_hash": ""
   },
   "package.json": {
@@ -120,15 +120,15 @@
     "semantic_hash": "ee4b85b73cbba1067f5fb73593b10b82"
   },
   "sw.js": {
-    "mtime": 1790105896.0080009,
-    "seen": 1790105980.3060193,
-    "ast_hash": "7a8fc3c2e733d9b5e4a01c30faa99de0",
+    "mtime": 1790108324.3582194,
+    "seen": 1790108360.9867816,
+    "ast_hash": "9a3cbf1cbeb8bc98fdfc0222aa7603e9",
     "semantic_hash": ""
   },
   "js/firebase-config.js": {
-    "mtime": 1790105040.9145637,
-    "seen": 1790105090.4014478,
-    "ast_hash": "e4309abe9aeb861bd5e919c15b372db9",
+    "mtime": 1790107508.2925928,
+    "seen": 1790107688.0509987,
+    "ast_hash": "e005f53afec3555869700304becd8890",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1790105902.9918442,
-    "seen": 1790105980.3060193,
-    "ast_hash": "2c16c4a2f8e09bdeae349f69f89a7852",
+    "mtime": 1790108334.7312365,
+    "seen": 1790108360.9867816,
+    "ast_hash": "4ad925607f63d36cf32e2fc25d984b17",
     "semantic_hash": ""
   },
   "public/index.html": {
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "js/services/cloud-vault-sync.js": {
-    "mtime": 1790105800.5466106,
-    "seen": 1790105980.3060193,
-    "ast_hash": "f5631e779eaadd558f83e6333a99d354",
+    "mtime": 1790107545.8485749,
+    "seen": 1790107688.0509987,
+    "ast_hash": "c24b3855cc743babb66d809dd7265764",
     "semantic_hash": ""
   }
 }

@@ -315,10 +315,12 @@ export async function renderLanding(container) {
         <div class="feature-grid-minimal">
           <div class="feature-card-minimal">
             <div>
-              <div class="feature-card-icon">🔐</div>
+              <div class="feature-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              </div>
               <h3 class="feature-card-title">Encrypted Local Vault</h3>
               <p class="feature-card-text">
-                IndexedDB storage fortified with 256-bit AES-GCM and device biometrics (TouchID / FaceID). Your bank statements never touch a remote server.
+                IndexedDB storage fortified with 256-bit AES-GCM encryption. Your bank statements never touch a remote server.
               </p>
             </div>
             <div class="feature-card-tag">PROTOCOL: WEBCRYPTO / DEXIE</div>
@@ -326,7 +328,9 @@ export async function renderLanding(container) {
 
           <div class="feature-card-minimal">
             <div>
-              <div class="feature-card-icon">📬</div>
+              <div class="feature-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              </div>
               <h3 class="feature-card-title">Gmail Statement Auto-Pull</h3>
               <p class="feature-card-text">
                 Secure, direct email statement fetch via Google OAuth. Automatic weekly sync searches for e-statements with zero regulatory AA middlemen and zero server telemetry.
@@ -337,7 +341,9 @@ export async function renderLanding(container) {
 
           <div class="feature-card-minimal">
             <div>
-              <div class="feature-card-icon">📄</div>
+              <div class="feature-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              </div>
               <h3 class="feature-card-title">In-Browser PDF Parsing</h3>
               <p class="feature-card-text">
                 Client-side WebAssembly PDF.js engine extracts password-protected Indian bank statements in under 300ms with automated IFSC and merchant tagging.
@@ -348,7 +354,9 @@ export async function renderLanding(container) {
 
           <div class="feature-card-minimal">
             <div>
-              <div class="feature-card-icon">⚡</div>
+              <div class="feature-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              </div>
               <h3 class="feature-card-title">Offline-First Service Worker</h3>
               <p class="feature-card-text">
                 Log transactions on an airplane or subway without internet. Background Sync seamlessly flushes your local transaction queue once connectivity resumes.
@@ -410,7 +418,7 @@ export async function renderLanding(container) {
       <section class="landing-bottom-cta">
         <h2 class="landing-bottom-cta-title">Take Complete Financial Ownership.</h2>
         <p class="landing-bottom-cta-sub">
-          No sign-ups requiring external servers. Create your private biometric vault on this device in under 15 seconds.
+          No sign-ups requiring external servers. Create your private encrypted vault on this device in under 15 seconds.
         </p>
         <button id="landing-bottom-cta-btn" class="btn btn-primary btn-lg">
           ${ctaText}

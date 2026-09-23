@@ -30,25 +30,12 @@
       "source_location": "L12"
     },
     {
-      "id": "js_auth_biometricauthservice",
-      "label": "BiometricAuthService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "BiometricAuthService",
-      "file_type": "code",
-      "norm_label": "biometricauthservice",
-      "source_file": "js/auth.js",
-      "source_location": "L9"
-    },
-    {
       "id": "js_db_appdatabase",
       "label": "AppDatabase",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 17,
+      "community": 12,
       "community_name": "db.js",
       "file_type": "code",
       "norm_label": "appdatabase",
@@ -62,7 +49,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "appcoordinator",
       "source_file": "js/app.js",
@@ -75,11 +62,24 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "cloudvaultsyncservice",
       "source_file": "js/services/cloud-vault-sync.js",
       "source_location": "L16"
+    },
+    {
+      "id": "js_auth_biometricauthservice",
+      "label": "BiometricAuthService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "dashboard.js",
+      "file_type": "code",
+      "norm_label": "biometricauthservice",
+      "source_file": "js/auth.js",
+      "source_location": "L9"
     },
     {
       "id": "js_parsers_bank_parser_bankstatementparser",
@@ -101,95 +101,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": "firebaseauthservice",
       "source_file": "js/auth.js",
       "source_location": "L104"
-    },
-    {
-      "id": "js_app_escapehtml",
-      "label": "escapeHtml()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "escapehtml()",
-      "source_file": "js/app.js",
-      "source_location": "L689"
-    },
-    {
-      "id": "js_db_drainofflinequeue",
-      "label": "drainOfflineQueue()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "drainofflinequeue()",
-      "source_file": "js/db.js",
-      "source_location": "L428"
-    },
-    {
-      "id": "js_db_getallusers",
-      "label": "getAllUsers()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "getallusers()",
-      "source_file": "js/db.js",
-      "source_location": "L91"
-    },
-    {
-      "id": "js_pwa_checkandrenderiosinstallprompt",
-      "label": "checkAndRenderIOSInstallPrompt()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "checkandrenderiosinstallprompt()",
-      "source_file": "js/pwa.js",
-      "source_location": "L102"
-    },
-    {
-      "id": "js_pwa_dismissiosinstallbanner",
-      "label": "dismissIOSInstallBanner()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "dismissiosinstallbanner()",
-      "source_file": "js/pwa.js",
-      "source_location": "L119"
-    },
-    {
-      "id": "js_pwa_initpwaengine",
-      "label": "initPWAEngine()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "initpwaengine()",
-      "source_file": "js/pwa.js",
-      "source_location": "L10"
-    },
-    {
-      "id": "js_pwa_promptpwainstall",
-      "label": "promptPWAInstall()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "promptpwainstall()",
-      "source_file": "js/pwa.js",
-      "source_location": "L84"
     },
     {
       "id": "js_views_landing_createparticlemesh",
@@ -197,7 +113,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "app.js",
+      "community_name": "createParticleMesh",
       "file_type": "code",
       "norm_label": "createparticlemesh()",
       "source_file": "js/views/landing.js",
@@ -209,7 +125,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "app.js",
+      "community_name": "createParticleMesh",
       "file_type": "code",
       "norm_label": "draw()",
       "source_file": "js/views/landing.js",
@@ -221,7 +137,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "app.js",
+      "community_name": "createParticleMesh",
       "file_type": "code",
       "norm_label": "makeparticle()",
       "source_file": "js/views/landing.js",
@@ -233,7 +149,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "app.js",
+      "community_name": "createParticleMesh",
       "file_type": "code",
       "norm_label": "onmousemove()",
       "source_file": "js/views/landing.js",
@@ -245,7 +161,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "app.js",
+      "community_name": "createParticleMesh",
       "file_type": "code",
       "norm_label": "onscroll()",
       "source_file": "js/views/landing.js",
@@ -257,7 +173,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "app.js",
+      "community_name": "createParticleMesh",
       "file_type": "code",
       "norm_label": "ontouchmove()",
       "source_file": "js/views/landing.js",
@@ -269,23 +185,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "app.js",
+      "community_name": "createParticleMesh",
       "file_type": "code",
       "norm_label": "resize()",
       "source_file": "js/views/landing.js",
       "source_location": "L54"
     },
     {
-      "id": "js_views_landing_renderlanding",
-      "label": "renderLanding()",
+      "id": "js_db_addnotification",
+      "label": "addNotification()",
       "_callable": true,
       "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
+      "community": 1,
+      "community_name": "accounts.js",
       "file_type": "code",
-      "norm_label": "renderlanding()",
-      "source_file": "js/views/landing.js",
-      "source_location": "L234"
+      "norm_label": "addnotification()",
+      "source_file": "js/db.js",
+      "source_location": "L453"
     },
     {
       "id": "js_db_resetuserdata",
@@ -732,64 +648,28 @@
       "source_location": "L443"
     },
     {
-      "id": "js_auth_biometricauthservice_authenticatebiometrics",
-      "label": ".authenticateBiometrics()",
+      "id": "js_db_addstatementuploadhistory",
+      "label": "addStatementUploadHistory()",
       "_callable": true,
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
-      "norm_label": ".authenticatebiometrics()",
-      "source_file": "js/auth.js",
-      "source_location": "L24"
+      "norm_label": "addstatementuploadhistory()",
+      "source_file": "js/db.js",
+      "source_location": "L571"
     },
     {
-      "id": "js_auth_biometricauthservice_isbiometricavailable",
-      "label": ".isBiometricAvailable()",
+      "id": "js_db_appdatabase_constructor",
+      "label": ".constructor()",
       "_callable": true,
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
-      "norm_label": ".isbiometricavailable()",
-      "source_file": "js/auth.js",
-      "source_location": "L13"
-    },
-    {
-      "id": "js_auth_biometricauthservice_isbiometriclockenabled",
-      "label": ".isBiometricLockEnabled()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "BiometricAuthService",
-      "file_type": "code",
-      "norm_label": ".isbiometriclockenabled()",
-      "source_file": "js/auth.js",
-      "source_location": "L83"
-    },
-    {
-      "id": "js_auth_biometricauthservice_setbiometriclockenabled",
-      "label": ".setBiometricLockEnabled()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "BiometricAuthService",
-      "file_type": "code",
-      "norm_label": ".setbiometriclockenabled()",
-      "source_file": "js/auth.js",
-      "source_location": "L88"
-    },
-    {
-      "id": "js_auth_biometricauthservice_verifypin",
-      "label": ".verifyPin()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "BiometricAuthService",
-      "file_type": "code",
-      "norm_label": ".verifypin()",
-      "source_file": "js/auth.js",
-      "source_location": "L53"
+      "norm_label": ".constructor()",
+      "source_file": "js/db.js",
+      "source_location": "L16"
     },
     {
       "id": "js_db_finduserbyemail",
@@ -797,11 +677,47 @@
       "_callable": true,
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
       "norm_label": "finduserbyemail()",
       "source_file": "js/db.js",
       "source_location": "L141"
+    },
+    {
+      "id": "js_db_getallusers",
+      "label": "getAllUsers()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "getallusers()",
+      "source_file": "js/db.js",
+      "source_location": "L91"
+    },
+    {
+      "id": "js_db_getpendingcount",
+      "label": "getPendingCount()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "getpendingcount()",
+      "source_file": "js/db.js",
+      "source_location": "L436"
+    },
+    {
+      "id": "js_db_getstatementuploadhistory",
+      "label": "getStatementUploadHistory()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "getstatementuploadhistory()",
+      "source_file": "js/db.js",
+      "source_location": "L529"
     },
     {
       "id": "js_db_loginuser",
@@ -809,11 +725,35 @@
       "_callable": true,
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
       "norm_label": "loginuser()",
       "source_file": "js/db.js",
       "source_location": "L95"
+    },
+    {
+      "id": "js_db_notifycloudsync",
+      "label": "notifyCloudSync()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "notifycloudsync()",
+      "source_file": "js/db.js",
+      "source_location": "L34"
+    },
+    {
+      "id": "js_db_purgealltestdata",
+      "label": "purgeAllTestData()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "purgealltestdata()",
+      "source_file": "js/db.js",
+      "source_location": "L229"
     },
     {
       "id": "js_db_registeruser",
@@ -821,11 +761,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
       "norm_label": "registeruser()",
       "source_file": "js/db.js",
       "source_location": "L152"
+    },
+    {
+      "id": "js_db_seedinitialdataifneeded",
+      "label": "seedInitialDataIfNeeded()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "seedinitialdataifneeded()",
+      "source_file": "js/db.js",
+      "source_location": "L329"
     },
     {
       "id": "js_db_setcurrentuser",
@@ -833,11 +785,47 @@
       "_callable": true,
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
       "norm_label": "setcurrentuser()",
       "source_file": "js/db.js",
       "source_location": "L83"
+    },
+    {
+      "id": "js_db_triggercloudsync",
+      "label": "triggerCloudSync()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "triggercloudsync()",
+      "source_file": "js/db.js",
+      "source_location": "L56"
+    },
+    {
+      "id": "js_db_version",
+      "label": "version()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "version()",
+      "source_file": "js/db.js",
+      "source_location": "L7"
+    },
+    {
+      "id": "js_firebase_config_loadfirebaseconfig",
+      "label": "loadFirebaseConfig()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "loadfirebaseconfig()",
+      "source_file": "js/firebase-config.js",
+      "source_location": "L18"
     },
     {
       "id": "js_views_login_escapehtml",
@@ -845,7 +833,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
       "norm_label": "escapehtml()",
       "source_file": "js/views/login.js",
@@ -857,7 +845,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
       "norm_label": "promptregistrationgooglestep()",
       "source_file": "js/views/login.js",
@@ -869,35 +857,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
       "norm_label": "renderlogin()",
       "source_file": "js/views/login.js",
       "source_location": "L12"
-    },
-    {
-      "id": "js_db_addnotification",
-      "label": "addNotification()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": "addnotification()",
-      "source_file": "js/db.js",
-      "source_location": "L453"
-    },
-    {
-      "id": "js_db_appdatabase_constructor",
-      "label": ".constructor()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": ".constructor()",
-      "source_file": "js/db.js",
-      "source_location": "L16"
     },
     {
       "id": "js_db_deletenotification",
@@ -905,23 +869,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "deletenotification()",
       "source_file": "js/db.js",
       "source_location": "L487"
-    },
-    {
-      "id": "js_db_getpendingcount",
-      "label": "getPendingCount()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": "getpendingcount()",
-      "source_file": "js/db.js",
-      "source_location": "L436"
     },
     {
       "id": "js_db_getunreadnotificationcount",
@@ -929,7 +881,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "getunreadnotificationcount()",
       "source_file": "js/db.js",
@@ -941,7 +893,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "getuserbudgets()",
       "source_file": "js/db.js",
@@ -953,7 +905,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "getusernotifications()",
       "source_file": "js/db.js",
@@ -965,7 +917,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "getuserspendingcap()",
       "source_file": "js/db.js",
@@ -977,7 +929,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "getusertransactions()",
       "source_file": "js/db.js",
@@ -989,7 +941,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "markallnotificationsasread()",
       "source_file": "js/db.js",
@@ -1001,35 +953,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "marknotificationasread()",
       "source_file": "js/db.js",
       "source_location": "L468"
-    },
-    {
-      "id": "js_db_purgealltestdata",
-      "label": "purgeAllTestData()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": "purgealltestdata()",
-      "source_file": "js/db.js",
-      "source_location": "L229"
-    },
-    {
-      "id": "js_db_seedinitialdataifneeded",
-      "label": "seedInitialDataIfNeeded()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": "seedinitialdataifneeded()",
-      "source_file": "js/db.js",
-      "source_location": "L329"
     },
     {
       "id": "js_db_setuserspendingcap",
@@ -1037,23 +965,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "setuserspendingcap()",
       "source_file": "js/db.js",
       "source_location": "L511"
-    },
-    {
-      "id": "js_db_version",
-      "label": "version()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": "version()",
-      "source_file": "js/db.js",
-      "source_location": "L7"
     },
     {
       "id": "js_services_email_service_dispatchemail",
@@ -1061,7 +977,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "dispatchemail()",
       "source_file": "js/services/email-service.js",
@@ -1073,7 +989,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "escapehtml()",
       "source_file": "js/services/email-service.js",
@@ -1085,7 +1001,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "sendlimitbreachemail()",
       "source_file": "js/services/email-service.js",
@@ -1097,23 +1013,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "sendmonthendreminderemail()",
       "source_file": "js/services/email-service.js",
       "source_location": "L119"
-    },
-    {
-      "id": "js_services_notification_center_checkmonthendreminder",
-      "label": "checkMonthEndReminder()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": "checkmonthendreminder()",
-      "source_file": "js/services/notification-center.js",
-      "source_location": "L277"
     },
     {
       "id": "js_services_notification_center_checkspendingcaps",
@@ -1121,7 +1025,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "checkspendingcaps()",
       "source_file": "js/services/notification-center.js",
@@ -1133,7 +1037,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "escapehtml()",
       "source_file": "js/services/notification-center.js",
@@ -1145,23 +1049,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "formattimeago()",
       "source_file": "js/services/notification-center.js",
       "source_location": "L421"
-    },
-    {
-      "id": "js_services_notification_center_initnotificationcenter",
-      "label": "initNotificationCenter()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": "initnotificationcenter()",
-      "source_file": "js/services/notification-center.js",
-      "source_location": "L28"
     },
     {
       "id": "js_services_notification_center_opennotificationdrawer",
@@ -1169,7 +1061,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "opennotificationdrawer()",
       "source_file": "js/services/notification-center.js",
@@ -1181,7 +1073,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "renderdrawerhtml()",
       "source_file": "js/services/notification-center.js",
@@ -1193,35 +1085,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "rendernotificationitem()",
       "source_file": "js/services/notification-center.js",
       "source_location": "L220"
-    },
-    {
-      "id": "js_services_notification_center_runautomatedchecks",
-      "label": "runAutomatedChecks()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": "runautomatedchecks()",
-      "source_file": "js/services/notification-center.js",
-      "source_location": "L267"
-    },
-    {
-      "id": "js_services_notification_center_updatenotificationbadge",
-      "label": "updateNotificationBadge()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": "updatenotificationbadge()",
-      "source_file": "js/services/notification-center.js",
-      "source_location": "L39"
     },
     {
       "id": "js_views_budgets_escapehtml",
@@ -1229,7 +1097,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "escapehtml()",
       "source_file": "js/views/budgets.js",
@@ -1241,7 +1109,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "openbudgeteditmodal()",
       "source_file": "js/views/budgets.js",
@@ -1253,7 +1121,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "openspendingcapmodal()",
       "source_file": "js/views/budgets.js",
@@ -1265,7 +1133,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "renderbudgets()",
       "source_file": "js/views/budgets.js",
@@ -1277,7 +1145,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "getitem()",
       "source_file": "scratch/test_notifications_and_caps.mjs",
@@ -1289,7 +1157,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "removeitem()",
       "source_file": "scratch/test_notifications_and_caps.mjs",
@@ -1301,7 +1169,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "setitem()",
       "source_file": "scratch/test_notifications_and_caps.mjs",
@@ -1313,11 +1181,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".applytheme()",
       "source_file": "js/app.js",
-      "source_location": "L124"
+      "source_location": "L125"
     },
     {
       "id": "js_app_appcoordinator_constructor",
@@ -1325,7 +1193,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "js/app.js",
@@ -1337,11 +1205,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".handleloginsuccess()",
       "source_file": "js/app.js",
-      "source_location": "L315"
+      "source_location": "L316"
     },
     {
       "id": "js_app_appcoordinator_handlenetworkchange",
@@ -1349,11 +1217,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".handlenetworkchange()",
       "source_file": "js/app.js",
-      "source_location": "L590"
+      "source_location": "L592"
     },
     {
       "id": "js_app_appcoordinator_init",
@@ -1361,7 +1229,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".init()",
       "source_file": "js/app.js",
@@ -1373,11 +1241,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".inittheme()",
       "source_file": "js/app.js",
-      "source_location": "L108"
+      "source_location": "L109"
     },
     {
       "id": "js_app_appcoordinator_navigate",
@@ -1385,11 +1253,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".navigate()",
       "source_file": "js/app.js",
-      "source_location": "L238"
+      "source_location": "L239"
     },
     {
       "id": "js_app_appcoordinator_refreshcurrentview",
@@ -1397,11 +1265,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".refreshcurrentview()",
       "source_file": "js/app.js",
-      "source_location": "L283"
+      "source_location": "L284"
     },
     {
       "id": "js_app_appcoordinator_setupglobalcontrols",
@@ -1409,11 +1277,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".setupglobalcontrols()",
       "source_file": "js/app.js",
-      "source_location": "L336"
+      "source_location": "L338"
     },
     {
       "id": "js_app_appcoordinator_setuprouting",
@@ -1421,11 +1289,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".setuprouting()",
       "source_file": "js/app.js",
-      "source_location": "L193"
+      "source_location": "L194"
     },
     {
       "id": "js_app_appcoordinator_showbiometriclockscreen",
@@ -1433,11 +1301,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".showbiometriclockscreen()",
       "source_file": "js/app.js",
-      "source_location": "L632"
+      "source_location": "L634"
     },
     {
       "id": "js_app_appcoordinator_showtoast",
@@ -1445,11 +1313,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".showtoast()",
       "source_file": "js/app.js",
-      "source_location": "L607"
+      "source_location": "L609"
     },
     {
       "id": "js_app_appcoordinator_showuserprofilesheet",
@@ -1457,11 +1325,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".showuserprofilesheet()",
       "source_file": "js/app.js",
-      "source_location": "L438"
+      "source_location": "L440"
     },
     {
       "id": "js_app_appcoordinator_updateheaderuserprofile",
@@ -1469,23 +1337,35 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".updateheaderuserprofile()",
       "source_file": "js/app.js",
-      "source_location": "L150"
+      "source_location": "L151"
     },
     {
-      "id": "js_db_addstatementuploadhistory",
-      "label": "addStatementUploadHistory()",
+      "id": "js_app_escapehtml",
+      "label": "escapeHtml()",
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
-      "norm_label": "addstatementuploadhistory()",
+      "norm_label": "escapehtml()",
+      "source_file": "js/app.js",
+      "source_location": "L691"
+    },
+    {
+      "id": "js_db_drainofflinequeue",
+      "label": "drainOfflineQueue()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "drainofflinequeue()",
       "source_file": "js/db.js",
-      "source_location": "L571"
+      "source_location": "L428"
     },
     {
       "id": "js_db_getcurrentuser",
@@ -1493,47 +1373,59 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "getcurrentuser()",
       "source_file": "js/db.js",
       "source_location": "L76"
     },
     {
-      "id": "js_db_getstatementuploadhistory",
-      "label": "getStatementUploadHistory()",
+      "id": "js_pwa_checkandrenderiosinstallprompt",
+      "label": "checkAndRenderIOSInstallPrompt()",
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
-      "norm_label": "getstatementuploadhistory()",
-      "source_file": "js/db.js",
-      "source_location": "L529"
+      "norm_label": "checkandrenderiosinstallprompt()",
+      "source_file": "js/pwa.js",
+      "source_location": "L102"
     },
     {
-      "id": "js_db_notifycloudsync",
-      "label": "notifyCloudSync()",
+      "id": "js_pwa_dismissiosinstallbanner",
+      "label": "dismissIOSInstallBanner()",
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
-      "norm_label": "notifycloudsync()",
-      "source_file": "js/db.js",
-      "source_location": "L34"
+      "norm_label": "dismissiosinstallbanner()",
+      "source_file": "js/pwa.js",
+      "source_location": "L128"
     },
     {
-      "id": "js_db_triggercloudsync",
-      "label": "triggerCloudSync()",
+      "id": "js_pwa_initpwaengine",
+      "label": "initPWAEngine()",
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
-      "norm_label": "triggercloudsync()",
-      "source_file": "js/db.js",
-      "source_location": "L56"
+      "norm_label": "initpwaengine()",
+      "source_file": "js/pwa.js",
+      "source_location": "L10"
+    },
+    {
+      "id": "js_pwa_promptpwainstall",
+      "label": "promptPWAInstall()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "promptpwainstall()",
+      "source_file": "js/pwa.js",
+      "source_location": "L84"
     },
     {
       "id": "js_services_cloud_vault_sync_cloudvaultsyncservice_getfirestore",
@@ -1541,7 +1433,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".getfirestore()",
       "source_file": "js/services/cloud-vault-sync.js",
@@ -1553,7 +1445,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".getvaultkey()",
       "source_file": "js/services/cloud-vault-sync.js",
@@ -1565,7 +1457,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".initrealtimesync()",
       "source_file": "js/services/cloud-vault-sync.js",
@@ -1577,7 +1469,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".pullcloudvault()",
       "source_file": "js/services/cloud-vault-sync.js",
@@ -1589,7 +1481,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".pushlocalvault()",
       "source_file": "js/services/cloud-vault-sync.js",
@@ -1601,7 +1493,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".schedulecloudpush()",
       "source_file": "js/services/cloud-vault-sync.js",
@@ -1613,11 +1505,71 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": ".stoprealtimesync()",
       "source_file": "js/services/cloud-vault-sync.js",
       "source_location": "L290"
+    },
+    {
+      "id": "js_services_notification_center_checkmonthendreminder",
+      "label": "checkMonthEndReminder()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "checkmonthendreminder()",
+      "source_file": "js/services/notification-center.js",
+      "source_location": "L277"
+    },
+    {
+      "id": "js_services_notification_center_initnotificationcenter",
+      "label": "initNotificationCenter()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "initnotificationcenter()",
+      "source_file": "js/services/notification-center.js",
+      "source_location": "L28"
+    },
+    {
+      "id": "js_services_notification_center_runautomatedchecks",
+      "label": "runAutomatedChecks()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "runautomatedchecks()",
+      "source_file": "js/services/notification-center.js",
+      "source_location": "L267"
+    },
+    {
+      "id": "js_services_notification_center_updatenotificationbadge",
+      "label": "updateNotificationBadge()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "updatenotificationbadge()",
+      "source_file": "js/services/notification-center.js",
+      "source_location": "L39"
+    },
+    {
+      "id": "js_views_landing_renderlanding",
+      "label": "renderLanding()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "renderlanding()",
+      "source_file": "js/views/landing.js",
+      "source_location": "L234"
     },
     {
       "id": "functions_index_gettransporter",
@@ -1656,6 +1608,30 @@
       "source_location": "L99"
     },
     {
+      "id": "scratch_test_verification_checkfiles",
+      "label": "checkFiles()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "test_verification.mjs",
+      "file_type": "code",
+      "norm_label": "checkfiles()",
+      "source_file": "scratch/test_verification.mjs",
+      "source_location": "L62"
+    },
+    {
+      "id": "js_auth_biometricauthservice_authenticatebiometrics",
+      "label": ".authenticateBiometrics()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "dashboard.js",
+      "file_type": "code",
+      "norm_label": ".authenticatebiometrics()",
+      "source_file": "js/auth.js",
+      "source_location": "L24"
+    },
+    {
       "id": "js_auth_biometricauthservice_getprivacymode",
       "label": ".getPrivacyMode()",
       "_callable": true,
@@ -1668,6 +1644,42 @@
       "source_location": "L78"
     },
     {
+      "id": "js_auth_biometricauthservice_isbiometricavailable",
+      "label": ".isBiometricAvailable()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "dashboard.js",
+      "file_type": "code",
+      "norm_label": ".isbiometricavailable()",
+      "source_file": "js/auth.js",
+      "source_location": "L13"
+    },
+    {
+      "id": "js_auth_biometricauthservice_isbiometriclockenabled",
+      "label": ".isBiometricLockEnabled()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "dashboard.js",
+      "file_type": "code",
+      "norm_label": ".isbiometriclockenabled()",
+      "source_file": "js/auth.js",
+      "source_location": "L83"
+    },
+    {
+      "id": "js_auth_biometricauthservice_setbiometriclockenabled",
+      "label": ".setBiometricLockEnabled()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "dashboard.js",
+      "file_type": "code",
+      "norm_label": ".setbiometriclockenabled()",
+      "source_file": "js/auth.js",
+      "source_location": "L88"
+    },
+    {
       "id": "js_auth_biometricauthservice_toggleprivacymode",
       "label": ".togglePrivacyMode()",
       "_callable": true,
@@ -1678,6 +1690,18 @@
       "norm_label": ".toggleprivacymode()",
       "source_file": "js/auth.js",
       "source_location": "L71"
+    },
+    {
+      "id": "js_auth_biometricauthservice_verifypin",
+      "label": ".verifyPin()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "dashboard.js",
+      "file_type": "code",
+      "norm_label": ".verifypin()",
+      "source_file": "js/auth.js",
+      "source_location": "L53"
     },
     {
       "id": "js_components_edit_category_modal_escapehtml",
@@ -2105,7 +2129,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".detecthostingconfig()",
       "source_file": "js/auth.js",
@@ -2117,7 +2141,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".getauth()",
       "source_file": "js/auth.js",
@@ -2129,7 +2153,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".getfirebaseconfig()",
       "source_file": "js/auth.js",
@@ -2141,7 +2165,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".getgmailaccesstoken()",
       "source_file": "js/auth.js",
@@ -2153,7 +2177,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".isconfigured()",
       "source_file": "js/auth.js",
@@ -2165,7 +2189,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".loadfirebasesdk()",
       "source_file": "js/auth.js",
@@ -2177,7 +2201,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".promptfirebaseconfigmodal()",
       "source_file": "js/auth.js",
@@ -2189,7 +2213,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".setfirebaseconfig()",
       "source_file": "js/auth.js",
@@ -2201,68 +2225,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "file_type": "code",
       "norm_label": ".signinwithgoogle()",
       "source_file": "js/auth.js",
       "source_location": "L207"
-    },
-    {
-      "id": "js_firebase_config_loadfirebaseconfig",
-      "label": "loadFirebaseConfig()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "loadfirebaseconfig()",
-      "source_file": "js/firebase-config.js",
-      "source_location": "L20"
-    },
-    {
-      "id": "scratch_test_verification_checkfiles",
-      "label": "checkFiles()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "checkfiles()",
-      "source_file": "scratch/test_verification.mjs",
-      "source_location": "L62"
-    },
-    {
-      "id": "js_app",
-      "label": "app.js",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "app.js",
-      "source_file": "js/app.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "js_pwa",
-      "label": "pwa.js",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "pwa.js",
-      "source_file": "js/pwa.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "js_views_landing",
-      "label": "landing.js",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "landing.js",
-      "source_file": "js/views/landing.js",
-      "source_location": "L1"
     },
     {
       "id": "js_views_accounts",
@@ -2337,22 +2304,154 @@
       "source_location": "L43"
     },
     {
+      "id": "firebase_app_js",
+      "label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "confidence": "EXTRACTED",
+      "file_type": "code",
+      "norm_label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+      "source_file": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
+    },
+    {
+      "id": "firebase_auth_js",
+      "label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "confidence": "EXTRACTED",
+      "file_type": "code",
+      "norm_label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+      "source_file": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
+    },
+    {
+      "id": "firebase_firestore_js",
+      "label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "confidence": "EXTRACTED",
+      "file_type": "code",
+      "norm_label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+      "source_file": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+    },
+    {
+      "id": "js_auth",
+      "label": "auth.js",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "auth.js",
+      "source_file": "js/auth.js",
+      "source_location": "L1"
+    },
+    {
       "id": "js_auth_googleauthservice",
       "label": "GoogleAuthService",
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
       "norm_label": "googleauthservice",
       "source_file": "js/auth.js",
       "source_location": "L424"
     },
     {
+      "id": "js_db",
+      "label": "db.js",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "db.js",
+      "source_file": "js/db.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "js_db_db",
+      "label": "db",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "db",
+      "source_file": "js/db.js",
+      "source_location": "L31"
+    },
+    {
+      "id": "js_firebase_config",
+      "label": "firebase-config.js",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "firebase-config.js",
+      "source_file": "js/firebase-config.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "js_firebase_config_firebaseconfig",
+      "label": "firebaseConfig",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "firebaseconfig",
+      "source_file": "js/firebase-config.js",
+      "source_location": "L6"
+    },
+    {
+      "id": "js_parsers_pdf_parser",
+      "label": "pdf-parser.js",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "pdf-parser.js",
+      "source_file": "js/parsers/pdf-parser.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "js_services_cloud_vault_sync",
+      "label": "cloud-vault-sync.js",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "cloud-vault-sync.js",
+      "source_file": "js/services/cloud-vault-sync.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "js_services_cloud_vault_sync_issyncing",
+      "label": "isSyncing",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "issyncing",
+      "source_file": "js/services/cloud-vault-sync.js",
+      "source_location": "L14"
+    },
+    {
+      "id": "js_services_gmail_sync",
+      "label": "gmail-sync.js",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "db.js",
+      "file_type": "code",
+      "norm_label": "gmail-sync.js",
+      "source_file": "js/services/gmail-sync.js",
+      "source_location": "L1"
+    },
+    {
       "id": "js_views_login",
       "label": "login.js",
       "_origin": "ast",
       "community": 12,
-      "community_name": "BiometricAuthService",
+      "community_name": "db.js",
       "file_type": "code",
       "norm_label": "login.js",
       "source_file": "js/views/login.js",
@@ -2793,22 +2892,11 @@
       "source_location": "L3"
     },
     {
-      "id": "js_db",
-      "label": "db.js",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "db.js",
-      "file_type": "code",
-      "norm_label": "db.js",
-      "source_file": "js/db.js",
-      "source_location": "L1"
-    },
-    {
       "id": "js_services_email_service",
       "label": "email-service.js",
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "email-service.js",
       "source_file": "js/services/email-service.js",
@@ -2819,7 +2907,7 @@
       "label": "SENDER_EMAIL",
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "sender_email",
       "source_file": "js/services/email-service.js",
@@ -2830,7 +2918,7 @@
       "label": "notification-center.js",
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "notification-center.js",
       "source_file": "js/services/notification-center.js",
@@ -2841,7 +2929,7 @@
       "label": "budgets.js",
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "budgets.js",
       "source_file": "js/views/budgets.js",
@@ -2852,7 +2940,7 @@
       "label": "test_notifications_and_caps.mjs",
       "_origin": "ast",
       "community": 17,
-      "community_name": "db.js",
+      "community_name": "notification-center.js",
       "file_type": "code",
       "norm_label": "test_notifications_and_caps.mjs",
       "source_file": "scratch/test_notifications_and_caps.mjs",
@@ -2917,37 +3005,37 @@
       "source_location": "L1"
     },
     {
-      "id": "firebase_firestore_js",
-      "label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+      "id": "js_app",
+      "label": "app.js",
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
-      "confidence": "EXTRACTED",
+      "community_name": "app.js",
       "file_type": "code",
-      "norm_label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
-      "source_file": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
-    },
-    {
-      "id": "js_services_cloud_vault_sync",
-      "label": "cloud-vault-sync.js",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "getCurrentUser",
-      "file_type": "code",
-      "norm_label": "cloud-vault-sync.js",
-      "source_file": "js/services/cloud-vault-sync.js",
+      "norm_label": "app.js",
+      "source_file": "js/app.js",
       "source_location": "L1"
     },
     {
-      "id": "js_services_cloud_vault_sync_issyncing",
-      "label": "isSyncing",
+      "id": "js_pwa",
+      "label": "pwa.js",
       "_origin": "ast",
       "community": 2,
-      "community_name": "getCurrentUser",
+      "community_name": "app.js",
       "file_type": "code",
-      "norm_label": "issyncing",
-      "source_file": "js/services/cloud-vault-sync.js",
-      "source_location": "L14"
+      "norm_label": "pwa.js",
+      "source_file": "js/pwa.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "js_views_landing",
+      "label": "landing.js",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "landing.js",
+      "source_file": "js/views/landing.js",
+      "source_location": "L1"
     },
     {
       "id": "scratch_security_check",
@@ -3190,6 +3278,39 @@
       "norm_label": "nodemailer",
       "source_file": "functions/package.json",
       "source_location": "L12"
+    },
+    {
+      "id": "scratch_test_verification",
+      "label": "test_verification.mjs",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "test_verification.mjs",
+      "file_type": "code",
+      "norm_label": "test_verification.mjs",
+      "source_file": "scratch/test_verification.mjs",
+      "source_location": "L1"
+    },
+    {
+      "id": "scratch_test_verification_parsed",
+      "label": "parsed",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "test_verification.mjs",
+      "file_type": "code",
+      "norm_label": "parsed",
+      "source_file": "scratch/test_verification.mjs",
+      "source_location": "L47"
+    },
+    {
+      "id": "scratch_test_verification_testheaders",
+      "label": "testHeaders",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "test_verification.mjs",
+      "file_type": "code",
+      "norm_label": "testheaders",
+      "source_file": "scratch/test_verification.mjs",
+      "source_location": "L16"
     },
     {
       "id": "scratch_generate_icons",
@@ -3764,127 +3885,6 @@
       "source_location": "L60"
     },
     {
-      "id": "firebase_app_js",
-      "label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-      "source_file": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
-    },
-    {
-      "id": "firebase_auth_js",
-      "label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
-      "source_file": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
-    },
-    {
-      "id": "js_auth",
-      "label": "auth.js",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "auth.js",
-      "source_file": "js/auth.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "js_db_db",
-      "label": "db",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "db",
-      "source_file": "js/db.js",
-      "source_location": "L31"
-    },
-    {
-      "id": "js_firebase_config",
-      "label": "firebase-config.js",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "firebase-config.js",
-      "source_file": "js/firebase-config.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "js_firebase_config_firebaseconfig",
-      "label": "firebaseConfig",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "firebaseconfig",
-      "source_file": "js/firebase-config.js",
-      "source_location": "L6"
-    },
-    {
-      "id": "js_parsers_pdf_parser",
-      "label": "pdf-parser.js",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "pdf-parser.js",
-      "source_file": "js/parsers/pdf-parser.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "js_services_gmail_sync",
-      "label": "gmail-sync.js",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "gmail-sync.js",
-      "source_file": "js/services/gmail-sync.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "scratch_test_verification",
-      "label": "test_verification.mjs",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "test_verification.mjs",
-      "source_file": "scratch/test_verification.mjs",
-      "source_location": "L1"
-    },
-    {
-      "id": "scratch_test_verification_parsed",
-      "label": "parsed",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "parsed",
-      "source_file": "scratch/test_verification.mjs",
-      "source_location": "L47"
-    },
-    {
-      "id": "scratch_test_verification_testheaders",
-      "label": "testHeaders",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "auth.js",
-      "file_type": "code",
-      "norm_label": "testheaders",
-      "source_file": "scratch/test_verification.mjs",
-      "source_location": "L16"
-    },
-    {
       "id": "agents_rules_graphify",
       "label": "rules/graphify.md",
       "_origin": "ast",
@@ -3911,6 +3911,30 @@
       "norm_label": "graphify",
       "source_file": ".agents/rules/graphify.md",
       "source_location": "L6"
+    },
+    {
+      "id": "ref_fs",
+      "label": "ref_fs",
+      "_origin": "semantic",
+      "community": 23,
+      "community_name": "test_verification.mjs",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_fs",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_path",
+      "label": "ref_path",
+      "_origin": "semantic",
+      "community": 23,
+      "community_name": "test_verification.mjs",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_path",
+      "source_file": "",
+      "type": "external"
     },
     {
       "id": "csv",
@@ -3961,38 +3985,14 @@
       "type": "external"
     },
     {
-      "id": "ref_fs",
-      "label": "ref_fs",
-      "_origin": "semantic",
-      "community": 8,
-      "community_name": "auth.js",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_fs",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "ref_https",
       "label": "ref_https",
       "_origin": "semantic",
       "community": 8,
-      "community_name": "auth.js",
+      "community_name": "FirebaseAuthService",
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_https",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "ref_path",
-      "label": "ref_path",
-      "_origin": "semantic",
-      "community": 8,
-      "community_name": "auth.js",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_path",
       "source_file": "",
       "type": "external"
     }
@@ -4031,7 +4031,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L699",
+      "source_location": "L701",
       "weight": 1.0
     },
     {
@@ -4043,7 +4043,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L316",
+      "source_location": "L317",
       "weight": 1.0
     },
     {
@@ -4055,24 +4055,24 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L317",
+      "source_location": "L318",
       "weight": 1.0
     },
     {
       "source": "js_app_appcoordinator_handleloginsuccess",
-      "target": "js_services_cloud_vault_sync_cloudvaultsyncservice_pullcloudvault",
+      "target": "js_pwa_dismissiosinstallbanner",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L321",
+      "source_location": "L319",
       "weight": 1.0
     },
     {
       "source": "js_app_appcoordinator_handleloginsuccess",
-      "target": "js_app_appcoordinator_showtoast",
+      "target": "js_services_cloud_vault_sync_cloudvaultsyncservice_pullcloudvault",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4084,7 +4084,7 @@
     },
     {
       "source": "js_app_appcoordinator_handleloginsuccess",
-      "target": "js_services_cloud_vault_sync_cloudvaultsyncservice_initrealtimesync",
+      "target": "js_app_appcoordinator_showtoast",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4096,6 +4096,18 @@
     },
     {
       "source": "js_app_appcoordinator_handleloginsuccess",
+      "target": "js_services_cloud_vault_sync_cloudvaultsyncservice_initrealtimesync",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "js/app.js",
+      "source_location": "L327",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_appcoordinator_handleloginsuccess",
       "target": "js_app_appcoordinator_refreshcurrentview",
       "relation": "calls",
       "_origin": "ast",
@@ -4103,7 +4115,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L326",
+      "source_location": "L328",
       "weight": 1.0
     },
     {
@@ -4115,7 +4127,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L333",
+      "source_location": "L335",
       "weight": 1.0
     },
     {
@@ -4127,7 +4139,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L595",
+      "source_location": "L597",
       "weight": 1.0
     },
     {
@@ -4139,7 +4151,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L597",
+      "source_location": "L599",
       "weight": 1.0
     },
     {
@@ -4151,7 +4163,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L599",
+      "source_location": "L601",
       "weight": 1.0
     },
     {
@@ -4163,7 +4175,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L100",
+      "source_location": "L101",
       "weight": 1.0
     },
     {
@@ -4175,7 +4187,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L102",
+      "source_location": "L103",
       "weight": 1.0
     },
     {
@@ -4324,7 +4336,7 @@
     },
     {
       "source": "js_app_appcoordinator_init",
-      "target": "js_services_cloud_vault_sync_cloudvaultsyncservice_pullcloudvault",
+      "target": "js_pwa_dismissiosinstallbanner",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4336,6 +4348,18 @@
     },
     {
       "source": "js_app_appcoordinator_init",
+      "target": "js_services_cloud_vault_sync_cloudvaultsyncservice_pullcloudvault",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "js/app.js",
+      "source_location": "L70",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_appcoordinator_init",
       "target": "js_services_cloud_vault_sync_cloudvaultsyncservice_initrealtimesync",
       "relation": "calls",
       "_origin": "ast",
@@ -4343,7 +4367,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L75",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -4355,7 +4379,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L92",
+      "source_location": "L93",
       "weight": 1.0
     },
     {
@@ -4367,7 +4391,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L111",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
@@ -4379,7 +4403,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L119",
+      "source_location": "L120",
       "weight": 1.0
     },
     {
@@ -4391,7 +4415,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L243",
+      "source_location": "L244",
       "weight": 1.0
     },
     {
@@ -4403,7 +4427,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L280",
+      "source_location": "L281",
       "weight": 1.0
     },
     {
@@ -4415,7 +4439,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L290",
+      "source_location": "L291",
       "weight": 1.0
     },
     {
@@ -4427,7 +4451,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L293",
+      "source_location": "L294",
       "weight": 1.0
     },
     {
@@ -4439,7 +4463,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L296",
+      "source_location": "L297",
       "weight": 1.0
     },
     {
@@ -4451,7 +4475,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L299",
+      "source_location": "L300",
       "weight": 1.0
     },
     {
@@ -4463,7 +4487,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L302",
+      "source_location": "L303",
       "weight": 1.0
     },
     {
@@ -4475,7 +4499,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L302",
+      "source_location": "L303",
       "weight": 1.0
     },
     {
@@ -4487,7 +4511,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L305",
+      "source_location": "L306",
       "weight": 1.0
     },
     {
@@ -4499,7 +4523,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L308",
+      "source_location": "L309",
       "weight": 1.0
     },
     {
@@ -4511,7 +4535,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L341",
+      "source_location": "L343",
       "weight": 1.0
     },
     {
@@ -4523,7 +4547,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L342",
+      "source_location": "L344",
       "weight": 1.0
     },
     {
@@ -4535,7 +4559,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L364",
+      "source_location": "L366",
       "weight": 1.0
     },
     {
@@ -4547,7 +4571,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L370",
+      "source_location": "L372",
       "weight": 1.0
     },
     {
@@ -4559,7 +4583,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L376",
+      "source_location": "L378",
       "weight": 1.0
     },
     {
@@ -4571,7 +4595,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L382",
+      "source_location": "L384",
       "weight": 1.0
     },
     {
@@ -4583,7 +4607,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L398",
+      "source_location": "L400",
       "weight": 1.0
     },
     {
@@ -4595,7 +4619,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L194",
+      "source_location": "L195",
       "weight": 1.0
     },
     {
@@ -4607,7 +4631,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L665",
+      "source_location": "L667",
       "weight": 1.0
     },
     {
@@ -4619,7 +4643,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L668",
+      "source_location": "L670",
       "weight": 1.0
     },
     {
@@ -4631,7 +4655,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L678",
+      "source_location": "L680",
       "weight": 1.0
     },
     {
@@ -4643,7 +4667,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L442",
+      "source_location": "L444",
       "weight": 1.0
     },
     {
@@ -4655,7 +4679,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L444",
+      "source_location": "L446",
       "weight": 1.0
     },
     {
@@ -4667,7 +4691,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L449",
+      "source_location": "L451",
       "weight": 1.0
     },
     {
@@ -4679,7 +4703,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L459",
+      "source_location": "L461",
       "weight": 1.0
     },
     {
@@ -4691,7 +4715,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L532",
+      "source_location": "L534",
       "weight": 1.0
     },
     {
@@ -4703,7 +4727,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L533",
+      "source_location": "L535",
       "weight": 1.0
     },
     {
@@ -4715,7 +4739,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L535",
+      "source_location": "L537",
       "weight": 1.0
     },
     {
@@ -4727,7 +4751,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L536",
+      "source_location": "L538",
       "weight": 1.0
     },
     {
@@ -4739,7 +4763,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L550",
+      "source_location": "L552",
       "weight": 1.0
     },
     {
@@ -4751,7 +4775,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L568",
+      "source_location": "L570",
       "weight": 1.0
     },
     {
@@ -4763,7 +4787,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L569",
+      "source_location": "L571",
       "weight": 1.0
     },
     {
@@ -4775,7 +4799,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L580",
+      "source_location": "L582",
       "weight": 1.0
     },
     {
@@ -4787,7 +4811,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L581",
+      "source_location": "L583",
       "weight": 1.0
     },
     {
@@ -4799,7 +4823,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "js/app.js",
-      "source_location": "L582",
+      "source_location": "L584",
       "weight": 1.0
     },
     {
@@ -10490,7 +10514,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L689",
+      "source_location": "L691",
       "weight": 1.0
     },
     {
@@ -10908,7 +10932,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/firebase-config.js",
-      "source_location": "L20",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -11073,7 +11097,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/pwa.js",
-      "source_location": "L119",
+      "source_location": "L128",
       "weight": 1.0
     },
     {
@@ -12618,7 +12642,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L108",
+      "source_location": "L109",
       "weight": 1.0
     },
     {
@@ -12629,7 +12653,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L124",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
@@ -12640,7 +12664,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L150",
+      "source_location": "L151",
       "weight": 1.0
     },
     {
@@ -12651,7 +12675,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L193",
+      "source_location": "L194",
       "weight": 1.0
     },
     {
@@ -12662,7 +12686,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L238",
+      "source_location": "L239",
       "weight": 1.0
     },
     {
@@ -12684,7 +12708,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L283",
+      "source_location": "L284",
       "weight": 1.0
     },
     {
@@ -12695,7 +12719,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L315",
+      "source_location": "L316",
       "weight": 1.0
     },
     {
@@ -12706,7 +12730,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L336",
+      "source_location": "L338",
       "weight": 1.0
     },
     {
@@ -12728,7 +12752,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L438",
+      "source_location": "L440",
       "weight": 1.0
     },
     {
@@ -12739,7 +12763,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L590",
+      "source_location": "L592",
       "weight": 1.0
     },
     {
@@ -12750,7 +12774,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L607",
+      "source_location": "L609",
       "weight": 1.0
     },
     {
@@ -12761,7 +12785,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "js/app.js",
-      "source_location": "L632",
+      "source_location": "L634",
       "weight": 1.0
     },
     {
